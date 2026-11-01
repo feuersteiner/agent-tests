@@ -11,8 +11,7 @@
     "check": "bun run --workspaces check && tsc -p examples/tsconfig.json",
     "example:check": "vitest run --config vitest.checks.config.mts",
     "example:evals": "vitest run --config vitest.evals.config.mts",
-    "pack": "bun run build && cd core && npm pack",
-    "library:verify": "node --test scripts/validate-upvotes.test.mjs"
+    "pack": "bun run build && cd core && npm pack"
   },
   "devDependencies": {
     "@types/node": "^22",

@@ -1,175 +1,220 @@
 # agent-tests
 
-Turn recurring agent mistakes and review lessons into reusable repository checks.
+Linting for intelligence: turn fuzzy business and code rules into tests.
 
-Learn a rule during an agent session, save it as a check, and verify future changes against it. Each result should explain what was checked, what was found, and what needs attention.
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/kESK4bgEPW)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**Status:** design stage. No CLI implementation is available yet. The behavior below describes the intended product; file formats and command syntax remain undecided.
+An agent test is a rule your codebase must follow, packaged so a person, an agent,
+or CI can check it. Triggers pick the files the rule applies to; checks judge them.
+Both use globs and regex where a pattern is enough, and a decision model where the
+rule needs judgment. Tests report findings and never modify your code.
 
-## Scope
+**Status:** WIP 🚧
 
-Agent-tests is a CLI for checks only. Checks inspect a repository, selected files, or a proposed change without modifying the target.
+## Example
 
-Examples:
+Your app's interface must be in French, but agents keep adding English strings.
+A test is two files in `.agents/tests/user-text-french/`. `TEST.md` states the rule
+in plain prose:
 
-- Component filenames follow PascalCase.
-- Files under billing do not import UI utilities.
-- API handlers validate inputs before using them.
-- A component directory contains the required files.
-- User-facing text is written in French.
-- A change preserves a rule learned during an earlier review.
-
-Checks return findings and recovery guidance. Creating files, rewriting content, and applying fixes belong to actions outside agent-tests.
-
-## Workflow
-
-1. An agent or reviewer identifies a rule worth preserving.
-2. An agent translates the rule into a reusable check with examples and expected outcomes.
-3. The check is validated against those examples before reuse.
-4. Relevant checks are selected for a repository area, task, or change.
-5. The CLI executes them and reports results with supporting evidence.
-6. New review lessons become additional checks or improvements to existing ones.
-
-The intended CLI covers installing, validating, running, and reporting checks. Optional sharing through a GitHub registry remains under consideration.
-
-## Check definitions
-
-A check needs:
-
-- A stable name and a plain-language description of the rule.
-- An applicability scope, such as paths, repository areas, or types of changes.
-- The inputs and execution method needed to evaluate it.
-- Explicit pass, fail, and any warning criteria.
-- Evidence to include in a finding and guidance for addressing a failure.
-- Test fixtures with expected results, including passing and failing examples.
-
-The exact package layout and definition format remain open.
-
-## Execution
-
-Checks may use deterministic logic such as regex, text matching, structural inspection, or scripts; Jev / decision models; or an LLM evaluator. A check only needs the methods appropriate to its rule.
-
-Deterministic regex construction from structured rules and literal regex written by an agent are both supported design goals. Either form needs examples that validate its behavior.
-
-Model-based checks need explicit evaluation criteria. Model configuration, method selection, escalation, and handling uncertain results remain to be specified; automatic fallback is not assumed.
-
-Existing test frameworks may supply evidence through adapters or commands where their execution can preserve the read-only target contract.
-
-## Results
-
-| Result | Meaning |
-| --- | --- |
-| Passed | The check applied and the target met the rule. |
-| Failed | The check applied and found a violation. |
-| Warning | The check applied and found an explicitly defined advisory issue. |
-| Irrelevant | The check did not apply to the target or change. |
-
-An execution error is separate from these results. Missing inputs, unavailable providers, and invalid evaluator responses must not be reported as passing checks. Uncertainty must be reported explicitly rather than treated as success or irrelevance.
-
-Results should be available to people and agents. Findings identify the check, affected paths or locations, expected behavior, observed evidence, and useful correction guidance. Output schemas and exit codes remain undecided.
-
-## Relationship to nippet
-
-**Agent-tests checks; nippet acts.** Agent-tests evaluates conventions and changes. Nippet creates or transforms files, folders, names, and text.
-
-Neither CLI requires the other. Both may eventually consume shared infrastructure for model adapters, YAML/schema utilities, and structured errors. No shared library exists yet; extraction should follow demonstrated implementation needs.
-
-## Setup and verification
-
-This repository is a Bun workspace with two packages:
-
-- `core/`: the library scaffold, created with `bun init --yes core`. No CLI implementation exists yet.
-- `docs/`: a Svelte 5 / SvelteKit site using [Bref-ui](https://github.com/feuersteiner/bref-ui), created with `bunx sv@latest create docs --template minimal --types ts --no-add-ons --no-install`.
-
-Use Bun 1.3.4 or newer. Run commands from the repository root:
-
-```sh
-bun install           # install both workspaces with one lockfile
-bun run dev           # start the docs site
-bun run check         # type-check core and docs
-bun run build         # build the docs site
-bun run preview       # preview the docs build
+```md
+All user-facing text is written in French. Examples, exceptions, and how to fix a
+violation...
 ```
 
-For a reproducible installation, use `bun install --frozen-lockfile`.
+`test.yaml`, written by an agent from `TEST.md`, holds everything that runs:
 
-### Packaging and publishing
-
-The root `README.md` and MIT `LICENSE` are the source documents. The core
-package's `prepack` hook copies both into `core/` before `npm pack` or
-`npm publish`. These generated copies are ignored by Git.
-
-```sh
-bun run --cwd core prepack        # copy the root README and license
-bun run pack                     # create the npm package in core/
-(cd core && npm pack --dry-run)   # inspect package contents without publishing
-BASE_PATH=/agent-tests bun run build # verify the GitHub Pages build locally
+```yaml
+id: user-text-french
+title: User text in French
+description: User-facing text is written in French.
+triggers:
+  path:
+    match: ["src/**/*.svelte", "src/**/*.html"]
+  content:
+    ask: "This file contains text displayed to an end user."
+checks:
+  - id: french-only
+    message: User-facing text is not in French.
+    fix: Translate the text into French.
+    smart:
+      ask: "Quote each piece of user-facing text that is not in French."
+evals:
+  - name: English button label
+    path: src/lib/Save.svelte
+    content: <button>Save</button>
+    expect: fail
 ```
 
-The workflows follow [Bref-ui's release setup](https://github.com/feuersteiner/bref-ui/tree/main/.github/workflows):
+Only Svelte and HTML files that a decision model judges to contain user-facing text
+are inspected. Every other file is skipped without a model call.
 
-- `.github/workflows/docs.yml` deploys `docs/build` on pushes to `main` or manual dispatch. Set the repository's **Settings → Pages → Source** to **GitHub Actions**. The workflow supplies the Pages base path, including `/agent-tests` for the default project URL.
-- `.github/workflows/publish-core.yml` publishes when `core/package.json` changes on `main`, or on manual dispatch, then creates an `agent-tests@<version>` GitHub release. Bump the core version for each release; npm rejects already published versions.
+## Where it runs
 
-Configure an [npm trusted publisher](https://docs.npmjs.com/trusted-publishers/)
-for package `agent-tests`, GitHub owner `feuersteiner`, repository `agent-tests`,
-and workflow filename `publish-core.yml`, with direct publishing enabled.
-If the package does not exist yet, publish the first version manually from
-`core/` with `npm publish --access public` using an authorized npm account,
-then configure its trusted publisher. CI uses OIDC and requires no npm token.
-Node.js 24 and its npm CLI are used for publishing and package verification;
-Bun manages workspace dependencies.
+- **While an agent works:** on the files it just edited.
+- **Before a commit:** on uncommitted changes.
+- **In CI:** on the whole repository, like `eslint .` or `prettier --check .`.
+- **In a test suite:** through Vitest, as pass/fail tests.
+- **In your own tools:** as a library from the npm package.
 
-### Logo concept
+## Get started (WIP)
 
-Run `python3 -m http.server 8000` from the repository root, then open
-`http://localhost:8000/logo.html`. No build or installation is required; Google
-Fonts supplies the Material Symbols shield and typeface, so internet access is required.
-Verify the logo on desktop and mobile, and use the accent swatches to preview colors.
-The pixel-art variant is at `http://localhost:8000/logo-pixel.html`; its shield
-uses a CSS pixel grid and does not require the Material Symbols font.
-Compare square eyes, terminal typography, reversed, and monochrome treatments at
-`http://localhost:8000/logo-terminal.html`. These studies use a custom SVG shield
-matching the original Material shield's crest, shoulders, 96-unit width and tip.
-Each flank joins tangent arcs with Fibonacci radii of 89 and 55; their centers
-are 34 units apart. Verify all four studies fit desktop and mobile widths.
-Enable “Show Fibonacci circles” to inspect the 144-unit shield frame, 21-unit
-eyes, 13-unit eye gap and dash width, and 3-unit dash thickness. Verify the
-construction toggle at desktop and mobile widths: blue circles construct the
-shield and gold circles construct the face. No build step is required.
-The locked brand palette is police blue `#102D50`, silver `#A9B8C8`, and
-off-white `#F3F6F9`. Use police blue on off-white and off-white on police blue;
-the dark presentation background is `#091522`.
+Not published yet.
 
-### Bref-ui theme
+```sh
+npm install -D agent-tests
+npx agent-tests init                          # config, .agents/tests/, pre-commit hook
+npx agent-tests add user-text-french          # install a community test at the root
+npx agent-tests add user-text-french apps/web # install it for apps/web/ only
+npx agent-tests validate user-text-french     # check a local test's structure
+npx agent-tests list                          # installed tests as a directory tree
+npx agent-tests targets user-text-french      # files that test would inspect
+npx agent-tests eval user-text-french         # run its labeled examples
+npx agent-tests run                           # check the whole repository
+npx agent-tests run --changed                 # uncommitted files
+npx agent-tests run --staged                  # pre-commit
+npx agent-tests run --base main               # pull requests
+npx agent-tests docs                          # skills that teach agents to write and run tests
+```
 
-`docs/src/lib/theme.ts` defines all nine Bref-ui semantic colors for light and
-dark modes, supplied to the root `<Theme>` component. Light mode uses police
-blue for primary controls; dark mode uses a stronger police blue `#4080BF` on
-near-black `#080C12` surfaces with a subtle blue undertone. Status colors use
-terminal green, amber, and red, with
-brighter Matrix-inspired colors in dark mode and darker equivalents in light mode.
-Secondary controls use police steel blue: `#2D5278` in light mode and `#557FA9`
-in dark mode. Silver remains the dark-mode muted text color; off-white anchors
-light surfaces and dark-mode foreground text.
+Choose the decision model (Jev, Clef, or OpenAI) in `agent-tests.config.yaml`
+and keep its credentials in `.env`.
 
-Run `bun run dev` and open `/theme/` to compare both palettes with real Bref-ui
-buttons, disabled states, status pills, and token swatches. Verify with
-`bun run check` and `bun run build`. The two preview panels use `data-theme`;
-the rest of the site follows the system color preference.
+## Triggers
 
-### Brand reference and typography
+Design locked; implementation WIP.
 
-`docs/brand.html` collects the circular logo presentation and Fibonacci guides,
-both approved semantic palettes, and the selected Menlo typography, matching
-VS Code's default editor font on macOS. The font stack is
-`Menlo, Monaco, 'Courier New', monospace`; no web font download is required.
+Triggers decide, per file, whether a test inspects it: yes or no. A trigger reads
+a file's `path`, its `content`, or both, and every filter it names must pass, in
+the order written. A list of triggers holds alternatives.
 
-The `docs/static/brand.html` symlink includes this reference in the docs build.
-Run `bun run dev` and open `/brand.html`, or use the repository's Python server
-at `http://localhost:8000/docs/brand.html`. Verify the construction checkbox,
-light/dark view button, and the Menlo wordmark. Use `bun run build` to
-verify inclusion in the published docs.
+- `path.match`: a glob on the path.
+- `path.ask`: a decision model judging the path.
+- `content.match`: a regex on the file text.
+- `content.ask`: a decision model judging the file text.
+
+```yaml
+# .agents/tests/brand-messaging/test.yaml: customer-facing copy follows Acme's brand voice.
+triggers:
+  # Marketing pages are always brand copy: a glob is enough.
+  - path:
+      match: ["content/**/*.md", "src/routes/(marketing)/**/*.svelte"]
+  # Elsewhere, cheap filters first and models last.
+  - path:
+      match: ["src/**/*.svelte", "emails/**/*.html"]
+      ask: "This path belongs to a customer-facing page, component, or email."
+    content:
+      match: "[Aa]cme"
+      ask: "This file contains product or marketing copy shown to customers."
+```
+
+Like `AGENTS.md`, any directory can have its own `.agents/tests/`. Its tests apply
+inside that directory, in addition to tests from parent directories, and its
+`.agents/tests/config.yaml` can opt out of specific parent tests.
+
+## Compilation
+
+Design locked; implementation WIP.
+
+Your agent turns `TEST.md` into `test.yaml`. `agent-tests compile <id>` hands it the
+rule, a test-generator skill, and your repository layout; the agent writes the
+triggers, checks, and evals, then loops on `agent-tests validate` and
+`agent-tests eval` until they pass. Edit `test.yaml` by hand whenever you like.
+When `TEST.md` changes, `validate` flags `test.yaml` as stale until it is recompiled.
+Library tests ship already compiled; after `add`, your agent adapts them to your
+repository.
+
+## Checks
+
+Design locked; implementation WIP.
+
+Checks judge each targeted file and report pass, warning, or error findings, through
+the CLI, Vitest, or the library. A check runs from `fast` to `smart` to `deep`,
+cheapest first, and escalates only what it cannot settle:
+
+```yaml
+# .agents/tests/brand-messaging/test.yaml
+checks:
+  - id: no-familiar-language
+    message: Copy uses familiar language.
+    fix: Rewrite in Acme's formal voice; see TEST.md.
+    human-tiebreak: true # if deep stays unsure, a person decides
+    fast: # patterns, no model
+      match: # any match fails
+        - '\b(gonna|wanna|gotta)\b'
+      maybe: # weak signal: a match escalates, with the hits as hints
+        - '\b(hey|awesome|folks|no worries)\b'
+    smart: # classifier such as Jev or Clef
+      ask: "Quote each phrase in this copy that uses familiar or casual language."
+      bounds: [0.3, 0.8] # below: pass, between: unsure, above: likely violation
+    deep: # structured LLM call, the final word
+      ask: "Judge each quoted phrase against the brand voice in TEST.md."
+      reasoning: medium # low, medium, or high
+```
+
+- **`fast`** fails on a `match`. A `maybe` hit escalates, and so does no hit when
+  `smart` or `deep` exists. The agent writes the patterns; `agent-tests validate`
+  checks them against the evals and flags risky ones. Patterns are regex today,
+  with room for other pattern types later.
+- **`smart`** passes, escalates, or flags violations by confidence bounds,
+  quoting each instance it finds.
+- **`deep`** confirms every violation a model flagged, with the `reasoning` effort
+  the check sets. If it stays unsure, the CLI shows a warning, or a person
+  reviews it with `human-tiebreak: true`.
+- A check uses only the levels it needs, and `maybe`, `bounds`, and `reasoning`
+  are optional. **Custom Vitest checks** pass or fail only; they never escalate.
+
+Every finding names its test, check, level, file, and line, with the fix:
+
+```text
+src/routes/+page.svelte:12:5  error  "Hey folks!" uses familiar language
+  brand-messaging/no-familiar-language (deep): Rewrite in Acme's formal voice.
+```
+
+## Evals
+
+Design locked; implementation WIP.
+
+Benchmarks that show whether a newer model or a regenerated test still makes the
+approved decisions before you upgrade. Each test keeps labeled examples under
+`evals` in its `test.yaml`:
+
+```yaml
+evals:
+  - name: casual greeting on the homepage
+    path: src/routes/+page.svelte
+    content: <h1>Hey folks! Welcome to Acme.</h1>
+    expect: fail
+  - name: formal copy
+    path: src/routes/about/+page.svelte
+    content: <p>Acme provides enterprise-grade testing.</p>
+    expect: pass
+  - name: billing code is not copy
+    path: src/billing/charge.ts
+    content: "export const charge = (cents: number) => cents;"
+    expect: skip # the triggers should not select it
+```
+
+`expect` is `pass`, `fail`, `unsure`, or `skip`. `agent-tests eval <id>` runs the real triggers and checks on every example and reports any that disagree.
+
+## Community library
+
+The [`library/`](library/AGENTS.md) directory is a shared catalog of tests. Anyone can contribute one with a pull request containing its `TEST.md`, credited to the author's GitHub profile, and its compiled `test.yaml`. Every PR is screened for malware and prompt injection, and accounts that attempt either are banned. Every test merged into `main` is available to `npx agent-tests add [test-id]`.
+
+Add your vote to the test's `score.csv`. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
+
+## Repository structure
+
+- [`core`](core): the `agent-tests` npm package.
+- [`docs`](docs): the documentation site, built with [Bref-ui](https://github.com/feuersteiner/bref-ui).
+- [`library`](library): community tests.
+- [`usecases.md`](usecases.md): proposed use cases.
+
+## Community and contributing
+
+For questions and ideas, join [Discord](https://discord.gg/kESK4bgEPW). Report bugs
+and suggest features through [GitHub Issues](https://github.com/feuersteiner/agent-tests/issues).
 
 ## License
 
