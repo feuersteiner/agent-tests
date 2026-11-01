@@ -128,15 +128,48 @@ Fonts supplies the Material Symbols shield and typeface, so internet access is r
 Verify the logo on desktop and mobile, and use the accent swatches to preview colors.
 The pixel-art variant is at `http://localhost:8000/logo-pixel.html`; its shield
 uses a CSS pixel grid and does not require the Material Symbols font.
-Compare square eyes, terminal typography, green, and monochrome at
+Compare square eyes, terminal typography, reversed, and monochrome treatments at
 `http://localhost:8000/logo-terminal.html`. These studies use a custom SVG shield
-with a Material-inspired pointed crest, sloped shoulders, 110-unit (2 × 55) width and
-89-unit flank radii. Verify all four studies
-fit desktop and mobile widths.
+matching the original Material shield's crest, shoulders, 96-unit width and tip.
+Each flank joins tangent arcs with Fibonacci radii of 89 and 55; their centers
+are 34 units apart. Verify all four studies fit desktop and mobile widths.
 Enable “Show Fibonacci circles” to inspect the 144-unit shield frame, 21-unit
 eyes, 13-unit eye gap and dash width, and 3-unit dash thickness. Verify the
 construction toggle at desktop and mobile widths: blue circles construct the
 shield and gold circles construct the face. No build step is required.
+The locked brand palette is police blue `#102D50`, silver `#A9B8C8`, and
+off-white `#F3F6F9`. Use police blue on off-white and off-white on police blue;
+the dark presentation background is `#091522`.
+
+### Bref-ui theme
+
+`docs/src/lib/theme.ts` defines all nine Bref-ui semantic colors for light and
+dark modes, supplied to the root `<Theme>` component. Light mode uses police
+blue for primary controls; dark mode uses a stronger police blue `#4080BF` on
+near-black `#080C12` surfaces with a subtle blue undertone. Status colors use
+terminal green, amber, and red, with
+brighter Matrix-inspired colors in dark mode and darker equivalents in light mode.
+Secondary controls use police steel blue: `#2D5278` in light mode and `#557FA9`
+in dark mode. Silver remains the dark-mode muted text color; off-white anchors
+light surfaces and dark-mode foreground text.
+
+Run `bun run dev` and open `/theme/` to compare both palettes with real Bref-ui
+buttons, disabled states, status pills, and token swatches. Verify with
+`bun run check` and `bun run build`. The two preview panels use `data-theme`;
+the rest of the site follows the system color preference.
+
+### Brand reference and typography
+
+`docs/brand.html` collects the circular logo presentation and Fibonacci guides,
+both approved semantic palettes, and the selected Menlo typography, matching
+VS Code's default editor font on macOS. The font stack is
+`Menlo, Monaco, 'Courier New', monospace`; no web font download is required.
+
+The `docs/static/brand.html` symlink includes this reference in the docs build.
+Run `bun run dev` and open `/brand.html`, or use the repository's Python server
+at `http://localhost:8000/docs/brand.html`. Verify the construction checkbox,
+light/dark view button, and the Menlo wordmark. Use `bun run build` to
+verify inclusion in the published docs.
 
 ## License
 

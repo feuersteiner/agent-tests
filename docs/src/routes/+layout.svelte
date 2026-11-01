@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Theme } from 'bref-ui';
+	import { palette } from '#lib/theme.ts';
 	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 
@@ -10,6 +11,6 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<Theme />
+<Theme {palette} />
 
 {@render children()}
