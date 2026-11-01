@@ -1,0 +1,100 @@
+name: Library add
+
+# Checks PRs that add a test to library/ against library/AGENTS.md. Runs from
+# the default branch and reads the PR as Git data: nothing from it is run.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+
+jobs:
+  add:
+    name: Library add
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      BASE: ${{ github.event.pull_request.base.sha }}
+      HEAD: ${{ github.event.pull_request.head.sha }}
+      AUTHOR: ${{ github.event.pull_request.user.login }}
+      LC_ALL: C.UTF-8
+      HIDDEN: '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{206F}\x{FEFF}\x{E0000}-\x{E007F}]|<!--|<script|[A-Za-z0-9+/]{80,}'
+      INJECTION: 'ignore (all |any )?(previous|prior|above) instructions|system prompt|you are now|jailbreak|developer mode|do not (tell|reveal)|exfiltrat|(curl|wget) |rm -rf|process\.env|api key|password'
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Find the new test
+        run: |
+          git fetch --quiet origin "refs/pull/$PR/head"
+          git diff --name-status --no-renames "$(git merge-base "$BASE" "$HEAD")" "$HEAD" > changes
+          dir=$(cut -f2 changes | grep -v 'score\.csv$' | grep -oE '^library/[^/]+/' | head -n1 || true)
+          if [ -n "$dir" ] && ! git cat-file -e "$BASE:${dir}TEST.md" 2> /dev/null; then
+            echo "DIR=$dir" >> "$GITHUB_ENV"
+            mkdir pr
+            git show "$HEAD:${dir}TEST.md" > pr/TEST.md || true
+            git show "$HEAD:${dir}test.yaml" > pr/test.yaml || true
+          fi
+
+      - name: Contains no hidden or encoded content
+        if: env.DIR
+        run: |
+          if grep -nP "$HIDDEN" pr/TEST.md pr/test.yaml; then
+            gh pr edit "$PR" --add-label security-flagged
+            gh pr close "$PR" --comment "Closed for hidden or encoded content. Attempts at malware or prompt injection lead to a ban."
+            exit 1
+          fi
+
+      - name: Revoke clearance after new commits
+        if: env.DIR && github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'security-cleared')
+        run: gh pr edit "$PR" --remove-label security-cleared
+
+      - name: Contains no prompt injection, unless a maintainer cleared it
+        if: env.DIR
+        env:
+          CLEARED: ${{ github.event.action != 'synchronize' && contains(github.event.pull_request.labels.*.name, 'security-cleared') }}
+        run: |
+          if grep -noiE "$INJECTION" pr/TEST.md pr/test.yaml && [ "$CLEARED" != true ]; then
+            gh pr edit "$PR" --add-label security-review
+            echo "::error::Possible prompt injection: a maintainer must review it and add security-cleared."
+            exit 1
+          fi
+
+      - name: Adds only TEST.md and test.yaml, in one kebab-case directory
+        if: env.DIR
+        run: |
+          printf 'A\t%s\n' "${DIR}TEST.md" "${DIR}test.yaml" | diff - <(sort changes)
+          [[ "$DIR" =~ ^library/[a-z0-9]+(-[a-z0-9]+)*/$ ]]
+
+      - name: Credits the author
+        if: env.DIR
+        run: |
+          credit="By [$AUTHOR](https://github.com/$AUTHOR)"
+          [ "$(head -n1 pr/TEST.md)" = "$credit" ] || { echo "::error::TEST.md must start with: $credit"; exit 1; }
+
+      - name: Links only to the author's profile
+        if: env.DIR
+        run: |
+          ! tail -n +2 pr/TEST.md | cat - pr/test.yaml | grep -ni 'https\?://'
+
+      - name: Compiles test.yaml from TEST.md in the library format
+        if: env.DIR
+        working-directory: pr
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+          yq . test.yaml > /dev/null || fail "test.yaml is not valid YAML."
+          [ "$(yq .id test.yaml)" = "$(basename "$DIR")" ] || fail "id must match the directory."
+          [ "$(yq .source test.yaml)" = "sha256:$(sha256sum TEST.md | cut -d' ' -f1)" ] || fail "source must be the SHA-256 of TEST.md."
+          [ "$(yq '[.checks[] | select(has("vitest"))] | length' test.yaml)" = 0 ] || fail "Library tests are declarative: no vitest."
+          for expect in fail pass skip; do
+            [ "$(yq "[.evals[] | select(.expect == \"$expect\")] | length" test.yaml)" -gt 0 ] || fail "evals need a $expect example."
+          done

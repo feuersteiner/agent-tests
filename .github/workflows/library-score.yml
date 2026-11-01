@@ -1,0 +1,69 @@
+name: Library score
+
+# Checks vote PRs against library/AGENTS.md. Runs from the default branch and
+# reads the PR as Git data: nothing from the PR is checked out or run.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  score:
+    name: Library score
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PR: ${{ github.event.pull_request.number }}
+      BASE: ${{ github.event.pull_request.base.sha }}
+      HEAD: ${{ github.event.pull_request.head.sha }}
+      AUTHOR: ${{ github.event.pull_request.user.login }}
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Find the vote
+        run: |
+          git fetch --quiet origin "refs/pull/$PR/head"
+          git diff --name-status --no-renames "$(git merge-base "$BASE" "$HEAD")" "$HEAD" > changes
+          csv=$(cut -f2 changes | grep 'score\.csv$' | head -n1 || true)
+          echo "CSV=$csv" >> "$GITHUB_ENV"
+
+      - name: Changes one score.csv and nothing else
+        if: env.CSV
+        run: |
+          [ "$(wc -l < changes)" = 1 ]
+          grep -qP '^[AM]\tlibrary/[a-z0-9-]+/score\.csv$' changes
+
+      - name: Votes for a test that exists on main
+        if: env.CSV
+        run: git cat-file -e "$BASE:$(dirname "$CSV")/test.yaml"
+
+      - name: Keeps score.csv well formed
+        if: env.CSV
+        run: |
+          git show "$HEAD:$CSV" > after.csv
+          tail -n +2 after.csv > after
+          # Header, then one GitHub handle per row: no @, quotes, or blank rows.
+          [ "$(head -n1 after.csv)" = github_handle ]
+          [ -z "$(grep -vxE '[A-Za-z0-9]+(-[A-Za-z0-9]+)*' after)" ]
+          # Each handle appears once, ignoring case.
+          [ -z "$(sort -f after | uniq -di)" ]
+
+      - name: Adds or removes exactly one row, the author's own
+        if: env.CSV
+        run: |
+          (git show "$BASE:$CSV" 2> /dev/null || echo github_handle) | tail -n +2 > before
+          change=$(diff before after | grep '^[<>] ' || true)
+          if [ "$(grep -c . <<< "$change")" != 1 ]; then
+            echo "::error::Add or remove exactly one row; leave every other row untouched."
+            exit 1
+          fi
+          if [ "${change:2,,}" != "${AUTHOR,,}" ]; then
+            echo "::error::Only you can add or remove yourself: the row is ${change:2}, the author is $AUTHOR."
+            exit 1
+          fi
