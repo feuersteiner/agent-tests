@@ -1,20 +1,9 @@
 # agent-tests docs
 
-Svelte 5 / SvelteKit scaffold using Bref-ui. `Theme` is mounted in the root layout.
+The documentation site, built with Svelte 5, SvelteKit, and
+[Bref-ui](https://github.com/feuersteiner/bref-ui). It deploys to GitHub Pages
+on every push to `main`.
 
-Run from the repository root:
+## Pages
 
-```sh
-bun install
-bun run dev
-bun run check
-bun run build
-bun run preview
-```
-
-Created with:
-
-```sh
-bunx sv@latest create docs --template minimal --types ts --no-add-ons --no-install
-bun add --cwd docs bref-ui@latest
-```
+WIP

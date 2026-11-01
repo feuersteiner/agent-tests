@@ -1,6 +1,12 @@
 # agent-tests agent guide
 
-- Read README.md before editing.
-- Keep changes scoped to this open-source item.
-- Keep credentials and runtime data out of Git.
-- Document setup and verification commands in README.md.
+## Layout
+
+- `core/`: the `agent-tests` npm package.
+- `docs/`: the documentation site.
+- `library/`: community tests and their binding rules.
+- `.github/workflows/`: docs deploy, npm publish, and library PR checks.
+
+## Ethos
+
+WIP
