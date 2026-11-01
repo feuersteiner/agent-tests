@@ -6,9 +6,17 @@
   "workspaces": ["core", "docs"],
   "scripts": {
     "dev": "bun run --cwd docs dev",
-    "build": "bun run --cwd docs build",
+    "build": "cp README.md LICENSE core/ && bun run --cwd docs build",
     "preview": "bun run --cwd docs preview",
-    "check": "bun run --workspaces check",
-    "pack": "cd core && npm pack"
+    "check": "bun run --workspaces check && tsc -p examples/tsconfig.json",
+    "example:check": "vitest run --config vitest.checks.config.mts",
+    "example:evals": "vitest run --config vitest.evals.config.mts",
+    "pack": "bun run build && cd core && npm pack",
+    "library:verify": "node --test scripts/validate-upvotes.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
   }
 }
