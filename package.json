@@ -1,0 +1,14 @@
+{
+  "name": "agent-tests-workspace",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "bun@1.3.4",
+  "workspaces": ["core", "docs"],
+  "scripts": {
+    "dev": "bun run --cwd docs dev",
+    "build": "bun run --cwd docs build",
+    "preview": "bun run --cwd docs preview",
+    "check": "bun run --workspaces check",
+    "pack": "cd core && npm pack"
+  }
+}

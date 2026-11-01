@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>agent-tests · Logo concept</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:FILL@1&amp;display=block" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; --accent: #c4f56a; --ink: #181b17; --paper: #f1f2eb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #11130f; color: var(--paper); font-family: "DM Sans", sans-serif; }
+    main { max-width: 1120px; padding: 40px; margin: auto; }
+    header, footer { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+    header { color: #a3a79b; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+    .status { display: flex; align-items: center; gap: 8px; }
+    .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .hero { min-height: 460px; display: grid; place-content: center; justify-items: center; text-align: center; }
+    /* The shield is a filled Material Symbol; two CSS cutouts create the bot eyes. */
+    .bot-shield { --size: 160px; --shield: var(--accent); --eyes: var(--ink); position: relative; display: inline-block; width: var(--size); height: var(--size); flex-shrink: 0; }
+    .bot-shield::before { content: "shield"; position: absolute; inset: 0; font-family: "Material Symbols Rounded"; font-weight: 400; font-style: normal; font-size: var(--size); line-height: 1; letter-spacing: normal; text-transform: none; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-feature-settings: "liga"; font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 48; color: var(--shield); }
+    .eyes { position: absolute; top: 38%; left: 32%; width: 36%; height: 16%; display: flex; justify-content: space-between; }
+    .eyes::before, .eyes::after { content: ""; width: 30%; height: 100%; background: var(--eyes); border-radius: 99px; }
+    h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1; margin: 21px 0 17px; font-weight: 600; letter-spacing: -.065em; }
+    .hero p { margin: 0; color: #989e8e; font-size: 15px; letter-spacing: -.01em; }
+    .variants { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .tile { height: 192px; padding: 22px; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between; }
+    .tile-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+    .light { background: var(--paper); color: var(--ink); }
+    .light .bot-shield { --shield: var(--ink); --eyes: var(--paper); }
+    .accent { background: var(--accent); color: var(--ink); }
+    .accent .bot-shield { --shield: var(--ink); --eyes: var(--accent); }
+    .dark { background: #20241c; color: var(--paper); }
+    .lockup { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; font-size: clamp(18px, 2.3vw, 25px); letter-spacing: -.055em; font-weight: 600; }
+    .lockup .bot-shield { --size: 48px; }
+    .app-icon { background: var(--ink); width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center; }
+    .app-icon .bot-shield { --size: 54px; --shield: var(--accent); --eyes: var(--ink); }
+    .sizes { display: flex; justify-content: center; align-items: center; gap: 20px; flex: 1; }
+    .sizes .bot-shield:nth-child(1) { --size: 24px; }
+    .sizes .bot-shield:nth-child(2) { --size: 36px; }
+    .sizes .bot-shield:nth-child(3) { --size: 52px; }
+    footer { margin-top: 28px; color: #858c7c; font-size: 11px; }
+    footer a { color: inherit; text-decoration-color: #454b3d; text-underline-offset: 3px; }
+    .palette { display: flex; align-items: center; gap: 7px; }
+    button { width: 23px; height: 23px; border: 3px solid #11130f; border-radius: 50%; background: var(--swatch); cursor: pointer; }
+    button[aria-pressed="true"] { outline: 1px solid #929a85; }
+    button:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+    @media (max-width: 640px) {
+      main { padding: 25px 20px; }
+      header { font-size: 10px; }
+      .hero { min-height: 390px; }
+      .variants { grid-template-columns: 1fr; }
+      .tile { height: 170px; }
+      .lockup { font-size: 25px; }
+      footer { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header><span>agent-tests / identity</span><span class="status">Concept 01</span></header>
+    <section class="hero" aria-label="Primary logo">
+      <span class="bot-shield" role="img" aria-label="Security shield with two robot eyes"><span class="eyes" aria-hidden="true"></span></span>
+      <h1>agent-tests</h1>
+      <p>Lessons learned. Regressions stopped.</p>
+    </section>
+    <section class="variants" aria-label="Logo applications">
+      <article class="tile light">
+        <span class="tile-label">01 / Wordmark</span>
+        <div class="lockup"><span class="bot-shield" aria-hidden="true"><span class="eyes"></span></span><span>agent-tests</span></div>
+      </article>
+      <article class="tile accent">
+        <span class="tile-label">02 / App icon</span>
+        <div class="lockup"><span class="app-icon" role="img" aria-label="Agent-tests app icon"><span class="bot-shield" aria-hidden="true"><span class="eyes"></span></span></span></div>
+      </article>
+      <article class="tile dark">
+        <span class="tile-label">03 / Small sizes</span>
+        <div class="sizes" role="img" aria-label="Shield logo at 24, 36, and 52 pixels">
+          <span class="bot-shield" aria-hidden="true"><span class="eyes"></span></span>
+          <span class="bot-shield" aria-hidden="true"><span class="eyes"></span></span>
+          <span class="bot-shield" aria-hidden="true"><span class="eyes"></span></span>
+        </div>
+      </article>
+    </section>
+    <footer>
+      <span><a href="https://developers.google.com/fonts/docs/material_symbols">Material Symbols</a> shield + bot eyes</span>
+      <div class="palette" role="group" aria-label="Accent color">
+        <span>Accent</span>
+        <button type="button" style="--swatch: #c4f56a" aria-label="Lime" aria-pressed="true" data-color="#c4f56a"></button>
+        <button type="button" style="--swatch: #83d8f5" aria-label="Ice blue" aria-pressed="false" data-color="#83d8f5"></button>
+        <button type="button" style="--swatch: #c9b6ff" aria-label="Lavender" aria-pressed="false" data-color="#c9b6ff"></button>
+      </div>
+    </footer>
+  </main>
+  <script>
+    document.querySelectorAll('[data-color]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.documentElement.style.setProperty('--accent', button.dataset.color);
+        document.querySelectorAll('[data-color]').forEach(swatch => {
+          swatch.setAttribute('aria-pressed', String(swatch === button));
+        });
+      });
+    });
+  </script>
+</body>
+</html>

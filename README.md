@@ -76,4 +76,68 @@ Neither CLI requires the other. Both may eventually consume shared infrastructur
 
 ## Setup and verification
 
-There are no installation, build, or test commands yet. Executable setup and verification commands will be documented here when implementation begins.
+This repository is a Bun workspace with two packages:
+
+- `core/`: the library scaffold, created with `bun init --yes core`. No CLI implementation exists yet.
+- `docs/`: a Svelte 5 / SvelteKit site using [Bref-ui](https://github.com/feuersteiner/bref-ui), created with `bunx sv@latest create docs --template minimal --types ts --no-add-ons --no-install`.
+
+Use Bun 1.3.4 or newer. Run commands from the repository root:
+
+```sh
+bun install           # install both workspaces with one lockfile
+bun run dev           # start the docs site
+bun run check         # type-check core and docs
+bun run build         # build the docs site
+bun run preview       # preview the docs build
+```
+
+For a reproducible installation, use `bun install --frozen-lockfile`.
+
+### Packaging and publishing
+
+The root `README.md` and MIT `LICENSE` are the source documents. The core
+package's `prepack` hook copies both into `core/` before `npm pack` or
+`npm publish`. These generated copies are ignored by Git.
+
+```sh
+bun run --cwd core prepack        # copy the root README and license
+bun run pack                     # create the npm package in core/
+(cd core && npm pack --dry-run)   # inspect package contents without publishing
+BASE_PATH=/agent-tests bun run build # verify the GitHub Pages build locally
+```
+
+The workflows follow [Bref-ui's release setup](https://github.com/feuersteiner/bref-ui/tree/main/.github/workflows):
+
+- `.github/workflows/docs.yml` deploys `docs/build` on pushes to `main` or manual dispatch. Set the repository's **Settings → Pages → Source** to **GitHub Actions**. The workflow supplies the Pages base path, including `/agent-tests` for the default project URL.
+- `.github/workflows/publish-core.yml` publishes when `core/package.json` changes on `main`, or on manual dispatch, then creates an `agent-tests@<version>` GitHub release. Bump the core version for each release; npm rejects already published versions.
+
+Configure an [npm trusted publisher](https://docs.npmjs.com/trusted-publishers/)
+for package `agent-tests`, GitHub owner `feuersteiner`, repository `agent-tests`,
+and workflow filename `publish-core.yml`, with direct publishing enabled.
+If the package does not exist yet, publish the first version manually from
+`core/` with `npm publish --access public` using an authorized npm account,
+then configure its trusted publisher. CI uses OIDC and requires no npm token.
+Node.js 24 and its npm CLI are used for publishing and package verification;
+Bun manages workspace dependencies.
+
+### Logo concept
+
+Run `python3 -m http.server 8000` from the repository root, then open
+`http://localhost:8000/logo.html`. No build or installation is required; Google
+Fonts supplies the Material Symbols shield and typeface, so internet access is required.
+Verify the logo on desktop and mobile, and use the accent swatches to preview colors.
+The pixel-art variant is at `http://localhost:8000/logo-pixel.html`; its shield
+uses a CSS pixel grid and does not require the Material Symbols font.
+Compare square eyes, terminal typography, green, and monochrome at
+`http://localhost:8000/logo-terminal.html`. These studies use a custom SVG shield
+with a Material-inspired pointed crest, sloped shoulders, 110-unit (2 × 55) width and
+89-unit flank radii. Verify all four studies
+fit desktop and mobile widths.
+Enable “Show Fibonacci circles” to inspect the 144-unit shield frame, 21-unit
+eyes, 13-unit eye gap and dash width, and 3-unit dash thickness. Verify the
+construction toggle at desktop and mobile widths: blue circles construct the
+shield and gold circles construct the face. No build step is required.
+
+## License
+
+[MIT](LICENSE).

@@ -1,0 +1,25 @@
+{
+  "name": "agent-tests",
+  "version": "0.0.1",
+  "description": "Reusable repository checks for lessons learned during agent sessions.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feuersteiner/agent-tests.git",
+    "directory": "core"
+  },
+  "module": "index.ts",
+  "exports": "./index.ts",
+  "files": ["index.ts", "README.md", "LICENSE"],
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "prepack": "node ../scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5 || ^6"
+  }
+}
