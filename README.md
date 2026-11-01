@@ -201,9 +201,9 @@ evals:
 
 ## Community library
 
-The [`library/`](library/AGENTS.md) directory is a shared catalog of tests. Anyone can contribute one with a pull request containing its `TEST.md`, credited to the author's GitHub profile, and its compiled `test.yaml`. Every PR is screened for malware and prompt injection, and accounts that attempt either are banned. Every test merged into `main` is available to `npx agent-tests add [test-id]`.
+The [`library/`](library/README.md) directory is a shared catalog of tests. Anyone can contribute one with a pull request containing its `TEST.md`, credited to the author's GitHub profile, and its compiled `test.yaml`. Every PR is screened for malware and prompt injection, and accounts that attempt either are banned. Every test merged into `main` is available to `npx agent-tests add [test-id]`.
 
-Vote for a test with `npx agent-tests vote <test-id>`: it uses your GitHub CLI login to open a pull request that adds or removes your handle in the test's `score.csv`, and the PR merges automatically once its check passes. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
+Vote for a test with `npx agent-tests vote <test-id>` (WIP): it uses your GitHub CLI login to open a pull request that adds or removes your handle in the test's `score.csv`, and the PR merges automatically once its check passes. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
 
 ## Repository structure
 
@@ -216,6 +216,7 @@ Vote for a test with `npx agent-tests vote <test-id>`: it uses your GitHub CLI l
 
 For questions and ideas, join [Discord](https://discord.gg/kESK4bgEPW). Report bugs
 and suggest features through [GitHub Issues](https://github.com/feuersteiner/agent-tests/issues).
+Contributors and their agents start with [`AGENTS.md`](AGENTS.md).
 
 ## License
 
