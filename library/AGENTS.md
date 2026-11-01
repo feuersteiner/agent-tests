@@ -62,8 +62,8 @@ Every test PR is checked for malware and prompt injection before review:
 - Both files are screened for phrases aimed at the agents and models that will
   read them, such as attempts to change a verdict, read secrets, or run
   commands.
-- `test.yaml` must parse, match the directory id and the `source` hash, use no
-  custom Vitest checks, and include `fail`, `pass`, and `skip` evals. The full
+- `test.yaml` must parse, match the directory id and the `source` hash, and
+  include `fail`, `pass`, and `skip` evals. The full
   format is checked by `agent-tests validate`, whose output the PR includes.
 
 PRs with hidden content are closed. Accounts that attempt malware or prompt

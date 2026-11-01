@@ -8,14 +8,11 @@
     "dev": "bun run --cwd docs dev",
     "build": "cp README.md LICENSE core/ && bun run --cwd docs build",
     "preview": "bun run --cwd docs preview",
-    "check": "bun run --workspaces check && tsc -p examples/tsconfig.json",
-    "example:check": "vitest run --config vitest.checks.config.mts",
-    "example:evals": "vitest run --config vitest.evals.config.mts",
+    "check": "bun run --workspaces check",
     "pack": "bun run build && cd core && npm pack"
   },
   "devDependencies": {
     "@types/node": "^22",
-    "typescript": "^6.0.3",
-    "vitest": "^5.0.5"
+    "typescript": "^6.0.3"
   }
 }

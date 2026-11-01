@@ -55,7 +55,7 @@ are inspected. Every other file is skipped without a model call.
 - **While an agent works:** on the files it just edited.
 - **Before a commit:** on uncommitted changes.
 - **In CI:** on the whole repository, like `eslint .` or `prettier --check .`.
-- **In a test suite:** through Vitest, as pass/fail tests.
+- **In a test suite:** through a Vitest plugin, as pass/fail tests beside your own.
 - **In your own tools:** as a library from the npm package.
 
 ## Get started (WIP)
@@ -164,7 +164,7 @@ checks:
   the check sets. If it stays unsure, the CLI shows a warning, or a person
   reviews it with `human-tiebreak: true`.
 - A check uses only the levels it needs, and `maybe`, `bounds`, and `reasoning`
-  are optional. **Custom Vitest checks** pass or fail only; they never escalate.
+  are optional.
 
 Every finding names its test, check, level, file, and line, with the fix:
 
@@ -210,7 +210,7 @@ Vote for a test with `npx agent-tests vote <test-id>` (WIP): it uses your GitHub
 - [`core`](core): the `agent-tests` npm package.
 - [`docs`](docs): the documentation site, built with [Bref-ui](https://github.com/feuersteiner/bref-ui).
 - [`library`](library): community tests.
-- [`usecases.md`](usecases.md): proposed use cases.
+- [`docs/usecases.md`](docs/usecases.md): proposed use cases.
 
 ## Community and contributing
 
