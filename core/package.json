@@ -1,24 +1,60 @@
 {
-  "name": "agent-tests",
-  "version": "0.0.1",
-  "description": "Reusable repository checks for lessons learned during agent sessions.",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/feuersteiner/agent-tests.git",
-    "directory": "core"
-  },
-  "module": "index.ts",
-  "exports": "./index.ts",
-  "files": ["index.ts", "README.md", "LICENSE"],
-  "type": "module",
-  "scripts": {
-    "check": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5 || ^6"
-  }
+	"name": "agent-tests",
+	"version": "0.0.1",
+	"description": "Reusable repository checks for lessons learned during agent sessions.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/feuersteiner/agent-tests.git",
+		"directory": "core"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./vitest": {
+			"types": "./dist/vitest/index.d.ts",
+			"import": "./dist/vitest/index.js",
+			"default": "./dist/vitest/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"dist-cli",
+		"README.md",
+		"LICENSE"
+	],
+	"type": "module",
+	"scripts": {
+		"build": "rm -rf dist dist-cli && tsc -p tsconfig.library.json && tsc -p tsconfig.cli.json && cp ../README.md ../LICENSE .",
+		"check": "tsc --noEmit",
+		"prepack": "bun run build"
+	},
+	"devDependencies": {},
+	"peerDependencies": {
+		"vitest": "^5.0.5"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"bin": {
+		"agent-tests": "./dist-cli/index.js"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"dependencies": {
+		"ai": "^6.0.0",
+		"@ai-sdk/openai": "^3.0.0",
+		"zod": "^4.0.0",
+		"yaml": "^2.8.0",
+		"dotenv": "^17.0.0",
+		"minimatch": "^10.0.0"
+	},
+	"peerDependenciesMeta": {
+		"vitest": {
+			"optional": true
+		}
+	}
 }

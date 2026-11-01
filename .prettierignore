@@ -1,0 +1,20 @@
+# Package managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Generated files
+**/node_modules/
+**/.svelte-kit/
+**/build/
+**/dist/
+**/dist-cli/
+**/static/
+coverage/
+core/README.md
+core/LICENSE
+
+# Legacy standalone brand reference, served unchanged through docs/static/brand.html
+docs/brand.html
