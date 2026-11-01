@@ -76,6 +76,7 @@ npx agent-tests run --changed                 # uncommitted files
 npx agent-tests run --staged                  # pre-commit
 npx agent-tests run --base main               # pull requests
 npx agent-tests docs                          # skills that teach agents to write and run tests
+npx agent-tests vote user-text-french         # toggle your vote for a library test
 ```
 
 Choose the decision model (Jev, Clef, or OpenAI) in `agent-tests.config.yaml`
@@ -202,7 +203,7 @@ evals:
 
 The [`library/`](library/AGENTS.md) directory is a shared catalog of tests. Anyone can contribute one with a pull request containing its `TEST.md`, credited to the author's GitHub profile, and its compiled `test.yaml`. Every PR is screened for malware and prompt injection, and accounts that attempt either are banned. Every test merged into `main` is available to `npx agent-tests add [test-id]`.
 
-Add your vote to the test's `score.csv`. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
+Vote for a test with `npx agent-tests vote <test-id>`: it uses your GitHub CLI login to open a pull request that adds or removes your handle in the test's `score.csv`, and the PR merges automatically once its check passes. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
 
 ## Repository structure
 
