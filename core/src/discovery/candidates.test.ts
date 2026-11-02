@@ -31,6 +31,20 @@ describe('candidate files', () => {
 		expect(await collectCandidates(root, { paths: ['../outside.txt'] })).toEqual([]);
 	});
 
+	it('canonicalizes absolute files, directories, and globs through a symlinked scan root', async () => {
+		await write(root, 'actual/src/copy.txt', 'going to');
+		await write(root, 'actual/src/other.md', 'formal prose');
+		const alias = join(root, 'alias');
+		await symlink(join(root, 'actual'), alias);
+		for (const filter of ['src/copy.txt', 'src/*.txt', 'src', '**/*.txt']) {
+			const files = await collectCandidates(alias, { paths: [join(alias, filter)] });
+			expect(files.map((file) => file.path)).toEqual(
+				filter === 'src' ? ['src/copy.txt', 'src/other.md'] : ['src/copy.txt']
+			);
+			expect(files[0]?.absolutePath).toBe(join(root, 'actual/src/copy.txt'));
+		}
+	});
+
 	it('rejects Git scopes outside a repository and contradictory scopes', async () => {
 		await expect(collectCandidates(root, { staged: true })).rejects.toThrow('Git repository');
 		await expect(collectCandidates(root, { changed: true, staged: true })).rejects.toThrow(
@@ -79,6 +93,33 @@ describe('candidate files', () => {
 		expect((await collectCandidates(root, { staged: true })).map((file) => file.path)).toEqual([
 			'copy.txt'
 		]);
+	});
+
+	it('unions index and working changes when working content matches HEAD', async () => {
+		await initializeGit(root);
+		await write(root, 'copy.txt', 'initial');
+		await git(root, 'add', '.');
+		await git(root, 'commit', '-m', 'initial');
+		await write(root, 'copy.txt', 'staged change');
+		await git(root, 'add', 'copy.txt');
+		await write(root, 'copy.txt', 'initial');
+		await write(root, 'untracked.txt', 'new');
+		expect(
+			(await collectCandidates(root, { changed: true })).map((file) => [file.path, file.content])
+		).toEqual([
+			['copy.txt', 'initial'],
+			['untracked.txt', 'new']
+		]);
+	});
+
+	it('uses literal staged filenames when wildcard matches include index symlinks', async () => {
+		await initializeGit(root);
+		await write(root, 'z?.txt', 'regular staged text');
+		await symlink('z?.txt', join(root, 'z!.txt'));
+		await git(root, 'add', '.');
+		expect(
+			(await collectCandidates(root, { staged: true })).map((file) => [file.path, file.content])
+		).toEqual([['z?.txt', 'regular staged text']]);
 	});
 
 	it('handles unborn repositories and nested roots with literal filenames', async () => {
