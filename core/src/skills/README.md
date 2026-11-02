@@ -11,3 +11,8 @@ packed installation without access to this source tree.
 Compilation supports a source-only test, rejects unsafe ids and symbolic source
 links, and reports ambiguous ids instead of choosing a package silently. Run it
 from the owning directory when multiple packages contain the same id.
+
+`compileTest` calls [source lookup](find-source/README.md), then the
+[repository outline](layout/README.md), and embeds `readSkill` output in the brief.
+Source lookup and layout share discovery's generated-directory exclusions,
+including `.next`; `listSkills` and `readSkill` each own a separate catalog entry.
