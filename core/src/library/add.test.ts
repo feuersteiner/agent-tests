@@ -1,8 +1,8 @@
-import { mkdir, readFile, readdir, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, realpath, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { addTest, listRemoteTests } from './index.js';
-import { sourceFile } from './source.js';
+import { sourceFile } from './utils.js';
 import {
 	fixtureCommit,
 	fixtureId,
@@ -34,7 +34,9 @@ describe('library installs', () => {
 		await withRoot(async (root) => {
 			const options = fixtureTransport(await reference());
 			const installed = await addTest(root, fixtureId, 'packages/web', options);
-			expect(installed.directory).toBe(join(root, 'packages/web/.agents/tests', fixtureId));
+			expect(installed.directory).toBe(
+				join(await realpath(root), 'packages/web/.agents/tests', fixtureId)
+			);
 			await expect(addTest(root, fixtureId, 'packages/web', options)).rejects.toThrow(
 				'already exists'
 			);

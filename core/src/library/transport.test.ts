@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { describe, expect, it, vi } from 'vitest';
-import { gitLibraryTransport } from './git-transport.js';
+import { gitLibraryTransport } from './git-transport/index.js';
 import { fixtureId, reference, withRoot } from './tests/fixture.js';
 
 const execute = promisify(execFile);

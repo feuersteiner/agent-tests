@@ -8,7 +8,11 @@ import type { DecisionModel } from '../models/index.js';
 import type { EvalResult } from '../evals/index.js';
 import type { LibraryFiles } from './types.js';
 
-/** Verify remote bytes and run the real eval pipeline before changing an installed test. */
+/**
+ * Validate id/files in an isolated temporary directory, then evaluate with the optional model.
+ * @returns Real eval outcomes including skipped model cases; installed files remain unchanged.
+ * @throws Invalid remote schema/source, filesystem, or eval errors; temporary files are removed.
+ */
 export const prepareTest = async (
 	id: string,
 	files: LibraryFiles,

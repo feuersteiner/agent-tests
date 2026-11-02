@@ -1,21 +1,22 @@
 import { basename, relative, resolve } from 'node:path';
-import { discoverTestDirectories } from '../discovery/index.js';
-import { libraryBrief } from './brief.js';
-import { withCatalog } from './catalog.js';
-import type { CatalogContext } from './catalog.js';
-import { assertId, testDirectory } from './paths.js';
-import { prepareTest } from './prepare.js';
-import { createSource, readManagedSnapshot } from './source.js';
-import { writeTest } from './write.js';
-import type { LibraryOptions, LibraryResult } from './types.js';
+import { libraryBrief } from '../brief.js';
+import { prepareTest } from '../prepare.js';
+import { createSource, readManagedSnapshot, testDirectory } from '../utils.js';
+import { writeTest } from '../write.js';
+import type { CatalogContext, LibraryResult } from '../types.js';
 
-const updateOne = async (
+/**
+ * Refresh one canonical installed directory against context's pinned catalog.
+ * @returns Preserved/skipped status for edits or races, otherwise eval-backed update status.
+ * @throws For unsafe paths, catalog reads, invalid remote rules, or publication errors.
+ */
+export const updateOne = async (
 	root: string,
 	directory: string,
 	context: CatalogContext
 ): Promise<LibraryResult> => {
 	const id = basename(directory);
-	const owner = relative(resolve(root), resolve(directory, '../../..'));
+	const owner = relative(root, resolve(directory, '../../..'));
 	await testDirectory(root, id, owner);
 	const result: LibraryResult = { id, directory, status: 'skipped', warnings: [], exitCode: 0 };
 	const original = await readManagedSnapshot(directory);
@@ -60,24 +61,4 @@ const updateOne = async (
 		exitCode: evals.exitCode,
 		warnings: [...new Set(evals.cases.flatMap((item) => item.warnings))]
 	};
-};
-
-/** Refresh unchanged managed copies; preserve edits and tests removed from the catalog. */
-export const updateTests = async (
-	root: string,
-	id?: string,
-	options: LibraryOptions = {}
-): Promise<LibraryResult[]> => {
-	if (id !== undefined) assertId(id);
-	const directories = (await discoverTestDirectories(root)).filter(
-		(path) => id === undefined || basename(path) === id
-	);
-	if (id !== undefined && directories.length === 0)
-		throw new Error(`Test '${id}' is not installed.`);
-	if (directories.length === 0) return [];
-	return withCatalog(root, options, async (context) => {
-		const results: LibraryResult[] = [];
-		for (const directory of directories) results.push(await updateOne(root, directory, context));
-		return results;
-	});
 };

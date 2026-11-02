@@ -1,6 +1,14 @@
 import type { DecisionModel } from '../models/index.js';
 import type { EvalResult } from '../evals/index.js';
 
+/** Configured pinned catalog and optional model shared by one library operation. */
+export interface CatalogContext {
+	catalog: LibraryCatalog;
+	repository: string;
+	ref: string;
+	model?: DecisionModel;
+}
+
 /** A catalog snapshot pins all reads to one exact Git commit. */
 export interface LibraryCatalog {
 	commit: string;
