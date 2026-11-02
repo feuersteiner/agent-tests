@@ -8,25 +8,10 @@ import {
 	runTests,
 	validateTests
 } from 'agent-tests';
-import type { EvalResult } from 'agent-tests';
-import { combineExitCodes, present, warningsText } from './present.js';
+import { present } from './present.js';
 import { scopeFor } from './scope.js';
 import type { CommandOutput, ParsedCommand } from './types.js';
-
-/** Explain each labeled example, distinguishing skipped work from matched expectations. */
-export const formatEvals = (results: EvalResult[]): string =>
-	results
-		.map((result) =>
-			[
-				`${result.testId}: ${result.passed} matched expectations, ${result.failed} disagreements, ${result.skipped} skipped outcomes`,
-				...result.cases.flatMap((example) => [
-					`  ${example.unrun ? 'unrun' : example.passed ? 'match' : 'disagreement'}: ${example.name} (${example.path}); expected ${example.expected}, got ${example.actual}`,
-					...(example.error ? [`  error: ${example.error}`] : []),
-					...warningsText(example.warnings)
-				])
-			].join('\n')
-		)
-		.join('\n');
+import { combineExitCodes, formatEvals } from './utils.js';
 
 /** Execute run, static validation or labeled evaluations without duplicating engine logic. */
 export const evaluationCommand = async (

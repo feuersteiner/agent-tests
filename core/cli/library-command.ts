@@ -1,7 +1,7 @@
 import { addTest, removeTest, updateTests } from 'agent-tests';
-import { formatEvals } from './evaluation-command.js';
-import { combineExitCodes, present, warningsText } from './present.js';
+import { present } from './present.js';
 import type { CommandOutput, ParsedCommand } from './types.js';
+import { combineExitCodes, formatEvals, warningsText } from './utils.js';
 
 /** Install, update or remove managed copies using the library's provenance safeguards. */
 export const libraryCommand = async (

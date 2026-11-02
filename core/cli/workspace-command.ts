@@ -1,6 +1,7 @@
 import { compileTest, initializeProject, loadConfiguration, voteTest } from 'agent-tests';
-import { present, warningsText } from './present.js';
+import { present } from './present.js';
 import type { CommandOutput, ParsedCommand } from './types.js';
+import { warningsText } from './utils.js';
 
 /** Dispatch configuration writes, compilation briefs and the authenticated user's vote. */
 export const workspaceCommand = async (

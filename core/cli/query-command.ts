@@ -6,9 +6,10 @@ import {
 	readSkill,
 	targetFiles
 } from 'agent-tests';
-import { present, warningsText } from './present.js';
+import { present } from './present.js';
 import { scopeFor } from './scope.js';
 import type { CommandOutput, ParsedCommand } from './types.js';
+import { warningsText } from './utils.js';
 
 /** Read listings, skills and trigger targets through the library's public entry. */
 export const queryCommand = async (
