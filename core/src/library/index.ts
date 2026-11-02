@@ -1,11 +1,11 @@
 import { withCatalog } from './catalog.js';
-import { assertId } from './paths.js';
+import { assertId } from './utils.js';
 import type { LibraryOptions, RemoteTest } from './types.js';
 
 export { addTest } from './add.js';
-export { updateTests } from './update.js';
+export { updateTests } from './update/index.js';
 export { removeTest } from './remove.js';
-export { gitLibraryTransport } from './git-transport.js';
+export { gitLibraryTransport } from './git-transport/index.js';
 export type {
 	LibraryCatalog,
 	LibraryFiles,
@@ -16,7 +16,11 @@ export type {
 	RemoteTest
 } from './types.js';
 
-/** List catalog ids pinned to one commit without installing files. */
+/**
+ * List ids from the catalog configured under root, using optional transport/model overrides.
+ * @returns Sorted unique identities and their exact shared commit; no local files are installed.
+ * @throws Configuration, unsafe id, catalog, or cleanup failures.
+ */
 export const listRemoteTests = async (
 	root: string,
 	options: LibraryOptions = {}

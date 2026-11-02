@@ -3,8 +3,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, expect, test } from 'vitest';
 import { createMockModel } from '../models/index.js';
-import { createCachedModel, modelIdentity } from './cache.js';
-import { selectHostedScope } from './collect.js';
+import { createCachedModel } from './cache/index.js';
+import { modelIdentity } from './model-identity.js';
+import { selectHostedScope } from './select-scope.js';
 
 const directories: string[] = [];
 afterEach(async () => {

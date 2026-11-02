@@ -1,4 +1,5 @@
-export { parseTestDefinition, parseTestYaml } from './parse.js';
+export { parseTestDefinition } from './parse-test-definition.js';
+export { parseTestYaml } from './parse-test-yaml/index.js';
 export type {
 	CheckDefinition,
 	DeepCheck,

@@ -9,7 +9,7 @@ interface WatchRun {
 }
 
 /** Start the real CLI in watch mode and observe current reports without masking its failures. */
-export const startPluginWatch = (root: string): WatchRun => {
+export const startPluginWatch = (root: string, environment: NodeJS.ProcessEnv = {}): WatchRun => {
 	const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 	const child = spawn(
 		process.execPath,
@@ -24,7 +24,11 @@ export const startPluginWatch = (root: string): WatchRun => {
 			'--outputFile',
 			join(root, 'watch-results.json')
 		],
-		{ cwd: root, env: { ...process.env, CI: '' }, stdio: ['ignore', 'pipe', 'pipe'] }
+		{
+			cwd: root,
+			env: { ...process.env, CI: '', ...environment },
+			stdio: ['ignore', 'pipe', 'pipe']
+		}
 	);
 	let output = '';
 	child.stdout.on('data', (chunk: Buffer) => {

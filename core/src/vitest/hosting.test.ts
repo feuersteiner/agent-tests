@@ -1,4 +1,5 @@
-import { rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, expect, test } from 'vitest';
 import { createPluginFixture, runPluginFixture } from './tests/fixture.js';
@@ -64,17 +65,28 @@ test('unavailable model checks are reported as skipped by the real runner', asyn
 	expect(JSON.stringify(result.annotations)).toContain('Model unavailable');
 });
 
-test('watch mode refreshes real targets after source content changes', async () => {
-	const root = await createPluginFixture('Formal prose', [fast]);
-	roots.push(root);
-	const watch = startPluginWatch(root);
-	try {
-		await watch.waitForFailures(0);
-		await writeFile(join(root, 'src/help.md'), 'gonna change');
-		await watch.waitForFailures(1);
-		await writeFile(join(root, 'src/help.md'), 'Formal again');
-		await watch.waitForFailures(0);
-	} finally {
-		await watch.close();
+test.each([false, true])(
+	'watch refreshes changed targets with symlinked TMPDIR=%s',
+	async (symlinked) => {
+		const root = await createPluginFixture('Formal prose', [fast]);
+		roots.push(root);
+		const environment: NodeJS.ProcessEnv = {};
+		if (symlinked) {
+			const temporary = await mkdtemp(join(tmpdir(), 'agent-tests-temp-alias-'));
+			roots.push(temporary);
+			await mkdir(join(temporary, 'actual'));
+			await symlink(join(temporary, 'actual'), join(temporary, 'alias'), 'dir');
+			environment.TMPDIR = join(temporary, 'alias');
+		}
+		const watch = startPluginWatch(root, environment);
+		try {
+			await watch.waitForFailures(0);
+			await writeFile(join(root, 'src/help.md'), 'gonna change');
+			await watch.waitForFailures(1);
+			await writeFile(join(root, 'src/help.md'), 'Formal again');
+			await watch.waitForFailures(0);
+		} finally {
+			await watch.close();
+		}
 	}
-});
+);

@@ -1,8 +1,9 @@
 import { mkdir, mkdtemp, rename, rm, rmdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { sourceFile } from './source.js';
+import { sourceFile } from './utils.js';
 import type { LibraryFiles, LibrarySource } from './types.js';
 
+/** Reserve an absent target; return false for an existing entry and propagate other mkdir errors. */
 const reserveTarget = async (directory: string): Promise<boolean> => {
 	try {
 		await mkdir(directory);
@@ -13,7 +14,12 @@ const reserveTarget = async (directory: string): Promise<boolean> => {
 	}
 };
 
-/** Publish staged files only after a last-moment path/source check; conflicts preserve local data. */
+/**
+ * Stage files/source beside directory and publish after verify accepts the current target twice.
+ * @param replace Whether to replace a verified managed copy instead of reserving a new directory.
+ * @returns True after publication; false preserves data when verification/reservation conflicts.
+ * @throws Filesystem/verification errors; restore the previous copy if publication fails.
+ */
 export const writeTest = async (
 	directory: string,
 	files: LibraryFiles,

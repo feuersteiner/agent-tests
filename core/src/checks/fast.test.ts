@@ -42,6 +42,17 @@ describe('fast checks', () => {
 		expect(result.findings[0]).toMatchObject({ severity: 'warning', level: 'fast', column: 4 });
 	});
 
+	it('preserves each repeated maybe hint location', async () => {
+		const result = await evaluateChecks(referenceTest({ fast: { maybe: 'awesome' } }), {
+			path: 'src/page.txt',
+			content: 'awesome\nawesome'
+		});
+		expect(result.findings).toMatchObject([
+			{ line: 1, column: 1, severity: 'warning' },
+			{ line: 2, column: 1, severity: 'warning' }
+		]);
+	});
+
 	it('handles empty matches without looping and deduplicates repeated patterns', async () => {
 		const result = await evaluateChecks(referenceTest({ fast: { match: ['^', '^'] } }), {
 			path: 'src/page.txt',
