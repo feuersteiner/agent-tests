@@ -1,4 +1,4 @@
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, realpath, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { addTest, removeTest, updateTests } from './index.js';
@@ -17,7 +17,7 @@ describe('conservative library updates', () => {
 			);
 			expect(updated?.status).toBe('updated');
 			expect(updated?.commit).toBe(nextCommit);
-			expect(updated?.evals?.passed).toBe(3);
+			expect(updated?.evals?.passed).toBe(5);
 			expect(await readFile(join(added.directory, 'test.yaml'), 'utf8')).toBe(yaml);
 		});
 	});
@@ -31,6 +31,30 @@ describe('conservative library updates', () => {
 			const results = await updateTests(root, fixtureId, fixtureTransport(files, nextCommit));
 			expect(results.map((result) => result.status)).toEqual(['updated', 'updated']);
 			expect(results.every((result) => result.brief?.includes('## Verification'))).toBe(true);
+		});
+	});
+
+	it('installs and updates root/nested owners through an explicit project-root symlink', async () => {
+		await withRoot(async (root) => {
+			const project = join(root, 'project');
+			const linked = join(root, 'linked-project');
+			await mkdir(project);
+			await symlink(project, linked, 'dir');
+			const files = await reference();
+			const canonical = await realpath(project);
+			for (const owner of ['.', 'packages/web']) {
+				const added = await addTest(linked, fixtureId, owner, fixtureTransport(files));
+				expect(added.directory).toBe(join(canonical, owner, '.agents/tests', fixtureId));
+				expect(added.brief).toContain(`Target: .agents/tests/${fixtureId}/test.yaml`);
+			}
+			const results = await updateTests(linked, fixtureId, fixtureTransport(files, nextCommit));
+			expect(results).toHaveLength(2);
+			for (const updated of results) {
+				expect(updated.status).toBe('updated');
+				expect(updated.commit).toBe(nextCommit);
+				expect(updated.brief).toContain(`Target: .agents/tests/${fixtureId}/test.yaml`);
+				expect(updated.directory.startsWith(`${canonical}/`)).toBe(true);
+			}
 		});
 	});
 

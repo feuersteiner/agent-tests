@@ -3,7 +3,15 @@ import type { TriggerFilter } from '../schema/index.js';
 import { matchFilter } from './match-filter.js';
 import type { TriggerResult, TriggerTarget } from './types.js';
 
-/** Evaluate one path or content filter, preserving the order of match and ask. */
+/**
+ * Evaluate one path or content filter in its written match/ask order, stopping on rejection.
+ * @param kind Whether to inspect the owner-relative path or file content.
+ * @param filter Match patterns and model questions in authored order.
+ * @param target Owner-relative POSIX path and file text supplied by the caller.
+ * @param model Optional decision provider; path questions omit content from their request.
+ * @returns Acceptance, rejection, or unresolved status for missing/unsure model decisions.
+ * @throws If a content regex is invalid or a model request fails (with a sanitized error).
+ */
 export const evaluateFilter = async (
 	kind: 'path' | 'content',
 	filter: TriggerFilter,

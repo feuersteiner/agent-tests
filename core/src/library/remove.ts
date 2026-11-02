@@ -1,9 +1,12 @@
 import { rm } from 'node:fs/promises';
-import { exists, testDirectory } from './paths.js';
-import { readManagedSource } from './source.js';
+import { exists, readManagedSnapshot, testDirectory } from './utils.js';
 import type { LibraryResult } from './types.js';
 
-/** Remove only a selected, unmodified managed copy; preserve unknown files and local edits. */
+/**
+ * Remove id from targetDir relative to root only when its managed payload remains unmodified.
+ * @returns Removed/0 or preserved skipped/1 for edited, extra, or unmanaged files.
+ * @throws Invalid ids, escaping/symlink targets, absent copies, or filesystem failures.
+ */
 export const removeTest = async (
 	root: string,
 	id: string,
@@ -11,7 +14,7 @@ export const removeTest = async (
 ): Promise<LibraryResult> => {
 	const directory = await testDirectory(root, id, targetDir);
 	if (!(await exists(directory))) throw new Error(`Test '${id}' is not installed at this target.`);
-	if (!(await readManagedSource(directory)))
+	if (!(await readManagedSnapshot(directory)))
 		return {
 			id,
 			directory,

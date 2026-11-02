@@ -1,4 +1,4 @@
-import { isWithinOwner } from './walk.js';
+import { isWithinOwner } from './is-within-owner.js';
 import type { CandidateFile, DiscoveredTest } from './types.js';
 
 /** Select compounded owner rules while honoring descendant exemptions. */
@@ -14,8 +14,8 @@ export const testsForFile = (
 	);
 };
 
-export { discoverTests } from './load-packages.js';
-export { discoverTestDirectories } from './directories.js';
-export { collectCandidates } from './candidates.js';
+export { discoverTests } from './load-packages/index.js';
+export { discoverTestDirectories } from './directories/index.js';
+export { collectCandidates } from './candidates/index.js';
 export { formatTestTree } from './tree.js';
 export type { CandidateFile, DiscoveredTest, RunScope } from './types.js';

@@ -1,8 +1,15 @@
 # Evals
 
-`evaluateTest` writes each labeled example into its own isolated temporary Git repository, runs the
-real triggers and checks, and compares the result with `expect`. Every repository is always removed.
+This directory's `index.ts` aggregates the public API; each implementation has one public function:
 
-`evaluateTests` discovers installed tests, optionally filters by id, and evaluates each definition.
-Results distinguish disagreements, skipped examples and execution errors; a missing model never
-turns an expected failure into a passing evaluation. No source repository files are changed.
+- `evaluate-test.ts`: `evaluateTest` rejects definitions without examples, calls
+  `withFixtureRepository` once per example, delegates to `evaluateCase`, then summarizes results.
+- `evaluate-tests.ts`: `evaluateTests` calls `discoverTests`, filters an optional id and calls
+  `evaluateTest` for each definition. A requested missing id throws.
+- `case.ts`: `evaluateCase` checks `isSafeEvalPath`, writes the example, calls production
+  `evaluateTriggers` and `evaluateChecks`, and reports disagreements or execution errors.
+- `fixture.ts`: `withFixtureRepository` initializes an isolated temporary Git repository and removes
+  it in `finally`, including when evaluation throws. Fixture creation failures propagate.
+
+`path.ts` owns the exported fixture-path predicate; `types.ts` owns result shapes. Missing models
+never turn expected failures into passing evaluations. Source repository files are unchanged.

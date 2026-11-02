@@ -1,10 +1,16 @@
 import { realpath } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
-import { readSkill } from './catalog.js';
-import { findSource } from './find-source.js';
-import { describeLayout } from './layout.js';
+import { readSkill } from './read-skill.js';
+import { findSource } from './find-source/index.js';
+import { describeLayout } from './layout/index.js';
 
-/** Print compilation material for one installed rule; never execute agents or change files. */
+/**
+ * Print compilation material without executing agents or changing files.
+ * @param root Repository or owning package directory, resolved to its real path.
+ * @param id Installed kebab-case rule id; compiled test.yaml is not required.
+ * @returns Source text, exact hash, bounded layout and generator/verification instructions.
+ * @throws For invalid ids, missing or ambiguous sources, symbolic source files or read failures.
+ */
 export const compileTest = async (root: string, id: string): Promise<string> => {
 	const directory = await realpath(resolve(root));
 	const source = await findSource(directory, id);
