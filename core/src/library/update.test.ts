@@ -17,7 +17,7 @@ describe('conservative library updates', () => {
 			);
 			expect(updated?.status).toBe('updated');
 			expect(updated?.commit).toBe(nextCommit);
-			expect(updated?.evals?.passed).toBe(3);
+			expect(updated?.evals?.passed).toBe(5);
 			expect(await readFile(join(added.directory, 'test.yaml'), 'utf8')).toBe(yaml);
 		});
 	});

@@ -19,7 +19,7 @@ describe('library installs', () => {
 			expect(result.status).toBe('added');
 			expect(result.commit).toBe(fixtureCommit);
 			expect(result.exitCode).toBe(0);
-			expect(result.evals?.passed).toBe(3);
+			expect(result.evals?.passed).toBe(5);
 			expect(result.brief).toContain('## Verification');
 			expect((await readdir(result.directory)).sort()).toEqual(
 				[sourceFile, 'TEST.md', 'test.yaml'].sort()
