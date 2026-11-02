@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -44,6 +44,15 @@ afterEach(async () => {
 });
 
 describe('runTests', () => {
+	it('uses canonical owner paths when the root is a symbolic link', async () => {
+		const linked = join(root, 'linked-root');
+		await symlink(root, linked, 'dir');
+		await writeFile(join(root, 'src/page.txt'), 'gonna');
+		const result = await runTests(linked, { paths: ['src/page.txt'] });
+		expect(result).toMatchObject({ checked: 1, exitCode: 1 });
+		expect(result.findings[0]?.file).toBe('src/page.txt');
+	});
+
 	it('runs changed, staged and base scopes with their actual file versions', async () => {
 		await writeFile(join(root, 'src/page.txt'), 'We are gonna assist.');
 		expect(await runTests(root, { changed: true })).toMatchObject({ checked: 1, exitCode: 1 });

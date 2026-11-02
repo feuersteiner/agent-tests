@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createMockModel } from '../models/index.js';
 import { evaluateChecks } from './evaluate-checks.js';
-import { formatGitHubAnnotations } from './annotations.js';
+import { formatGitHubAnnotations } from './annotations/index.js';
 import { referenceTest } from './test-support/fixture.js';
 
 const target = { path: 'src/page.txt', content: 'Formal.' };
