@@ -1,6 +1,17 @@
+/**
+ * Normalize an unknown JSON object for safe settings field access.
+ * @param value GitHub response field.
+ * @returns Object properties, or an empty object for primitive/null input.
+ */
 const object = (value: unknown): Record<string, unknown> =>
 	typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};
 
+/**
+ * Extract string identity fields from a GitHub response array.
+ * @param value Candidate identity list.
+ * @param key Login or slug field to select.
+ * @returns String identities, ignoring malformed entries.
+ */
 const names = (value: unknown, key: string): string[] =>
 	Array.isArray(value)
 		? value
@@ -8,6 +19,11 @@ const names = (value: unknown, key: string): string[] =>
 				.filter((item): item is string => typeof item === 'string')
 		: [];
 
+/**
+ * Preserve GitHub user, team and app restrictions in writable API form.
+ * @param value Existing restriction or bypass settings.
+ * @returns Login/slug lists for each identity category.
+ */
 const identities = (value: unknown) => {
 	const input = object(value);
 	return {
@@ -17,12 +33,22 @@ const identities = (value: unknown) => {
 	};
 };
 
+/**
+ * Read a GitHub enabled flag while retaining a caller-selected default.
+ * @param value Existing option object.
+ * @param fallback Default when the response omits a boolean flag.
+ * @returns Existing boolean or fallback.
+ */
 const enabled = (value: unknown, fallback = false): boolean => {
 	const option = object(value).enabled;
 	return typeof option === 'boolean' ? option : fallback;
 };
 
-/** Strengthen required reviews/checks while carrying forward existing restrictions and bypasses. */
+/**
+ * Strengthen required reviews/checks while carrying forward restrictions and bypasses.
+ * @param value Existing protection, or null for an unprotected branch.
+ * @returns PUT payload preserving check app bindings, stronger review counts and permissions.
+ */
 export const protectionBody = (value: unknown): Record<string, unknown> => {
 	const before = object(value);
 	const status = object(before.required_status_checks);
@@ -73,15 +99,4 @@ export const protectionBody = (value: unknown): Record<string, unknown> => {
 	])
 		if (key in before) result[key] = enabled(before[key]);
 	return result;
-};
-
-/** Stable equality detects protection edits made between planning and application. */
-export const protectionFingerprint = (value: unknown): string => {
-	if (Array.isArray(value)) return `[${value.map(protectionFingerprint).join(',')}]`;
-	if (typeof value === 'object' && value !== null)
-		return `{${Object.entries(value)
-			.sort(([left], [right]) => left.localeCompare(right))
-			.map(([key, item]) => `${JSON.stringify(key)}:${protectionFingerprint(item)}`)
-			.join(',')}}`;
-	return JSON.stringify(value) ?? 'null';
 };

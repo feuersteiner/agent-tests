@@ -1,12 +1,15 @@
-import { api } from './github.js';
-import type { GhRunner } from './types.js';
+import { api } from '../utils.js';
+import type { GhRunner } from '../types.js';
+import type { GitTree } from './types.js';
 
-interface GitTree {
-	truncated?: boolean;
-	tree: { path: string; mode: string; type: string }[];
-}
-
-/** Refuse executable files, symlinks or incomplete Git metadata before reading an existing CSV. */
+/**
+ * Require a unique regular nonexecutable score blob before decoding existing CSV.
+ * @param repository Validated owner/repository.
+ * @param id Library test ID.
+ * @param commit Immutable main commit.
+ * @param gh Read-only GitHub transport.
+ * @throws Rejects incomplete trees, missing/duplicate entries, unsafe modes or read failures.
+ */
 export const requireRegularScore = async (
 	repository: string,
 	id: string,

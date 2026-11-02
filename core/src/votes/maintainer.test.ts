@@ -107,4 +107,23 @@ describe('maintainer setup', () => {
 		expect(output).toEqual(plan.changes.map((change) => change.description));
 		expect(mock.calls.filter((call) => call.body !== undefined)).toHaveLength(plan.changes.length);
 	});
+
+	it('stops after a failed write while retaining earlier successful settings', async () => {
+		const mock = fixture();
+		const plan = await planMaintainerSetup('acme/tests', mock.gh);
+		const completed: unknown[] = [];
+		let attempts = 0;
+		const failingGh: GhRunner = async (args, body) => {
+			if (body !== undefined) {
+				attempts++;
+				if (attempts === 2) throw new Error('Mocked write failure');
+				completed.push(body);
+			}
+			return mock.gh(args, body);
+		};
+		await expect(applyMaintainerSetup(plan, failingGh)).rejects.toThrow('Mocked write failure');
+		expect(attempts).toBe(2);
+		expect(completed).toEqual([plan.changes[0]!.body]);
+		expect(mock.calls.filter((call) => call.body !== undefined)).toHaveLength(1);
+	});
 });

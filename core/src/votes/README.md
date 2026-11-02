@@ -20,3 +20,14 @@ permissions are preserved. Concurrent protection changes require a new plan.
 The trusted `Library score` workflow validates an exact one-row author-only change before
 approving its specific head commit and enabling auto-merge. Both old and new CSV entries must
 be nonexecutable regular Git blobs; a vote cannot change file modes. Pull request code is never run.
+
+Implemented function-call workflows: [vote decisions](vote/README.md),
+[state reads](read-state/README.md), [opening votes](open-vote/README.md),
+[planning setup](plan-maintainer-setup/README.md) and
+[applying setup](apply-maintainer-setup/README.md). Call these APIs through the public
+votes barrel; private steps are owned by their stage.
+
+Setup writes run serially. A failed later write rejects the operation and leaves earlier
+settings applied, without rollback. Vote failures can likewise leave a fork, branch, commit
+or PR remotely; the local checkout stays untouched. All automated verification uses injected
+transports or local workflow fixtures.
