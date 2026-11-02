@@ -15,3 +15,9 @@ export interface ValidationResult {
 	issues: ValidationIssue[];
 	exitCode: ExitCode;
 }
+
+/** A regex and the check that owns it, if it belongs to a check. */
+export interface Pattern {
+	value: string;
+	checkId?: string;
+}
