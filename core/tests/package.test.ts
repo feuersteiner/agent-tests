@@ -22,8 +22,6 @@ describe('published package', () => {
 		expect(files).toContain('dist/vitest/index.d.ts');
 		expect(files).toContain('dist/vitest/runner.js');
 		expect(files).toContain('dist-cli/index.js');
-		expect(files).toContain('dist/vitest/index.js');
-		expect(files).toContain('dist/vitest/runner.js');
 		expect(files.some((file) => /^(src|cli|tests)\//.test(file))).toBe(false);
 		const entry = readFileSync(
 			path.join(project.temporary, 'node_modules/agent-tests/dist-cli/index.js'),
@@ -76,7 +74,7 @@ describe('published package', () => {
 				'-e',
 				"import agentTests, { agentTests as named } from 'agent-tests/vitest'; const plugin = agentTests(); console.log(JSON.stringify({ name: plugin.name, same: agentTests === named, configure: typeof plugin.configureVitest, cleanup: typeof plugin.closeBundle }));"
 			],
-			{ cwd: temporary, env: offlineEnvironment, encoding: 'utf8' }
+			{ cwd: project.temporary, env: project.offlineEnvironment, encoding: 'utf8' }
 		);
 		expect(JSON.parse(output)).toEqual({
 			name: 'agent-tests',
@@ -104,13 +102,13 @@ describe('published package', () => {
 		const temporary = project.temporary;
 		const installed = path.join(temporary, '.agents/tests/no-informal-english');
 		mkdirSync(installed, { recursive: true });
-		mkdirSync(path.join(temporary, 'src'), { recursive: true });
+		mkdirSync(path.join(temporary, 'src/help'), { recursive: true });
 		for (const file of ['TEST.md', 'test.yaml'])
 			writeFileSync(
 				path.join(installed, file),
 				readFileSync(path.join(root, 'library/no-informal-english', file))
 			);
-		writeFileSync(path.join(temporary, 'src/help.md'), 'We are gonna save.');
+		writeFileSync(path.join(temporary, 'src/help/guide.md'), 'We are gonna save.');
 		writeFileSync(
 			path.join(temporary, 'ordinary.test.mjs'),
 			"import { test } from 'vitest'; test('ordinary', () => {});"
@@ -120,7 +118,7 @@ describe('published package', () => {
 			[
 				"import { defineConfig } from 'vitest/config';",
 				"import { agentTests } from 'agent-tests/vitest';",
-				"export default defineConfig({ plugins: [agentTests({scope: {paths: ['src/help.md']}})], test: {include: ['ordinary.test.mjs']} });"
+				"export default defineConfig({ plugins: [agentTests({scope: {paths: ['src/help/guide.md']}})], test: {include: ['ordinary.test.mjs']} });"
 			].join('\n')
 		);
 		const result = spawnSync(

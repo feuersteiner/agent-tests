@@ -36,7 +36,7 @@ describe('built CLI local catalog flow', () => {
 		expect(installed).toMatchObject({
 			id: referenceId,
 			status: 'added',
-			evals: { passed: 3, failed: 0 }
+			evals: { passed: 5, failed: 0 }
 		});
 		expect(installed.brief).toContain(`# Compile ${referenceId}`);
 		const source = path.join(root, '.agents/tests', referenceId, '.agent-tests-source.json');
@@ -45,7 +45,7 @@ describe('built CLI local catalog flow', () => {
 		expect(cli(root, ['validate', referenceId]).status).toBe(0);
 		const evaluated = cli(root, ['eval', referenceId, '--json']);
 		expect(evaluated.status, evaluated.stderr).toBe(0);
-		expect(JSON.parse(evaluated.stdout).results[0]).toMatchObject({ passed: 3, failed: 0 });
+		expect(JSON.parse(evaluated.stdout).results[0]).toMatchObject({ passed: 5, failed: 0 });
 		const listed = cli(root, ['list']);
 		expect(listed.stdout).toContain(`└── ${referenceId}`);
 		const targets = cli(root, ['targets', referenceId, '--json']);
