@@ -1,7 +1,7 @@
 import type { TestDefinition } from '../schema/index.js';
 import type { DecisionModel } from '../models/index.js';
 import type { CheckEvaluation, CheckTarget } from './types.js';
-import { evaluateCheck } from './evaluate-check.js';
+import { evaluateCheck } from './evaluate-check/index.js';
 
 /** Evaluate all checks and preserve failed, uncertain and skipped outcomes separately. */
 export const evaluateChecks = async (

@@ -18,3 +18,10 @@ Git scopes outside a repository fail explicitly.
 
 `testsForFile` applies owner boundaries and descendant exemptions.
 `formatTestTree` renders discovered rules in stable owner and ID order.
+
+Stage ownership: [candidate selection](candidates/README.md),
+[package discovery](load-packages/README.md), [rule directory discovery](directories/README.md),
+[Git selection](git-paths/README.md), and [directory traversal](walk-directories/README.md).
+Their `index.ts` files own orchestration. The discovery barrel preserves the package API;
+filesystem/path predicates and Git execution each have a single-function stage file.
+Absolute path filters canonicalize existing ancestors while retaining glob suffixes.

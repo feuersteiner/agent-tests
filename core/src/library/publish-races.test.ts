@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, rename, symlink, writeFile } from 'node:fs/pr
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { addTest, updateTests } from './index.js';
-import { createSource, hash, sourceFile } from './source.js';
+import { createSource, hash, sourceFile } from './utils.js';
 import { writeTest } from './write.js';
 import type { LibraryFiles, LibraryOptions } from './types.js';
 import { fixtureId, fixtureTransport, nextCommit, reference, withRoot } from './tests/fixture.js';

@@ -110,6 +110,35 @@ describe('compilation brief', () => {
 		await expect(compileTest(root, 'no-informal-english')).rejects.toThrow('ambiguous');
 	});
 
+	it('ignores generated .next copies while compiling source-only rules', async () => {
+		const root = await fixture();
+		await installSource(root, 'Legitimate source.');
+		await installSource(join(root, '.next/server'), 'Generated duplicate.');
+		const brief = await compileTest(root, 'no-informal-english');
+		expect(brief).toContain('Legitimate source.');
+		expect(brief).not.toContain('Generated duplicate.');
+		expect(brief).not.toContain('.next/');
+	});
+
+	it('skips symbolic installation directories instead of reading outside sources', async () => {
+		const root = await fixture();
+		const outside = await fixture();
+		await installSource(outside, 'Outside source.');
+		await symlink(join(outside, '.agents'), join(root, '.agents'));
+		await expect(compileTest(root, 'no-informal-english')).rejects.toThrow('No installed TEST.md');
+	});
+
+	it('keeps the visible repository outline bounded', async () => {
+		const root = await fixture();
+		await installSource(root);
+		for (let index = 0; index < 85; index++)
+			await writeFile(join(root, `file-${String(index).padStart(2, '0')}.txt`), 'Visible.');
+		const brief = await compileTest(root, 'no-informal-english');
+		expect(brief).toContain('file-79.txt');
+		expect(brief).not.toContain('file-80.txt');
+		expect(brief).toContain('(layout limited to 80 entries)');
+	});
+
 	it('refuses symbolic source files outside the repository', async () => {
 		const root = await fixture();
 		const outside = await fixture();

@@ -5,8 +5,10 @@ source: sha256:8750e6112cce3226eb5bdb6fe6bc1b96dc16a66a3c5d4d58e2d1978b47090dbd
 triggers:
   path:
     match:
-      - 'src/**/*.md'
-      - 'src/**/*.txt'
+      # Reference layout: customer-facing prose lives in src/help/.
+      # Installing agents adapt these globs to the repository's public prose.
+      - 'src/help/**/*.md'
+      - 'src/help/**/*.txt'
 checks:
   - id: formal-vocabulary
     message: Customer-facing prose contains informal English.
@@ -25,4 +27,12 @@ evals:
   - name: Source code is outside the prose scope
     path: src/internal.ts
     content: const phrase = 'gonna';
+    expect: skip
+  - name: Internal Markdown is outside the reference public prose scope
+    path: src/internal/design-notes.md
+    content: We are gonna refactor the cache.
+    expect: skip
+  - name: Internal plain text is outside the reference public prose scope
+    path: src/internal/design-notes.txt
+    content: We gotta refactor the cache.
     expect: skip

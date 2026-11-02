@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, realpath, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { execFile } from 'node:child_process';
@@ -11,7 +11,8 @@ export const referenceDefinition = parseTestYaml(
 	readFileSync(new URL('test.yaml', referenceDirectory), 'utf8')
 );
 
-export const createRoot = async (): Promise<string> => mkdtemp(join(tmpdir(), 'agent-discovery-'));
+export const createRoot = async (): Promise<string> =>
+	realpath(await mkdtemp(join(tmpdir(), 'agent-discovery-')));
 
 export const write = async (root: string, path: string, content: string): Promise<void> => {
 	const target = join(root, path);

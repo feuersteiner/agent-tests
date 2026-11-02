@@ -1,16 +1,12 @@
 import { createConfiguredModel, loadConfiguration } from '../configuration/index.js';
-import { gitLibraryTransport } from './git-transport.js';
-import type { LibraryCatalog, LibraryOptions } from './types.js';
-import type { DecisionModel } from '../models/index.js';
+import { gitLibraryTransport } from './git-transport/index.js';
+import type { CatalogContext, LibraryOptions } from './types.js';
 
-export interface CatalogContext {
-	catalog: LibraryCatalog;
-	repository: string;
-	ref: string;
-	model?: DecisionModel;
-}
-
-/** Open one pinned catalog and always release its temporary files, including on errors. */
+/**
+ * Load root configuration, open a pinned catalog, and call action with optional model overrides.
+ * @returns The action result after closing the catalog; cleanup also runs when action rejects.
+ * @throws Configuration, invalid commit, transport, action, or cleanup failures.
+ */
 export const withCatalog = async <T>(
 	root: string,
 	options: LibraryOptions,

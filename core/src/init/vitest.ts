@@ -1,8 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { assertLocalPath, createFile } from './files.js';
+import { createFile } from './create-file.js';
+import { assertLocalPath } from './utils.js';
 import { vitestConfiguration } from './templates.js';
-import { editVitestConfiguration } from './vitest-edit.js';
+import { editVitestConfiguration } from './vitest-edit/index.js';
 import type { InitResult } from './types.js';
 
 /** Create or additively update the conventional config; preserve unsupported or changing files. */

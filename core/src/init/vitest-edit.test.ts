@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runInNewContext } from 'node:vm';
-import { editVitestConfiguration } from './vitest-edit.js';
+import { editVitestConfiguration } from './vitest-edit/index.js';
 import { initializeProject } from './index.js';
 
 it('adds the plugin while preserving existing config and plugins', () => {
@@ -100,3 +100,36 @@ it('reports manual integration without overwriting dynamic configuration', async
 		await rm(root, { recursive: true, force: true });
 	}
 });
+
+it.each([
+	'export default { ["plugins"]: [] };',
+	'export default { plugins: [], ["plu" + "gins"]: [] };',
+	'const key = "plugins"; export default { [key]: [] };',
+	'export default { get ["plu" + "gins"]() { return []; } };',
+	'export default { "plu\\u0067ins": [] };',
+	'export default { plu\\u0067ins: [] };',
+	'export default { get "plugins"() { return []; } };'
+])(
+	'preserves effective plugins and reports manual integration for unsafe root keys: %s',
+	async (source) => {
+		const root = await mkdtemp(join(tmpdir(), 'agent-tests-computed-'));
+		try {
+			const effectivePlugins = (configuration: string): unknown =>
+				runInNewContext(
+					configuration.replace('export default', 'globalThis.configuration =') +
+						'\nconfiguration.plugins'
+				);
+			expect(effectivePlugins(source)).toEqual([]);
+			await writeFile(join(root, 'vitest.config.ts'), source);
+			const result = await initializeProject(root, { vitest: true });
+			const preserved = await readFile(join(root, 'vitest.config.ts'), 'utf8');
+			expect(result.exitCode).toBe(2);
+			expect(result.warnings.join('\n')).toContain('add agentTests() to its root plugins array');
+			expect(result.skipped).toContain('vitest.config.ts');
+			expect(preserved).toBe(source);
+			expect(effectivePlugins(preserved)).toEqual([]);
+		} finally {
+			await rm(root, { recursive: true, force: true });
+		}
+	}
+);
