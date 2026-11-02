@@ -1,4 +1,5 @@
-import { rm } from 'node:fs/promises';
+import { rm, symlink } from 'node:fs/promises';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createMockModel } from '../models/index.js';
 import { createRoot, installTest, referenceDefinition, write } from '../discovery/tests/fixture.js';
@@ -9,7 +10,7 @@ const fixture = async () => {
 	const root = await createRoot();
 	roots.push(root);
 	await installTest(root);
-	await write(root, 'src/help.md', 'We are gonna save.');
+	await write(root, 'src/help/guide.md', 'We are gonna save.');
 	await write(root, 'src/internal.ts', 'const value = 1;');
 	return root;
 };
@@ -21,15 +22,27 @@ describe('installed test targets', () => {
 	it('selects targets without executing failing checks', async () => {
 		const root = await fixture();
 		const result = await targetFiles(root, 'no-informal-english');
-		expect(result.files).toEqual(['src/help.md']);
+		expect(result.files).toEqual(['src/help/guide.md']);
 		expect(result.exitCode).toBe(0);
+	});
+
+	it('selects the same owner-relative targets through a symlinked root', async () => {
+		const root = await fixture();
+		const links = await createRoot();
+		roots.push(links);
+		const alias = join(links, 'repository');
+		await symlink(root, alias, 'dir');
+		expect((await targetFiles(alias, 'no-informal-english')).files).toEqual(['src/help/guide.md']);
+		expect(await targetFiles(alias, 'no-informal-english')).toEqual(
+			await targetFiles(root, 'no-informal-english')
+		);
 	});
 
 	it('respects nested inherited exemptions', async () => {
 		const root = await fixture();
 		await write(root, 'app/.agents/tests/config.yaml', 'disable: [no-informal-english]');
-		await write(root, 'app/src/help.md', 'We are gonna save.');
-		expect((await targetFiles(root, 'no-informal-english')).files).toEqual(['src/help.md']);
+		await write(root, 'app/src/help/guide.md', 'We are gonna save.');
+		expect((await targetFiles(root, 'no-informal-english')).files).toEqual(['src/help/guide.md']);
 	});
 
 	it('distinguishes missing model selections from deterministic rejections', async () => {
@@ -40,7 +53,7 @@ describe('installed test targets', () => {
 		});
 		const skipped = await targetFiles(root, 'no-informal-english');
 		expect(skipped.files).toEqual([]);
-		expect(skipped.skipped).toEqual(['src/help.md']);
+		expect(skipped.skipped).toEqual(['src/help/guide.md']);
 		expect(skipped.warnings).not.toEqual([]);
 		const selected = await targetFiles(
 			root,
@@ -48,7 +61,7 @@ describe('installed test targets', () => {
 			{},
 			createMockModel([{ decision: 'pass' }])
 		);
-		expect(selected.files).toEqual(['src/help.md']);
+		expect(selected.files).toEqual(['src/help/guide.md']);
 	});
 
 	it('rejects unknown and ambiguous identifiers', async () => {
@@ -56,6 +69,6 @@ describe('installed test targets', () => {
 		await expect(targetFiles(root, 'missing')).rejects.toThrow('Unknown test');
 		await installTest(root, 'app');
 		await expect(targetFiles(root, 'no-informal-english')).rejects.toThrow('Ambiguous test');
-		expect((await targetFiles(root, './no-informal-english')).files).toEqual(['src/help.md']);
+		expect((await targetFiles(root, './no-informal-english')).files).toEqual(['src/help/guide.md']);
 	});
 });

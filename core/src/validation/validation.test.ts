@@ -1,8 +1,9 @@
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { stringify } from 'yaml';
 import { fixture } from './tests/fixtures.js';
+import * as evalValidation from './evals.js';
 import { validateTest, validateTests } from './index.js';
 
 const roots: string[] = [];
@@ -67,6 +68,30 @@ describe('validation', () => {
 			expect.objectContaining({ code: 'pattern-risky', severity: 'error' })
 		);
 	});
+
+	it.each(['(a{1,})+$', '(a{1,3})+$', '(a{2,}){2,}$'])(
+		'rejects nested brace repetition %s before static comparisons',
+		async (pattern) => {
+			const test = await fixture();
+			roots.push(test.root);
+			test.definition.checks[0]!.fast = { match: pattern };
+			test.definition.evals = [
+				{ name: 'Bounded rejection', path: 'src/a.md', content: 'aaaa!', expect: 'fail' }
+			];
+			await writeFile(join(test.directory, 'test.yaml'), stringify(test.definition));
+			const comparisons = vi.spyOn(evalValidation, 'validateEvals').mockResolvedValue([]);
+			try {
+				expect(await validateTest(test.directory)).toMatchObject({
+					valid: false,
+					exitCode: 1,
+					issues: [expect.objectContaining({ code: 'pattern-risky', severity: 'error' })]
+				});
+				expect(comparisons).not.toHaveBeenCalled();
+			} finally {
+				comparisons.mockRestore();
+			}
+		}
+	);
 
 	it('does not approve unverified evals when a risky pattern blocks comparisons', async () => {
 		const test = await fixture();

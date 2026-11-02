@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
-import { createFile } from './files.js';
+import { createFile } from './create-file.js';
 import { hook } from './templates.js';
 import type { InitResult } from './types.js';
 

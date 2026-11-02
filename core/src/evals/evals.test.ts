@@ -17,8 +17,14 @@ describe('evals', () => {
 	it('executes the reference fail/pass/skip examples through real stages', async () => {
 		const definition = await reference();
 		const result = await evaluateTest(definition);
-		expect(result).toMatchObject({ passed: 3, failed: 0, skipped: 1, exitCode: 0 });
-		expect(result.cases.map((example) => example.actual)).toEqual(['fail', 'pass', 'skip']);
+		expect(result).toMatchObject({ passed: 5, failed: 0, skipped: 3, exitCode: 0 });
+		expect(result.cases.map((example) => example.actual)).toEqual([
+			'fail',
+			'pass',
+			'skip',
+			'skip',
+			'skip'
+		]);
 		expect(result.cases[0]!.findings).toContainEqual(
 			expect.objectContaining({
 				testId: 'no-informal-english',
@@ -33,7 +39,7 @@ describe('evals', () => {
 		const definition = await reference();
 		definition.evals[0]!.expect = 'pass';
 		const result = await evaluateTest(definition);
-		expect(result).toMatchObject({ passed: 2, failed: 1, exitCode: 1 });
+		expect(result).toMatchObject({ passed: 4, failed: 1, exitCode: 1 });
 		expect(result.cases[0]).toMatchObject({ expected: 'pass', actual: 'fail', passed: false });
 	});
 
@@ -43,12 +49,12 @@ describe('evals', () => {
 		definition.checks[0]!.smart = { ask: 'Find informal English.' };
 		const model = createMockModel([{ decision: 'fail' }, { decision: 'pass' }]);
 		expect(await evaluateTest(definition, model)).toMatchObject({
-			passed: 3,
+			passed: 5,
 			failed: 0,
 			exitCode: 0
 		});
 		const missing = await evaluateTest(definition);
-		expect(missing).toMatchObject({ passed: 1, failed: 2, skipped: 3, exitCode: 1 });
+		expect(missing).toMatchObject({ passed: 3, failed: 2, skipped: 5, exitCode: 1 });
 		expect(missing.cases[0]!.warnings.length).toBeGreaterThan(0);
 	});
 

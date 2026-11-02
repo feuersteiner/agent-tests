@@ -1,26 +1,7 @@
 import type { TestDefinition } from '../schema/index.js';
+import { collectPatterns } from './collect-patterns.js';
+import { isRiskyPattern } from './is-risky-pattern.js';
 import type { ValidationIssue } from './types.js';
-
-interface Pattern {
-	value: string;
-	checkId?: string;
-}
-
-const list = (value?: string | string[]): string[] =>
-	value === undefined ? [] : typeof value === 'string' ? [value] : value;
-
-const collectPatterns = (definition: TestDefinition): Pattern[] => {
-	const triggers = Array.isArray(definition.triggers) ? definition.triggers : [definition.triggers];
-	return [
-		...triggers.flatMap((trigger) => list(trigger.content?.match).map((value) => ({ value }))),
-		...definition.checks.flatMap((check) =>
-			[...list(check.fast?.match), ...list(check.fast?.maybe)].map((value) => ({
-				value,
-				checkId: check.id
-			}))
-		)
-	];
-};
 
 /** Flags invalid expressions and common exponential backtracking patterns without executing them. */
 export const validatePatterns = (definition: TestDefinition): ValidationIssue[] =>
@@ -37,7 +18,7 @@ export const validatePatterns = (definition: TestDefinition): ValidationIssue[] 
 				}
 			];
 		}
-		if (/\([^)]*[+*][^)]*\)[+*{]/.test(value) || /\\[1-9]/.test(value))
+		if (isRiskyPattern(value))
 			return [
 				{
 					code: 'pattern-risky',
@@ -49,6 +30,3 @@ export const validatePatterns = (definition: TestDefinition): ValidationIssue[] 
 
 		return [];
 	});
-
-export const matchesPattern = (patterns: string | string[] | undefined, content: string): boolean =>
-	list(patterns).some((pattern) => new RegExp(pattern).test(content));

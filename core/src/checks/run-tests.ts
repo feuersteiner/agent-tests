@@ -1,3 +1,4 @@
+import { realpath } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 import { createConfiguredModel, loadConfiguration } from '../configuration/index.js';
 import { collectCandidates, discoverTests, testsForFile } from '../discovery/index.js';
@@ -16,7 +17,7 @@ export const runTests = async (
 ): Promise<RunResult> => {
 	const result = createRunResult();
 	try {
-		const directory = resolve(root);
+		const directory = await realpath(root);
 		const configured = model ?? createConfiguredModel(await loadConfiguration(directory));
 		const definitions = await discoverTests(directory);
 		const candidates = await collectCandidates(directory, scope);
