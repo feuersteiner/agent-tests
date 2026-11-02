@@ -35,12 +35,3 @@ export const askModel = async (
 		throw new Error(`Model evaluation failed for check ${check.id} at ${level}.`);
 	}
 };
-
-/** Interpret smart confidence as confidence that the file contains a violation. */
-export const smartDecision = (check: CheckDefinition, response: DecisionResponse) => {
-	if (response.decision === 'unsure' || response.confidence === undefined) return response.decision;
-	const [lower, upper] = check.smart?.bounds ?? [0.3, 0.8];
-	if (response.confidence < lower) return 'pass';
-	if (response.confidence > upper) return 'fail';
-	return 'unsure';
-};

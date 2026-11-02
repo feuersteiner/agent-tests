@@ -1,5 +1,4 @@
-import type { FastCheck } from '../schema/index.js';
-import type { PatternMatch } from './types.js';
+import type { PatternMatch } from '../types.js';
 
 /** Match every occurrence of each pattern; reject invalid regular expressions. */
 export const scanPatterns = (
@@ -20,9 +19,3 @@ export const scanPatterns = (
 	}
 	return matches.sort((left, right) => left.index - right.index);
 };
-
-/** Separate definite violations from weak hints without contacting a model. */
-export const evaluateFast = (fast: FastCheck | undefined, content: string) => ({
-	matches: scanPatterns(fast?.match, content),
-	hints: scanPatterns(fast?.maybe, content)
-});
