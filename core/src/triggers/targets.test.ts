@@ -1,4 +1,5 @@
-import { rm } from 'node:fs/promises';
+import { rm, symlink } from 'node:fs/promises';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createMockModel } from '../models/index.js';
 import { createRoot, installTest, referenceDefinition, write } from '../discovery/tests/fixture.js';
@@ -23,6 +24,18 @@ describe('installed test targets', () => {
 		const result = await targetFiles(root, 'no-informal-english');
 		expect(result.files).toEqual(['src/help.md']);
 		expect(result.exitCode).toBe(0);
+	});
+
+	it('selects the same owner-relative targets through a symlinked root', async () => {
+		const root = await fixture();
+		const links = await createRoot();
+		roots.push(links);
+		const alias = join(links, 'repository');
+		await symlink(root, alias, 'dir');
+		expect((await targetFiles(alias, 'no-informal-english')).files).toEqual(['src/help.md']);
+		expect(await targetFiles(alias, 'no-informal-english')).toEqual(
+			await targetFiles(root, 'no-informal-english')
+		);
 	});
 
 	it('respects nested inherited exemptions', async () => {
