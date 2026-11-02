@@ -1,4 +1,4 @@
-import { walkDirectories } from '../../discovery/walk.js';
+import { walkDirectories } from '../../discovery/walk-directories/index.js';
 import { collectRows } from './collect-rows.js';
 import { renderRows } from './render-rows.js';
 

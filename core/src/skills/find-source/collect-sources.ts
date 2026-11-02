@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { walkDirectories } from '../../discovery/walk.js';
+import { walkDirectories } from '../../discovery/walk-directories/index.js';
 import { readSource } from './read-source.js';
 import { isSourceDirectory } from './utils.js';
 import type { CompilationSource } from './types.js';
