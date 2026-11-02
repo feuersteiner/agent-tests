@@ -38,3 +38,17 @@ declare module 'vitest' {
 		agentTests: HostedContext;
 	}
 }
+
+/** One plugin instance owns its temporary directory and asynchronous watcher release. */
+export interface PluginState {
+	temporary?: string;
+	stopWatching?: () => Promise<void>;
+}
+
+/** Canonical project paths are reused consistently by injection, file writes and watch notifications. */
+export interface HostedProject {
+	directory: string;
+	entry: string;
+	source: string;
+	provided: HostedContext;
+}

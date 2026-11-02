@@ -60,6 +60,9 @@ describe('published package', () => {
 		const files = packed.files.map((file) => file.path);
 		expect(files).toContain('dist/index.js');
 		expect(files).toContain('dist/index.d.ts');
+		expect(files).toContain('dist/vitest/index.js');
+		expect(files).toContain('dist/vitest/index.d.ts');
+		expect(files).toContain('dist/vitest/runner.js');
 		expect(files).toContain('dist-cli/index.js');
 		expect(files.some((file) => /^(src|cli|tests)\//.test(file))).toBe(false);
 		const entry = readFileSync(
@@ -103,6 +106,24 @@ describe('published package', () => {
 			{ cwd: temporary, env: offlineEnvironment, encoding: 'utf8' }
 		);
 		expect(JSON.parse(output)).toMatchObject({ exitCode: 0, checked: 0, findings: [] });
+	});
+
+	it('imports the public Vitest plugin from the packed artifact offline', () => {
+		const output = execFileSync(
+			process.execPath,
+			[
+				'--input-type=module',
+				'-e',
+				"import agentTests, { agentTests as named } from 'agent-tests/vitest'; const plugin = agentTests(); console.log(JSON.stringify({ name: plugin.name, same: agentTests === named, configure: typeof plugin.configureVitest, cleanup: typeof plugin.closeBundle }));"
+			],
+			{ cwd: temporary, env: offlineEnvironment, encoding: 'utf8' }
+		);
+		expect(JSON.parse(output)).toEqual({
+			name: 'agent-tests',
+			same: true,
+			configure: 'function',
+			cleanup: 'function'
+		});
 	});
 
 	it('returns structured usage failures with exit 2', () => {

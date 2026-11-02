@@ -1,6 +1,7 @@
 import { createConfiguredModel, loadConfiguration } from '../configuration/index.js';
 import type { DecisionModel } from '../models/index.js';
-import { createCachedModel, modelIdentity } from './cache.js';
+import { createCachedModel } from './cache/index.js';
+import { modelIdentity } from './model-identity.js';
 
 /** Load private credentials in the current process, sharing only fingerprinted cached answers. */
 export const loadHostedModel = async (
