@@ -15,12 +15,10 @@
   },
   "files": [
     "index.ts",
-    "src/types/*.ts",
-    "src/parser/*.ts",
-    "src/parser/README.md",
+    "src",
     "README.md",
     "LICENSE",
-    "!src/parser/*.test.ts"
+    "!src/**/*.test.ts"
   ],
   "type": "module",
   "scripts": {
