@@ -1,0 +1,84 @@
+id: no-corporate-jargon
+title: No corporate jargon
+description: Customer-facing English Markdown and plain-text prose under src/ uses concrete words instead of corporate jargon.
+source: sha256:3d624a7ae53a58662a9619b99f104ea3983a8502b78fd96d3b93fdca2b497594
+triggers:
+  path:
+    match:
+      - 'src/**/*.md'
+      - 'src/**/*.txt'
+checks:
+  - id: concrete-words
+    message: Customer-facing prose contains corporate jargon.
+    fix: Replace synergy with cooperation, game-changing with a specific description of the improvement, cutting-edge with new, and leverage with use.
+    fast:
+      match: '\b([Ss][Yy][Nn][Ee][Rr][Gg][Yy]|[Gg][Aa][Mm][Ee]-[Cc][Hh][Aa][Nn][Gg][Ii][Nn][Gg]|[Cc][Uu][Tt][Tt][Ii][Nn][Gg]-[Ee][Dd][Gg][Ee]|[Ll][Ee][Vv][Ee][Rr][Aa][Gg][Ee])\b'
+evals:
+  - name: Synergy in Markdown prose
+    path: src/welcome.md
+    content: Our service creates synergy between your teams.
+    expect: fail
+  - name: Game-changing in plain-text prose
+    path: src/content/announcement.txt
+    content: This game-changing update helps you work faster.
+    expect: fail
+  - name: Cutting-edge in Markdown prose
+    path: src/content/product.md
+    content: Try our cutting-edge tools today.
+    expect: fail
+  - name: Leverage in plain-text prose
+    path: src/message.txt
+    content: Leverage your team's experience.
+    expect: fail
+  - name: Uppercase synergy
+    path: src/content/teams.md
+    content: Create SYNERGY between teams.
+    expect: fail
+  - name: Uppercase game-changing phrase
+    path: src/content/update.txt
+    content: A GAME-CHANGING update is available.
+    expect: fail
+  - name: Uppercase cutting-edge phrase
+    path: src/content/tools.md
+    content: Try CUTTING-EDGE tools today.
+    expect: fail
+  - name: Uppercase leverage
+    path: src/content/help.txt
+    content: LEVERAGE your experience.
+    expect: fail
+  - name: Mixed case and punctuation
+    path: src/content/banner.md
+    content: 'Work together with (sYnErGy)!'
+    expect: fail
+  - name: Concrete alternatives
+    path: src/content/overview.md
+    content: Cooperation helps teams use the new tools to finish reports in half the time.
+    expect: pass
+  - name: Leveraged is a different word
+    path: src/message.txt
+    content: The team leveraged its experience last year.
+    expect: pass
+  - name: Terms inside longer words
+    path: src/content/terms.md
+    content: synergyx xsynergy game-changingness xgame-changing cutting-edgex xcutting-edge leveraged leverageable xleverage
+    expect: pass
+  - name: Unhyphenated phrases
+    path: src/content/description.txt
+    content: The game changing rooms and the cutting edge of the blade are clean.
+    expect: pass
+  - name: Internal Markdown outside src
+    path: notes/planning.md
+    content: Leverage synergy for a game-changing and cutting-edge launch.
+    expect: skip
+  - name: Internal plain text outside src
+    path: notes/planning.txt
+    content: SYNERGY and LEVERAGE are notes for the launch.
+    expect: skip
+  - name: Source code under src
+    path: src/content/banner.ts
+    content: const banner = 'Leverage our cutting-edge tools';
+    expect: skip
+  - name: Root Markdown outside src
+    path: README.md
+    content: Our game-changing update creates synergy.
+    expect: skip
