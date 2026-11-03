@@ -1,7 +1,7 @@
 {
 	"name": "agent-tests",
 	"version": "0.0.1",
-	"description": "Reusable repository checks for lessons learned during agent sessions.",
+	"description": "linting and testing for intelligence",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
