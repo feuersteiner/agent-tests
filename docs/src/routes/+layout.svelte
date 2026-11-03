@@ -3,8 +3,7 @@
 	import { onMount } from 'svelte';
 	import { Button, Theme as BrefTheme, ThemeModeToggle } from 'bref-ui-themes/crystal-code';
 	import type { IconName, ThemeMode } from 'bref-ui/types';
-	import logoLight from '#lib/assets/logo-light.svg';
-	import logoDark from '#lib/assets/logo-dark.svg';
+	import logo from '#lib/assets/logo.svg';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -17,12 +16,6 @@
 		dark: 'dark_mode'
 	};
 	let mode = $state<ThemeMode>('auto');
-	const darkMedia = $derived(
-		mode === 'auto' ? '(prefers-color-scheme: dark)' : mode === 'dark' ? 'all' : 'not all'
-	);
-	const lightMedia = $derived(
-		mode === 'auto' ? '(prefers-color-scheme: light)' : mode === 'light' ? 'all' : 'not all'
-	);
 
 	function cycleTheme() {
 		mode = modes[(modes.indexOf(mode) + 1) % modes.length];
@@ -44,8 +37,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" type="image/svg+xml" href={logoLight} media={lightMedia} />
-	<link rel="icon" type="image/svg+xml" href={logoDark} media={darkMedia} />
+	<link rel="icon" type="image/svg+xml" href={logo} />
 </svelte:head>
 
 <ThemeModeToggle {mode} />
@@ -54,10 +46,7 @@
 		<a class="skip-link" href="#content">Skip to content</a>
 		<header>
 			<a class="brand" href={resolve('/')} aria-label="agent-tests home">
-				<picture>
-					<source srcset={logoDark} media={darkMedia} />
-					<img src={logoLight} alt="" width="36" height="36" />
-				</picture>
+				<img src={logo} alt="" width="36" height="36" />
 				<strong>agent-tests</strong>
 			</a>
 			<div class="actions">
@@ -182,7 +171,6 @@
 		gap: 8px;
 	}
 
-	picture,
 	img {
 		display: block;
 	}

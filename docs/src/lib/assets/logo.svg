@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+	<title id="title">agent-tests shield</title>
+	<defs>
+		<filter id="shield-shadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+			<feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#102D50" flood-opacity="0.6" />
+		</filter>
+	</defs>
+	<rect x="2" y="2" width="156" height="156" rx="72" fill="#FFFFFF" stroke="#102D50" stroke-width="4" />
+	<g transform="translate(8 8)">
+		<path filter="url(#shield-shadow)" fill="#102D50" d="M72 11.85L120 29.85V60.85A89 89 0 0 1 107.67869625 106.03160622A55 55 0 0 1 72 131.85A55 55 0 0 1 36.32130375 106.03160622A89 89 0 0 1 24 60.85V29.85Z" />
+		<g fill="#FFFFFF">
+			<rect x="44.5" y="55" width="21" height="21" />
+			<rect x="78.5" y="55" width="21" height="21" />
+			<rect x="44.5" y="89" width="13" height="3" />
+		</g>
+	</g>
+</svg>
