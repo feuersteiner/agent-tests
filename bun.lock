@@ -24,6 +24,7 @@
       "version": "0.0.1",
       "dependencies": {
         "bref-ui": "^3.1.0",
+        "bref-ui-themes": "1.0.2",
       },
       "devDependencies": {
         "@sveltejs/adapter-static": "^4.0.1",
@@ -114,6 +115,8 @@
     "axobject-query": ["axobject-query@4.1.0", "", {}, "sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ=="],
 
     "bref-ui": ["bref-ui@3.1.0", "", { "dependencies": { "@fontsource-variable/material-symbols-outlined": "^5.3.5" }, "peerDependencies": { "svelte": "^5.56.1" }, "bin": { "bref-ui": "dist-cli/index.js" } }, "sha512-AA5mrKcnolxbyo3idQTIuHw053sh/1P9ieCKeLrwsZjOdeH3H9Em+F8xO/V7nXxEs9MMzjPfUH2SFJOlSuzXrQ=="],
+
+    "bref-ui-themes": ["bref-ui-themes@1.0.2", "", { "dependencies": { "@fontsource-variable/material-symbols-outlined": "^5.3.5" }, "peerDependencies": { "bref-ui": "^3.0.0", "svelte": "^5.0.0" } }, "sha512-JATcLun8ZEZoYC/3kCQyZ+aPPvR3DTyrYYZTgrFOaf0szCayLofzKJVc9pA5txGQCylOE16bmqa76KVQaILtFw=="],
 
     "bun-types": ["bun-types@1.4.4", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-yjrJh5oGX7mMPKGd19YXyIjmEuj4G4zNC30bs7PM9Az7NQ3ndF3j6hbeRdvJTRQEhJ/FYQwW0a2moweEi2hMxQ=="],
 
