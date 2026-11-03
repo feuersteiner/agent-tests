@@ -9,3 +9,4 @@ export * from './validation/index.js';
 export * from './evals/index.js';
 export * from './skills/index.js';
 export * from './init/index.js';
+export * from './library/index.js';
