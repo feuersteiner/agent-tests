@@ -26,6 +26,7 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"dependencies": {
-		"bref-ui": "^3.1.0"
+		"bref-ui": "^3.1.0",
+		"bref-ui-themes": "1.0.2"
 	}
 }
