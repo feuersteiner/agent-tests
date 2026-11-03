@@ -8,9 +8,7 @@
 		"declarationMap": true,
 		"sourceMap": true
 	},
-	"include": [
-		"src/index.ts"
-	],
+	"include": ["src/index.ts", "src/vitest/index.ts", "src/vitest/runner.ts"],
 	"exclude": [
 		"src/**/*.test.ts",
 		"src/**/__tests__/**",
