@@ -1,18 +1,15 @@
 <script lang="ts">
-	import { Button } from 'bref-ui';
+	import { Button } from 'bref-ui-themes/crystal-code';
 </script>
 
 <svelte:head>
 	<title>agent-tests docs</title>
-	<meta
-		name="description"
-		content="Reusable repository checks for lessons learned during agent sessions."
-	/>
+	<meta name="description" content="Reusable repository checks for lessons learned during agent sessions." />
 </svelte:head>
 
-<main>
+<main id="content" tabindex="-1">
 	<h1>agent-tests</h1>
-	<p>Turn recurring agent mistakes and review lessons into reusable repository checks.</p>
+	<p>linting and testing for intelligence</p>
 	<p>Documentation is coming soon. The library is currently a scaffold.</p>
 	<Button label="Explore Bref-ui" href="https://feuersteiner.github.io/bref-ui/" />
 </main>
