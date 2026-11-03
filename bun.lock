@@ -22,6 +22,9 @@
     "core": {
       "name": "agent-tests",
       "version": "0.0.1",
+      "bin": {
+        "agent-tests": "./dist-cli/index.js",
+      },
       "dependencies": {
         "@ai-sdk/openai": "^3.0.0",
         "ai": "^6.0.0",

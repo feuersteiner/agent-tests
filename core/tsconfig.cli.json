@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"noEmit": false,
+		"rootDir": "cli",
+		"outDir": "dist-cli",
+		"paths": {
+			"agent-tests": ["./dist/index.d.ts"]
+		}
+	},
+	"include": ["cli/**/*.ts"]
+}
