@@ -14,4 +14,6 @@ Validation failures and underlying scoring errors reject the returned promise.
 `run` is a `public readonly` async function property. TypeScript prevents
 reassignment; subclasses can still override it.
 
-Concrete fast, smart, and deep engines remain WIP.
+[`FastEngine`](fast/README.md) implements regex scoring. It and its params
+schema/type are exported directly from the package root; this base module stays
+independent of concrete engines. Smart and deep engines remain WIP.
