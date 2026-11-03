@@ -5,3 +5,4 @@ export * from './results/index.js';
 export * from './discovery/index.js';
 export * from './triggers/index.js';
 export * from './checks/index.js';
+export * from './evals/index.js';
