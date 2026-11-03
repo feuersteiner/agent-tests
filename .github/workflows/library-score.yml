@@ -1,8 +1,6 @@
 name: Library score
 
-# Checks vote PRs against library/AGENTS.md. Runs from the default branch and
-# reads the PR as Git data: nothing from the PR is checked out or run.
-
+# Trusted base workflow reads pull request objects; it never executes PR code.
 on:
   pull_request_target:
     types: [opened, reopened, synchronize]
@@ -12,58 +10,90 @@ jobs:
     name: Library score
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      pull-requests: write
     env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
       PR: ${{ github.event.pull_request.number }}
       BASE: ${{ github.event.pull_request.base.sha }}
       HEAD: ${{ github.event.pull_request.head.sha }}
       AUTHOR: ${{ github.event.pull_request.user.login }}
     steps:
-      - name: Check out the default branch
+      - name: Check out the trusted base
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Find the vote
+      - name: Validate an author-only vote
+        id: vote
+        shell: bash
         run: |
           git fetch --quiet origin "refs/pull/$PR/head"
-          git diff --name-status --no-renames "$(git merge-base "$BASE" "$HEAD")" "$HEAD" > changes
-          csv=$(cut -f2 changes | grep 'score\.csv$' | head -n1 || true)
-          echo "CSV=$csv" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import os, re, subprocess
 
-      - name: Changes one score.csv and nothing else
-        if: env.CSV
+          def git(*args):
+              return subprocess.check_output(['git', *args])
+
+          base, head, author = [os.environ[key] for key in ('BASE', 'HEAD', 'AUTHOR')]
+          ancestor = git('merge-base', base, head).decode().strip()
+          parts = git('diff', '--name-status', '--no-renames', '-z', ancestor, head).split(b'\0')
+          entries = list(zip(parts[0:-1:2], parts[1:-1:2]))
+          votes = [(status, path) for status, path in entries if path.endswith(b'/score.csv')]
+          if not votes:
+              raise SystemExit(0)
+          assert len(entries) == 1 and entries[0][0] in (b'A', b'M'), 'Change only one score.csv'
+          path = entries[0][1].decode('utf-8')
+          assert re.fullmatch(r'library/[a-z0-9]+(?:-[a-z0-9]+)*/score\.csv', path), 'Invalid vote path'
+          git('cat-file', '-e', f'{base}:{path.rsplit("/", 1)[0]}/test.yaml')
+
+          def regular_csv(ref, required=False):
+              entry = git('ls-tree', '-z', ref, '--', path)
+              assert entry or not required, 'The voted score.csv must exist'
+              if entry:
+                  metadata, name = entry.rstrip(b'\0').split(b'\t', 1)
+                  assert name == path.encode(), 'Unexpected score.csv tree entry'
+                  assert metadata.split()[:2] == [b'100644', b'blob'], 'score.csv must be a regular nonexecutable file'
+              return bool(entry)
+
+          regular_csv(ancestor)
+          regular_csv(head, required=True)
+
+          def rows(data):
+              text = data.decode('utf-8')
+              assert text.endswith('\n'), 'score.csv must end with a newline'
+              header, *values = text[:-1].split('\n')
+              assert header == 'github_handle', 'Invalid score.csv header'
+              assert all(re.fullmatch(r'[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*', v) for v in values), 'Invalid handle'
+              assert len({v.lower() for v in values}) == len(values), 'Duplicate handle'
+              return values
+
+          exists = regular_csv(base)
+          before_data = git('show', f'{base}:{path}') if exists else b'github_handle\n'
+          before = rows(before_data)
+          after = rows(git('show', f'{head}:{path}'))
+          identity = author.lower()
+          old = [v for v in before if v.lower() == identity]
+          new = [v for v in after if v.lower() == identity]
+          assert len(old) + len(new) == 1, 'Add or remove exactly the author row'
+          assert [v for v in before if v.lower() != identity] == [v for v in after if v.lower() != identity], 'Do not change other votes'
+          assert abs(len(after) - len(before)) == 1, 'One changed row is required'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('valid=true\n')
+          PY
+
+      - name: Approve the validated commit
+        if: steps.vote.outputs.valid == 'true'
         run: |
-          [ "$(wc -l < changes)" = 1 ]
-          grep -qP '^[AM]\tlibrary/[a-z0-9-]+/score\.csv$' changes
+          gh api "repos/$GH_REPO/pulls/$PR/reviews" --method POST \
+            -f event=APPROVE -f commit_id="$HEAD"
 
-      - name: Votes for a test that exists on main
-        if: env.CSV
-        run: git cat-file -e "$BASE:$(dirname "$CSV")/test.yaml"
-
-      - name: Keeps score.csv well formed
-        if: env.CSV
+      - name: Enable auto-merge for the validated commit
+        if: steps.vote.outputs.valid == 'true'
         run: |
-          git show "$HEAD:$CSV" > after.csv
-          tail -n +2 after.csv > after
-          # Header, then one GitHub handle per row: no @, quotes, or blank rows.
-          [ "$(head -n1 after.csv)" = github_handle ]
-          [ -z "$(grep -vxE '[A-Za-z0-9]+(-[A-Za-z0-9]+)*' after)" ]
-          # Each handle appears once, ignoring case.
-          [ -z "$(sort -f after | uniq -di)" ]
-
-      - name: Adds or removes exactly one row, the author's own
-        if: env.CSV
-        run: |
-          (git show "$BASE:$CSV" 2> /dev/null || echo github_handle) | tail -n +2 > before
-          change=$(diff before after | grep '^[<>] ' || true)
-          if [ "$(grep -c . <<< "$change")" != 1 ]; then
-            echo "::error::Add or remove exactly one row; leave every other row untouched."
-            exit 1
-          fi
-          if [ "${change:2,,}" != "${AUTHOR,,}" ]; then
-            echo "::error::Only you can add or remove yourself: the row is ${change:2}, the author is $AUTHOR."
-            exit 1
-          fi
+          method=$(gh api "repos/$GH_REPO" --jq \
+            'if .allow_squash_merge then "--squash" elif .allow_merge_commit then "--merge" elif .allow_rebase_merge then "--rebase" else error("No allowed merge method") end')
+          gh pr merge "$PR" --repo "$GH_REPO" --auto "$method" --match-head-commit "$HEAD"
