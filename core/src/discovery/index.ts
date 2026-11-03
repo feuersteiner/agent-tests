@@ -16,5 +16,6 @@ export const testsForFile = (
 
 export { discoverTests } from './load-packages/index.js';
 export { discoverTestDirectories } from './directories/index.js';
+export { collectCandidates } from './candidates/index.js';
 export { formatTestTree } from './tree.js';
 export type { CandidateFile, DiscoveredTest, RunScope } from './types.js';
