@@ -1,9 +1,9 @@
-import { PatternsSchema } from '../types/index.ts';
-import type { Patterns } from '../types/index.ts';
-import { Trigger } from './index.ts';
+import { PatternsSchema } from '../../types/index.ts';
+import type { Patterns } from '../../types/index.ts';
+import { Filter } from './index.ts';
 
 /** Compile every regex before checking content for an alternative match. */
-export class ContentMatchTrigger extends Trigger<Patterns> {
+export class ContentMatchFilter extends Filter<Patterns> {
 	protected override readonly paramsSchema = PatternsSchema;
 
 	protected override async matches(input: string, patterns: Patterns): Promise<boolean> {

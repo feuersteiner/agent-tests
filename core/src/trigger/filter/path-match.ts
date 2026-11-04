@@ -1,10 +1,10 @@
 import { posix } from 'node:path';
-import { PatternsSchema } from '../types/index.ts';
-import type { Patterns } from '../types/index.ts';
-import { Trigger } from './index.ts';
+import { PatternsSchema } from '../../types/index.ts';
+import type { Patterns } from '../../types/index.ts';
+import { Filter } from './index.ts';
 
 /** Match a POSIX path against alternative glob patterns. */
-export class PathMatchTrigger extends Trigger<Patterns> {
+export class PathMatchFilter extends Filter<Patterns> {
 	protected override readonly paramsSchema = PatternsSchema;
 
 	protected override async matches(input: string, patterns: Patterns): Promise<boolean> {
