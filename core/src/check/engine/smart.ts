@@ -1,6 +1,6 @@
 import type { z } from 'zod';
-import type { AI } from '../ai/index.ts';
-import { SmartCheckSchema } from '../types/index.ts';
+import type { AI } from '../../ai/index.ts';
+import { SmartCheckSchema } from '../../types/index.ts';
 import { Engine } from './index.ts';
 
 /** Shared smart-check prompt and optional score thresholds. */

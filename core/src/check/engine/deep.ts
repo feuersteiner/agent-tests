@@ -1,6 +1,6 @@
 import type { z } from 'zod';
-import type { AI } from '../ai/index.ts';
-import { DeepCheckSchema } from '../types/index.ts';
+import type { AI } from '../../ai/index.ts';
+import { DeepCheckSchema } from '../../types/index.ts';
 import { Engine } from './index.ts';
 
 /** Shared deep-check prompt and optional reasoning level. */
