@@ -1,18 +1,25 @@
 {
   "name": "agent-tests-workspace",
   "private": true,
+  "type": "module",
   "license": "MIT",
   "packageManager": "bun@1.3.4",
-  "workspaces": ["core", "docs"],
+  "workspaces": [
+    "core",
+    "docs"
+  ],
   "scripts": {
     "dev": "bun run --cwd docs dev",
     "build": "cp README.md LICENSE core/ && bun run --cwd docs build",
     "preview": "bun run --cwd docs preview",
     "check": "bun run --workspaces check",
-    "pack": "bun run build && cd core && npm pack"
+    "pack": "bun run build && cd core && npm pack",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@types/node": "^22",
+    "prettier": "^3.9.10",
+    "prettier-plugin-svelte": "^4.1.1",
     "typescript": "^6.0.3"
   }
 }
