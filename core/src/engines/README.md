@@ -1,19 +1,22 @@
 # Engines
 
-`Engine<Params>` defines the shared abstract engine API. Its public async
-`run(input, params)` returns a `Promise<number>` with a finite score in `[0, 1]`.
-`ScoreSchema` validates that range; `Score` is its inferred TypeScript type.
-All three exports are available from `agent-tests`.
+[`Engine<Params>`](index.ts) exposes readonly async `run(input, params): Promise<number>`.
+It validates and normalizes params with Zod before scoring, then requires a finite score in `[0, 1]`.
+Invalid params, invalid scores, regex errors, and AI errors reject the promise.
+Subclasses implement protected readonly `paramsSchema: z.ZodType<Params>` and `score(input, params)`.
 
-Extend `Engine<Params>` with a protected readonly `paramsSchema: z.ZodType<Params>`
-and a protected `score(input, params): Promise<number>` implementation. `run`
-validates params with Zod, passes the parsed params (including normalization) to
-`score`, then validates the returned score. Invalid params prevent scoring.
-Validation failures and underlying scoring errors reject the returned promise.
+[`FastEngine`](fast.ts) uses case-sensitive JavaScript regexes without flags.
+`match` and `maybe` accept nonempty strings or nonempty arrays of nonempty strings; at least one is required.
+Each list contains alternatives; all patterns compile before matching.
+A `match` hit scores `1` with priority; a `maybe` hit scores `0.5`; otherwise `0`.
 
-`run` is a `public readonly` async function property. TypeScript prevents
-reassignment; subclasses can still override it.
+[`SmartEngine`](smart.ts) and [`DeepEngine`](deep.ts) require an injected [AI](../ai/README.md): `new SmartEngine(ai)` or `new DeepEngine(ai)`.
+The caller configures providers; `ask` must be nonblank and describe the passing condition.
+Smart forwards only `{ input, ask }`, preserving the raw AI score.
+Optional Smart `bounds` are two increasing numbers in `[0, 1]`; the engine neither forwards nor applies them.
+Bounds interpretation belongs to check execution.
+Deep forwards `input`, `ask`, and optional `reasoning` (`low`, `medium`, or `high`, with no default).
+Deep returns the raw AI score; its params have no bounds.
 
-[`FastEngine`](fast/README.md) implements regex scoring. It and its params
-schema/type are exported directly from the package root; this base module stays
-independent of concrete engines. Smart and deep engines remain WIP.
+Each concrete engine's `*EngineParamsSchema` reuses its corresponding `*CheckSchema`.
+`Engine`, `ScoreSchema`, `Score`, and all concrete engine classes, params schemas, and params types export from `agent-tests`.

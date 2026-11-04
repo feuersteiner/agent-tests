@@ -1,40 +1,40 @@
 {
-  "name": "agent-tests",
-  "version": "0.0.1",
-  "description": "Reusable repository checks for lessons learned during agent sessions.",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/feuersteiner/agent-tests.git",
-    "directory": "core"
-  },
-  "module": "index.ts",
-  "exports": {
-    ".": "./index.ts",
-    "./types": "./src/types/index.ts"
-  },
-  "files": [
-    "index.ts",
-    "src",
-    "README.md",
-    "LICENSE",
-    "!src/**/*.test.ts"
-  ],
-  "type": "module",
-  "scripts": {
-    "check": "tsc --noEmit",
-    "test": "vitest run"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "vitest": "^5.1.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5 || ^6"
-  },
-  "dependencies": {
-    "ai": "7.0.162",
-    "yaml": "^2.9.1",
-    "zod": "^4.6.7"
-  }
+	"name": "agent-tests",
+	"version": "0.0.1",
+	"description": "Reusable repository checks for lessons learned during agent sessions.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/feuersteiner/agent-tests.git",
+		"directory": "core"
+	},
+	"module": "index.ts",
+	"exports": {
+		".": "./index.ts",
+		"./types": "./src/types/index.ts"
+	},
+	"files": [
+		"index.ts",
+		"src",
+		"README.md",
+		"LICENSE",
+		"!src/**/*.test.ts"
+	],
+	"type": "module",
+	"scripts": {
+		"check": "tsc --noEmit",
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"vitest": "^5.1.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5 || ^6"
+	},
+	"dependencies": {
+		"ai": "7.0.162",
+		"yaml": "^2.9.1",
+		"zod": "^4.6.7"
+	}
 }

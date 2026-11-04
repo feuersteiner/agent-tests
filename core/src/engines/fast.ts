@@ -1,7 +1,7 @@
 import type { z } from 'zod';
-import { Engine } from '../index.ts';
-import { FastCheckSchema } from '../../types/index.ts';
-import type { Patterns } from '../../types/index.ts';
+import { Engine } from './index.ts';
+import { FastCheckSchema } from '../types/index.ts';
+import type { Patterns } from '../types/index.ts';
 
 /** Regex patterns with at least one match or maybe pattern. */
 export const FastEngineParamsSchema = FastCheckSchema;
