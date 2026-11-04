@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
-import { FastEngine } from '../../../index.ts'
-import { FastEngineParamsSchema } from './index.ts'
-import type { FastEngineParams } from './index.ts'
+import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
+import { FastEngine } from '../../../index.ts';
+import { FastEngineParamsSchema } from './index.ts';
+import type { FastEngineParams } from './index.ts';
 
 describe('FastEngine', () => {
 	it.each<[string, FastEngineParams, number]>([
@@ -16,13 +16,12 @@ describe('FastEngine', () => {
 		['gonna ship', { match: '\\b(gonna|wanna)\\b' }, 1],
 		['begonna', { match: '\\b(gonna|wanna)\\b' }, 0]
 	])('scores %s with %j as %s', async (input, params, expected) => {
-		await expect(new FastEngine().run(input, params)).resolves.toBe(expected)
-	})
+		await expect(new FastEngine().run(input, params)).resolves.toBe(expected);
+	});
 
 	it('prioritizes match over maybe', async () => {
-		await expect(new FastEngine().run('copy', { match: 'copy', maybe: 'copy' }))
-			.resolves.toBe(1)
-	})
+		await expect(new FastEngine().run('copy', { match: 'copy', maybe: 'copy' })).resolves.toBe(1);
+	});
 
 	it.each([
 		{},
@@ -34,11 +33,12 @@ describe('FastEngine', () => {
 		{ match: 'copy', mode: 'regex' },
 		{ match: 'copy', mode: 'glob' },
 		{ match: 'copy', glob: 'src/**' }
-	])('rejects invalid params %j through inherited validation', async params => {
-		expect(FastEngineParamsSchema.safeParse(params).success).toBe(false)
-		await expect(new FastEngine().run('copy', params as FastEngineParams))
-			.rejects.toBeInstanceOf(z.ZodError)
-	})
+	])('rejects invalid params %j through inherited validation', async (params) => {
+		expect(FastEngineParamsSchema.safeParse(params).success).toBe(false);
+		await expect(new FastEngine().run('copy', params as FastEngineParams)).rejects.toBeInstanceOf(
+			z.ZodError
+		);
+	});
 
 	it.each<FastEngineParams>([
 		{ match: '[' },
@@ -46,17 +46,17 @@ describe('FastEngine', () => {
 		{ match: ['copy', '['] },
 		{ match: 'copy', maybe: '[' },
 		{ maybe: ['copy', '['] }
-	])('rejects invalid regexes even behind matching patterns: %j', async params => {
-		await expect(new FastEngine().run('copy', params)).rejects.toBeInstanceOf(SyntaxError)
-	})
+	])('rejects invalid regexes even behind matching patterns: %j', async (params) => {
+		await expect(new FastEngine().run('copy', params)).rejects.toBeInstanceOf(SyntaxError);
+	});
 
 	it('keeps repeated regex calls independent', async () => {
-		const engine = new FastEngine()
-		const params: FastEngineParams = { match: 'copy' }
-		const scores = []
+		const engine = new FastEngine();
+		const params: FastEngineParams = { match: 'copy' };
+		const scores = [];
 		for (const input of ['copy', 'copy', 'other', 'copy']) {
-			scores.push(await engine.run(input, params))
+			scores.push(await engine.run(input, params));
 		}
-		expect(scores).toEqual([1, 1, 0, 1])
-	})
-})
+		expect(scores).toEqual([1, 1, 0, 1]);
+	});
+});

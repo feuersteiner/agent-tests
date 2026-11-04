@@ -5,15 +5,15 @@ validates an already decoded value. Both run synchronously and return `AgentTest
 or throw an `Error` containing field paths or YAML line/column information.
 
 ```ts
-import { readFileSync } from 'node:fs'
-import { parseTestDefinition, parseTestYaml } from 'agent-tests'
-import { AgentTestSchema } from 'agent-tests/types'
-import type { AgentTest } from 'agent-tests/types'
+import { readFileSync } from 'node:fs';
+import { parseTestDefinition, parseTestYaml } from 'agent-tests';
+import { AgentTestSchema } from 'agent-tests/types';
+import type { AgentTest } from 'agent-tests/types';
 
-const text = readFileSync('library/no-informal-english/test.yaml', 'utf8')
-const test: AgentTest = parseTestYaml(text)
-parseTestDefinition({ ...test, title: 'Formal public copy' })
-AgentTestSchema.safeParse(test) // Direct Zod validation without throwing.
+const text = readFileSync('library/no-informal-english/test.yaml', 'utf8');
+const test: AgentTest = parseTestYaml(text);
+parseTestDefinition({ ...test, title: 'Formal public copy' });
+AgentTestSchema.safeParse(test); // Direct Zod validation without throwing.
 ```
 
 File reading in this example belongs to the caller: the parser accepts strings

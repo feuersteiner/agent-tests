@@ -3,17 +3,17 @@
 `FastEngine` matches input text against JavaScript regex patterns without flags.
 
 ```ts
-import { FastEngine } from 'agent-tests'
-import type { FastEngineParams } from 'agent-tests'
+import { FastEngine } from 'agent-tests';
+import type { FastEngineParams } from 'agent-tests';
 
-const engine = new FastEngine()
+const engine = new FastEngine();
 const params: FastEngineParams = {
 	match: ['gonna', 'wanna'],
 	maybe: 'hey'
-}
-await engine.run('We are gonna ship.', params) // 1
-await engine.run('hey there', params) // 0.5
-await engine.run('Formal copy.', params) // 0
+};
+await engine.run('We are gonna ship.', params); // 1
+await engine.run('hey there', params); // 0.5
+await engine.run('Formal copy.', params); // 0
 ```
 
 Params require at least one of `match` or `maybe`.

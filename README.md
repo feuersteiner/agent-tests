@@ -31,15 +31,15 @@ title: User text in French
 description: User-facing text is written in French.
 triggers:
   path:
-    match: ["src/**/*.svelte", "src/**/*.html"]
+    match: ['src/**/*.svelte', 'src/**/*.html']
   content:
-    ask: "This file contains text displayed to an end user."
+    ask: 'This file contains text displayed to an end user.'
 checks:
   - id: french-only
     message: User-facing text is not in French.
     fix: Translate the text into French.
     smart:
-      ask: "Quote each piece of user-facing text that is not in French."
+      ask: 'Quote each piece of user-facing text that is not in French.'
 evals:
   - name: English button label
     path: src/lib/Save.svelte
@@ -100,14 +100,14 @@ the order written. A list of triggers holds alternatives.
 triggers:
   # Marketing pages are always brand copy: a glob is enough.
   - path:
-      match: ["content/**/*.md", "src/routes/(marketing)/**/*.svelte"]
+      match: ['content/**/*.md', 'src/routes/(marketing)/**/*.svelte']
   # Elsewhere, cheap filters first and models last.
   - path:
-      match: ["src/**/*.svelte", "emails/**/*.html"]
-      ask: "This path belongs to a customer-facing page, component, or email."
+      match: ['src/**/*.svelte', 'emails/**/*.html']
+      ask: 'This path belongs to a customer-facing page, component, or email.'
     content:
-      match: "[Aa]cme"
-      ask: "This file contains product or marketing copy shown to customers."
+      match: '[Aa]cme'
+      ask: 'This file contains product or marketing copy shown to customers.'
 ```
 
 Like `AGENTS.md`, any directory can have its own `.agents/tests/`. Its tests apply
@@ -147,10 +147,10 @@ checks:
       maybe: # weak signal: a match escalates, with the hits as hints
         - '\b(hey|awesome|folks|no worries)\b'
     smart: # classifier such as Jev or Clef
-      ask: "Quote each phrase in this copy that uses familiar or casual language."
+      ask: 'Quote each phrase in this copy that uses familiar or casual language.'
       bounds: [0.3, 0.8] # below: pass, between: unsure, above: likely violation
     deep: # structured LLM call, the final word
-      ask: "Judge each quoted phrase against the brand voice in TEST.md."
+      ask: 'Judge each quoted phrase against the brand voice in TEST.md.'
       reasoning: medium # low, medium, or high
 ```
 
@@ -193,7 +193,7 @@ evals:
     expect: pass
   - name: billing code is not copy
     path: src/billing/charge.ts
-    content: "export const charge = (cents: number) => cents;"
+    content: 'export const charge = (cents: number) => cents;'
     expect: skip # the triggers should not select it
 ```
 

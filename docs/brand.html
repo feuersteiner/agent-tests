@@ -1,147 +1,453 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Agent-tests brand reference: Fibonacci logo construction, police blue palettes, and Menlo typography.">
-  <title>agent-tests / Brand</title>
-  <style>
-    :root { --brand-font: Menlo, Monaco, 'Courier New', monospace; }
-    /* Semantic colors mirror src/lib/theme.ts. */
-    [data-theme="light"] { color-scheme: light; --primary: #102D50; --secondary: #2D5278; --background: #F3F6F9; --foreground: #102D50; --muted: #53677F; --info: #245C91; --success: #147A3C; --warning: #8A5A00; --error: #B42336; }
-    [data-theme="dark"] { color-scheme: dark; --primary: #4080BF; --secondary: #557FA9; --background: #080C12; --foreground: #F3F6F9; --muted: #A9B8C8; --info: #8FC8ED; --success: #5CFF8A; --warning: #FFD166; --error: #FF6B7A; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--background); color: var(--foreground); font: 15px/1.6 system-ui, sans-serif; }
-    main { max-width: 1160px; margin: auto; padding: 36px 32px 60px; }
-    button, input { accent-color: var(--primary); }
-    :focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; }
-    header, .section-heading, .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    header { border-bottom: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); padding-bottom: 22px; }
-    .brand-name, h1, h2, .eyebrow, code { font-family: var(--brand-font); font-variant-ligatures: none; }
-    .brand-name { font-weight: 400; letter-spacing: -.045em; }
-    h1 { font-size: 20px; font-weight: 400; letter-spacing: -.045em; margin: 0; }
-    h2 { font-size: 18px; line-height: 1.3; font-weight: 400; letter-spacing: -.04em; margin: 0; }
-    p { margin: 0; }
-    .eyebrow { font-size: 10px; letter-spacing: .06em; color: var(--muted); }
-    .eyebrow { text-transform: uppercase; }
-    section { margin-top: 32px; }
-    .section-heading { align-items: end; margin-bottom: 20px; flex-wrap: wrap; }
-    .guide-control { display: flex; gap: 8px; align-items: center; font-size: 12px; cursor: pointer; }
-    .identity-grid, .palettes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-    .panel { border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); border-radius: 18px; overflow: hidden; }
-    .construction { margin: 0; padding: 30px; background: var(--background); color: #F3F6F9; display: grid; justify-items: center; align-content: center; }
-    .construction > svg { width: min(100%, 320px); height: auto; overflow: visible; }
-    body:has(#show-guides:not(:checked)) .guide-layer { display: none; }
-    .applications { display: grid; grid-template-rows: 1fr 1fr; gap: 20px; }
-    .application { background: var(--background); color: var(--foreground); padding: 24px; min-height: 190px; display: flex; flex-direction: column; justify-content: space-between; }
-    .lockup { display: flex; justify-content: center; align-items: center; gap: 8px; flex: 1; }
-    .lockup svg { width: 72px; height: 72px; flex-shrink: 0; }
-    .lockup .brand-name { font-size: clamp(20px, 2.5vw, 29px); white-space: nowrap; }
-    .brand-colors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .brand-color { border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); border-radius: 12px; overflow: hidden; }
-    .brand-color .paint { height: 70px; background: var(--paint); }
-    .brand-color p { padding: 12px 14px; font-size: 12px; }
-    .brand-color code { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
-    .palette-panel { background: var(--background); color: var(--foreground); padding: 24px; }
-    .panel-heading { margin-bottom: 18px; }
-    .panel-heading h3 { margin: 0; font-size: 14px; font-weight: 500; }
-    .swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-    .swatch { margin: 0; border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); border-radius: 8px; overflow: hidden; }
-    .swatch .paint { height: 44px; }
-    .swatch figcaption { padding: 8px; font: 10px/1.7 var(--brand-font); }
-    .swatch code { display: block; font-family: inherit; color: var(--muted); }
-    .type-specimen { padding: 26px; }
-    .font-specimen { font: 400 clamp(28px, 5vw, 48px)/1.5 var(--brand-font); letter-spacing: -.045em; display: block; }
-    .theme-button { background: var(--primary); color: var(--background); border: 0; border-radius: 7px; padding: 8px 12px; font: inherit; font-size: 12px; cursor: pointer; }
-    @media (max-width: 760px) { .identity-grid, .palettes { grid-template-columns: 1fr; } main { padding: 24px 20px 40px; } header { align-items: start; flex-wrap: wrap; } .lockup .brand-name { font-size: 26px; } }
-    @media (max-width: 420px) { .brand-colors { grid-template-columns: 1fr; } .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } .palette-panel { padding: 18px; } .lockup .brand-name { font-size: 21px; } }
-  </style>
-</head>
-<body data-theme="dark">
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <g id="brand-mark">
-        <path fill="currentColor" fill-rule="evenodd" d="M72 11.85L120 29.85V60.85A89 89 0 0 1 107.67869625 106.03160622A55 55 0 0 1 72 131.85A55 55 0 0 1 36.32130375 106.03160622A89 89 0 0 1 24 60.85V29.85Z M44.5 55h21v21h-21Z M78.5 55h21v21h-21Z M44.5 89h13v3h-13Z" />
-      </g>
-      <clipPath id="guide-frame"><rect width="144" height="144" /></clipPath>
-      <g id="fibonacci-circles" fill="none" stroke="#EAC98F" stroke-width=".45">
-        <g clip-path="url(#guide-frame)" stroke="#9FE0EF" opacity=".65">
-          <circle cx="31" cy="60.85" r="89" /><circle cx="113" cy="60.85" r="89" />
-          <circle cx="60.29298509" cy="78.11038889" r="55" /><circle cx="83.70701491" cy="78.11038889" r="55" />
-        </g>
-        <circle cx="72" cy="72" r="72" opacity=".65" /><circle cx="72" cy="72" r="44.5" opacity=".5" />
-        <circle cx="72" cy="65.5" r="27.5" /><circle cx="72" cy="65.5" r="17" opacity=".65" />
-        <circle cx="55" cy="65.5" r="10.5" /><circle cx="89" cy="65.5" r="10.5" />
-        <circle cx="51" cy="90.5" r="6.5" /><circle cx="51" cy="90.5" r="1.5" />
-        <path d="M0 55H144M0 89H144M44.5 0V144M72 0V144M99.5 0V144" stroke-dasharray="2 3" opacity=".55" />
-      </g>
-    </defs>
-  </svg>
-  <main>
-    <header>
-      <h1>agent-tests</h1>
-      <button class="theme-button" id="theme-toggle" type="button">Light view</button>
-    </header>
-    <section id="identity" aria-labelledby="identity-title">
-      <div class="section-heading"><h2 id="identity-title">Logo</h2><label class="guide-control"><input type="checkbox" id="show-guides" aria-controls="construction-layer" checked>Fibonacci circles</label></div>
-      <div class="identity-grid">
-        <figure class="construction panel">
-          <svg viewBox="0 0 144 144" role="img" aria-label="Agent-tests shield in a circular badge with Fibonacci construction circles">
-            <circle cx="72" cy="72" r="72" fill="#102D50" />
-            <use href="#brand-mark" />
-            <g id="construction-layer" class="guide-layer"><use href="#fibonacci-circles" /></g>
-          </svg>
-        </figure>
-        <div class="applications">
-          <div class="application panel" data-theme="light"><p class="eyebrow">Light</p><div class="lockup"><svg viewBox="0 0 144 144" aria-hidden="true"><use href="#brand-mark" /></svg><span class="brand-name">agent-tests</span></div></div>
-          <div class="application panel" data-theme="dark"><p class="eyebrow">Dark</p><div class="lockup"><svg viewBox="0 0 144 144" aria-hidden="true"><use href="#brand-mark" /></svg><span class="brand-name">agent-tests</span></div></div>
-        </div>
-      </div>
-    </section>
-    <section id="palette" aria-labelledby="palette-title">
-      <div class="section-heading"><h2 id="palette-title">Colors</h2></div>
-      <div class="brand-colors">
-        <div class="brand-color"><div class="paint" style="--paint: #102D50"></div><p>Police blue<code>#102D50</code></p></div>
-        <div class="brand-color"><div class="paint" style="--paint: #A9B8C8"></div><p>Silver<code>#A9B8C8</code></p></div>
-        <div class="brand-color"><div class="paint" style="--paint: #F3F6F9"></div><p>Off-white<code>#F3F6F9</code></p></div>
-      </div>
-      <div class="palettes">
-        <article class="palette-panel panel" data-theme="light"><div class="panel-heading"><h3>Light</h3></div><div class="swatches" aria-label="Light semantic colors"></div></article>
-        <article class="palette-panel panel" data-theme="dark"><div class="panel-heading"><h3>Dark</h3></div><div class="swatches" aria-label="Dark semantic colors"></div></article>
-      </div>
-    </section>
-    <section id="typography" aria-labelledby="type-title">
-      <div class="section-heading"><h2 id="type-title">Menlo</h2></div>
-      <div class="type-specimen panel">
-        <span class="font-specimen">agent-tests</span>
-      </div>
-    </section>
-  </main>
-  <script>
-    const roles = ['primary', 'secondary', 'background', 'foreground', 'muted', 'info', 'success', 'warning', 'error'];
-    document.querySelectorAll('.palette-panel').forEach(panel => {
-      const colors = getComputedStyle(panel);
-      roles.forEach(role => {
-        const hex = colors.getPropertyValue(`--${role}`).trim();
-        const swatch = document.createElement('figure');
-        swatch.className = 'swatch';
-        const paint = document.createElement('div');
-        paint.className = 'paint';
-        paint.style.backgroundColor = hex;
-        const caption = document.createElement('figcaption');
-        caption.textContent = role;
-        const value = document.createElement('code');
-        value.textContent = hex;
-        caption.append(value);
-        swatch.append(paint, caption);
-        panel.querySelector('.swatches').append(swatch);
-      });
-    });
-    document.getElementById('theme-toggle').addEventListener('click', event => {
-      const dark = document.body.dataset.theme === 'dark';
-      document.body.dataset.theme = dark ? 'light' : 'dark';
-      event.currentTarget.textContent = dark ? 'Dark view' : 'Light view';
-    });
-  </script>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta
+			name="description"
+			content="Agent-tests brand reference: Fibonacci logo construction, police blue palettes, and Menlo typography."
+		/>
+		<title>agent-tests / Brand</title>
+		<style>
+			:root {
+				--brand-font: Menlo, Monaco, 'Courier New', monospace;
+			}
+			/* Semantic colors mirror src/lib/theme.ts. */
+			[data-theme='light'] {
+				color-scheme: light;
+				--primary: #102d50;
+				--secondary: #2d5278;
+				--background: #f3f6f9;
+				--foreground: #102d50;
+				--muted: #53677f;
+				--info: #245c91;
+				--success: #147a3c;
+				--warning: #8a5a00;
+				--error: #b42336;
+			}
+			[data-theme='dark'] {
+				color-scheme: dark;
+				--primary: #4080bf;
+				--secondary: #557fa9;
+				--background: #080c12;
+				--foreground: #f3f6f9;
+				--muted: #a9b8c8;
+				--info: #8fc8ed;
+				--success: #5cff8a;
+				--warning: #ffd166;
+				--error: #ff6b7a;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				background: var(--background);
+				color: var(--foreground);
+				font:
+					15px/1.6 system-ui,
+					sans-serif;
+			}
+			main {
+				max-width: 1160px;
+				margin: auto;
+				padding: 36px 32px 60px;
+			}
+			button,
+			input {
+				accent-color: var(--primary);
+			}
+			:focus-visible {
+				outline: 2px solid var(--primary);
+				outline-offset: 5px;
+			}
+			header,
+			.section-heading,
+			.panel-heading {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 18px;
+			}
+			header {
+				border-bottom: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+				padding-bottom: 22px;
+			}
+			.brand-name,
+			h1,
+			h2,
+			.eyebrow,
+			code {
+				font-family: var(--brand-font);
+				font-variant-ligatures: none;
+			}
+			.brand-name {
+				font-weight: 400;
+				letter-spacing: -0.045em;
+			}
+			h1 {
+				font-size: 20px;
+				font-weight: 400;
+				letter-spacing: -0.045em;
+				margin: 0;
+			}
+			h2 {
+				font-size: 18px;
+				line-height: 1.3;
+				font-weight: 400;
+				letter-spacing: -0.04em;
+				margin: 0;
+			}
+			p {
+				margin: 0;
+			}
+			.eyebrow {
+				font-size: 10px;
+				letter-spacing: 0.06em;
+				color: var(--muted);
+			}
+			.eyebrow {
+				text-transform: uppercase;
+			}
+			section {
+				margin-top: 32px;
+			}
+			.section-heading {
+				align-items: end;
+				margin-bottom: 20px;
+				flex-wrap: wrap;
+			}
+			.guide-control {
+				display: flex;
+				gap: 8px;
+				align-items: center;
+				font-size: 12px;
+				cursor: pointer;
+			}
+			.identity-grid,
+			.palettes {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 20px;
+			}
+			.panel {
+				border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+				border-radius: 18px;
+				overflow: hidden;
+			}
+			.construction {
+				margin: 0;
+				padding: 30px;
+				background: var(--background);
+				color: #f3f6f9;
+				display: grid;
+				justify-items: center;
+				align-content: center;
+			}
+			.construction > svg {
+				width: min(100%, 320px);
+				height: auto;
+				overflow: visible;
+			}
+			body:has(#show-guides:not(:checked)) .guide-layer {
+				display: none;
+			}
+			.applications {
+				display: grid;
+				grid-template-rows: 1fr 1fr;
+				gap: 20px;
+			}
+			.application {
+				background: var(--background);
+				color: var(--foreground);
+				padding: 24px;
+				min-height: 190px;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+			.lockup {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 8px;
+				flex: 1;
+			}
+			.lockup svg {
+				width: 72px;
+				height: 72px;
+				flex-shrink: 0;
+			}
+			.lockup .brand-name {
+				font-size: clamp(20px, 2.5vw, 29px);
+				white-space: nowrap;
+			}
+			.brand-colors {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 12px;
+				margin-bottom: 20px;
+			}
+			.brand-color {
+				border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+				border-radius: 12px;
+				overflow: hidden;
+			}
+			.brand-color .paint {
+				height: 70px;
+				background: var(--paint);
+			}
+			.brand-color p {
+				padding: 12px 14px;
+				font-size: 12px;
+			}
+			.brand-color code {
+				display: block;
+				color: var(--muted);
+				font-size: 11px;
+				margin-top: 3px;
+			}
+			.palette-panel {
+				background: var(--background);
+				color: var(--foreground);
+				padding: 24px;
+			}
+			.panel-heading {
+				margin-bottom: 18px;
+			}
+			.panel-heading h3 {
+				margin: 0;
+				font-size: 14px;
+				font-weight: 500;
+			}
+			.swatches {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 10px;
+			}
+			.swatch {
+				margin: 0;
+				border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+			.swatch .paint {
+				height: 44px;
+			}
+			.swatch figcaption {
+				padding: 8px;
+				font: 10px/1.7 var(--brand-font);
+			}
+			.swatch code {
+				display: block;
+				font-family: inherit;
+				color: var(--muted);
+			}
+			.type-specimen {
+				padding: 26px;
+			}
+			.font-specimen {
+				font: 400 clamp(28px, 5vw, 48px)/1.5 var(--brand-font);
+				letter-spacing: -0.045em;
+				display: block;
+			}
+			.theme-button {
+				background: var(--primary);
+				color: var(--background);
+				border: 0;
+				border-radius: 7px;
+				padding: 8px 12px;
+				font: inherit;
+				font-size: 12px;
+				cursor: pointer;
+			}
+			@media (max-width: 760px) {
+				.identity-grid,
+				.palettes {
+					grid-template-columns: 1fr;
+				}
+				main {
+					padding: 24px 20px 40px;
+				}
+				header {
+					align-items: start;
+					flex-wrap: wrap;
+				}
+				.lockup .brand-name {
+					font-size: 26px;
+				}
+			}
+			@media (max-width: 420px) {
+				.brand-colors {
+					grid-template-columns: 1fr;
+				}
+				.swatches {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.palette-panel {
+					padding: 18px;
+				}
+				.lockup .brand-name {
+					font-size: 21px;
+				}
+			}
+		</style>
+	</head>
+	<body data-theme="dark">
+		<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+			<defs>
+				<g id="brand-mark">
+					<path
+						fill="currentColor"
+						fill-rule="evenodd"
+						d="M72 11.85L120 29.85V60.85A89 89 0 0 1 107.67869625 106.03160622A55 55 0 0 1 72 131.85A55 55 0 0 1 36.32130375 106.03160622A89 89 0 0 1 24 60.85V29.85Z M44.5 55h21v21h-21Z M78.5 55h21v21h-21Z M44.5 89h13v3h-13Z"
+					/>
+				</g>
+				<clipPath id="guide-frame"><rect width="144" height="144" /></clipPath>
+				<g id="fibonacci-circles" fill="none" stroke="#EAC98F" stroke-width=".45">
+					<g clip-path="url(#guide-frame)" stroke="#9FE0EF" opacity=".65">
+						<circle cx="31" cy="60.85" r="89" />
+						<circle cx="113" cy="60.85" r="89" />
+						<circle cx="60.29298509" cy="78.11038889" r="55" />
+						<circle cx="83.70701491" cy="78.11038889" r="55" />
+					</g>
+					<circle cx="72" cy="72" r="72" opacity=".65" />
+					<circle cx="72" cy="72" r="44.5" opacity=".5" />
+					<circle cx="72" cy="65.5" r="27.5" />
+					<circle cx="72" cy="65.5" r="17" opacity=".65" />
+					<circle cx="55" cy="65.5" r="10.5" />
+					<circle cx="89" cy="65.5" r="10.5" />
+					<circle cx="51" cy="90.5" r="6.5" />
+					<circle cx="51" cy="90.5" r="1.5" />
+					<path
+						d="M0 55H144M0 89H144M44.5 0V144M72 0V144M99.5 0V144"
+						stroke-dasharray="2 3"
+						opacity=".55"
+					/>
+				</g>
+			</defs>
+		</svg>
+		<main>
+			<header>
+				<h1>agent-tests</h1>
+				<button class="theme-button" id="theme-toggle" type="button">Light view</button>
+			</header>
+			<section id="identity" aria-labelledby="identity-title">
+				<div class="section-heading">
+					<h2 id="identity-title">Logo</h2>
+					<label class="guide-control">
+						<input type="checkbox" id="show-guides" aria-controls="construction-layer" checked />
+						Fibonacci circles
+					</label>
+				</div>
+				<div class="identity-grid">
+					<figure class="construction panel">
+						<svg
+							viewBox="0 0 144 144"
+							role="img"
+							aria-label="Agent-tests shield in a circular badge with Fibonacci construction circles"
+						>
+							<circle cx="72" cy="72" r="72" fill="#102D50" />
+							<use href="#brand-mark" />
+							<g id="construction-layer" class="guide-layer"><use href="#fibonacci-circles" /></g>
+						</svg>
+					</figure>
+					<div class="applications">
+						<div class="application panel" data-theme="light">
+							<p class="eyebrow">Light</p>
+							<div class="lockup">
+								<svg viewBox="0 0 144 144" aria-hidden="true"><use href="#brand-mark" /></svg>
+								<span class="brand-name">agent-tests</span>
+							</div>
+						</div>
+						<div class="application panel" data-theme="dark">
+							<p class="eyebrow">Dark</p>
+							<div class="lockup">
+								<svg viewBox="0 0 144 144" aria-hidden="true"><use href="#brand-mark" /></svg>
+								<span class="brand-name">agent-tests</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section id="palette" aria-labelledby="palette-title">
+				<div class="section-heading"><h2 id="palette-title">Colors</h2></div>
+				<div class="brand-colors">
+					<div class="brand-color">
+						<div class="paint" style="--paint: #102d50"></div>
+						<p>
+							Police blue
+							<code>#102D50</code>
+						</p>
+					</div>
+					<div class="brand-color">
+						<div class="paint" style="--paint: #a9b8c8"></div>
+						<p>
+							Silver
+							<code>#A9B8C8</code>
+						</p>
+					</div>
+					<div class="brand-color">
+						<div class="paint" style="--paint: #f3f6f9"></div>
+						<p>
+							Off-white
+							<code>#F3F6F9</code>
+						</p>
+					</div>
+				</div>
+				<div class="palettes">
+					<article class="palette-panel panel" data-theme="light">
+						<div class="panel-heading"><h3>Light</h3></div>
+						<div class="swatches" aria-label="Light semantic colors"></div>
+					</article>
+					<article class="palette-panel panel" data-theme="dark">
+						<div class="panel-heading"><h3>Dark</h3></div>
+						<div class="swatches" aria-label="Dark semantic colors"></div>
+					</article>
+				</div>
+			</section>
+			<section id="typography" aria-labelledby="type-title">
+				<div class="section-heading"><h2 id="type-title">Menlo</h2></div>
+				<div class="type-specimen panel">
+					<span class="font-specimen">agent-tests</span>
+				</div>
+			</section>
+		</main>
+		<script>
+			const roles = [
+				'primary',
+				'secondary',
+				'background',
+				'foreground',
+				'muted',
+				'info',
+				'success',
+				'warning',
+				'error'
+			];
+			document.querySelectorAll('.palette-panel').forEach((panel) => {
+				const colors = getComputedStyle(panel);
+				roles.forEach((role) => {
+					const hex = colors.getPropertyValue(`--${role}`).trim();
+					const swatch = document.createElement('figure');
+					swatch.className = 'swatch';
+					const paint = document.createElement('div');
+					paint.className = 'paint';
+					paint.style.backgroundColor = hex;
+					const caption = document.createElement('figcaption');
+					caption.textContent = role;
+					const value = document.createElement('code');
+					value.textContent = hex;
+					caption.append(value);
+					swatch.append(paint, caption);
+					panel.querySelector('.swatches').append(swatch);
+				});
+			});
+			document.getElementById('theme-toggle').addEventListener('click', (event) => {
+				const dark = document.body.dataset.theme === 'dark';
+				document.body.dataset.theme = dark ? 'light' : 'dark';
+				event.currentTarget.textContent = dark ? 'Dark view' : 'Light view';
+			});
+		</script>
+	</body>
 </html>

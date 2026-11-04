@@ -4,7 +4,10 @@
 
 <svelte:head>
 	<title>agent-tests docs</title>
-	<meta name="description" content="Reusable repository checks for lessons learned during agent sessions." />
+	<meta
+		name="description"
+		content="Reusable repository checks for lessons learned during agent sessions."
+	/>
 </svelte:head>
 
 <main id="content" tabindex="-1">
