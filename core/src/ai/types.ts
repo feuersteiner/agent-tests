@@ -32,11 +32,3 @@ export const AiExplanationSchema = z.strictObject({
   failures: z.array(FailInstanceSchema),
 });
 export type AiExplanation = z.infer<typeof AiExplanationSchema>;
-
-/** Shared scoring/explanation operations implemented by explicit adapters. */
-export interface AiAdapter {
-  /** Return support for the passing condition, using optional system instructions. */
-  run(request: AiRequest, config?: AiConfig): Promise<number>;
-  /** Explain failures with optional system instructions, preserving the supplied score. */
-  explain(request: AiRequest, score: number, config?: AiConfig): Promise<AiExplanation>;
-}
