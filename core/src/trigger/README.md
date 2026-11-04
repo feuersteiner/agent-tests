@@ -12,7 +12,7 @@ Match params are a string or nonempty string array; arrays are alternatives.
 Path `*` stays within a segment; `**` crosses directories; ordinary wildcards exclude leading dots.
 Content filters compile every regex before matching. Validation, regex, and AI errors reject `run`.
 
-Only ask constructors take an injected [AI](../ai/index.ts); ask params are passing-condition strings.
+Only ask constructors take an injected [AI](../shared/ai/index.ts); ask params are passing-condition strings.
 Every execution requires `{ threshold: number }`; ask returns `rawScore >= config.threshold`.
 Match filters ignore config. Threshold validation, defaults, and provider setup belong to the caller.
 Filters do not store config or threshold. The package root's `Trigger` remains the shared YAML type.

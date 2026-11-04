@@ -11,7 +11,7 @@ Validation, regex, and AI errors reject the promise.
 All patterns compile before matching; each list contains alternatives.
 A `match` hit scores `1` with priority, a `maybe` hit scores `0.5`, otherwise `0`.
 
-[SmartEngine](engine/smart.ts) and [DeepEngine](engine/deep.ts) require constructor-injected [AI](../ai/README.md).
+[SmartEngine](engine/smart.ts) and [DeepEngine](engine/deep.ts) require constructor-injected [AI](../shared/ai/README.md).
 The caller configures providers; `ask` is a nonblank passing condition. Both return raw AI scores.
 Smart forwards only `{ input, ask }`; optional `bounds` are two increasing numbers in `[0, 1]`.
 Smart neither forwards nor applies bounds; interpretation belongs to check execution.

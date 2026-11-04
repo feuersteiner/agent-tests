@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ReasoningLevelSchema, SmartCheckSchema } from '../types/index.ts';
+import { ReasoningLevelSchema, SmartCheckSchema } from '../../types/index.ts';
 
 const scoreSchema = z.number().min(0).max(1);
 

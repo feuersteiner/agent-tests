@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import type { AI } from '../../ai/index.ts';
+import type { AI } from '../../shared/ai/index.ts';
 import { SmartCheckSchema } from '../../types/index.ts';
 import { Engine } from './index.ts';
 

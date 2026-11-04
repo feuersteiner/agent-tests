@@ -1,5 +1,5 @@
-import { AiRequestSchema } from '../../ai/index.ts';
-import type { AI } from '../../ai/index.ts';
+import { AiRequestSchema } from '../../shared/ai/index.ts';
+import type { AI } from '../../shared/ai/index.ts';
 import { Filter } from './index.ts';
 import type { FilterConfig } from './index.ts';
 
