@@ -9,12 +9,16 @@
 		"directory": "core"
 	},
 	"module": "index.ts",
+	"bin": {
+		"agent-tests": "./cli/index.js"
+	},
 	"exports": {
 		".": "./index.ts",
 		"./types": "./src/types/index.ts"
 	},
 	"files": [
 		"index.ts",
+		"cli",
 		"src",
 		"README.md",
 		"LICENSE",

@@ -26,6 +26,9 @@
       "peerDependencies": {
         "typescript": "^5 || ^6",
       },
+      "bin": {
+        "agent-tests": "./cli/index.js",
+      },
     },
     "docs": {
       "name": "@agent-tests/docs",
