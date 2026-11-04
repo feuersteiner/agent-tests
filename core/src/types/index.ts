@@ -1,3 +1,4 @@
+// TODO: Move contracts beside owning modules; preserve this barrel, root exports, and ./types (PLAN.md).
 import { z } from 'zod';
 import { CheckSchema } from './check.ts';
 import { EvalSchema } from './eval.ts';
