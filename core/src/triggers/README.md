@@ -21,8 +21,8 @@ ask params use `AiRequestSchema.shape.ask`.
 
 `PathMatchTrigger` uses `node:path.posix.matchesGlob`: `*` stays within one path
 segment, `**` can cross directories, and ordinary wildcards exclude leading dots.
-`ContentMatchTrigger` uses `FastEngine` with case-sensitive JavaScript regexes
-without flags, passing on score `1`. Pattern arrays are alternatives. Every
+`ContentMatchTrigger` uses local, case-sensitive JavaScript regexes
+without flags. Pattern arrays are alternatives. Every
 content regex compiles before matching; any invalid regex rejects the promise.
 
 Every `run` requires caller-supplied global configuration shaped as

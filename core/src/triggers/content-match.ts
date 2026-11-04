@@ -1,4 +1,3 @@
-import { FastEngine } from '../engines/fast.ts';
 import { PatternsSchema } from '../types/index.ts';
 import type { Patterns } from '../types/index.ts';
 import { Trigger } from './index.ts';
@@ -8,6 +7,8 @@ export class ContentMatchTrigger extends Trigger<Patterns> {
 	protected override readonly paramsSchema = PatternsSchema;
 
 	protected override async matches(input: string, patterns: Patterns): Promise<boolean> {
-		return (await new FastEngine().run(input, { match: patterns })) === 1;
+		const values = Array.isArray(patterns) ? patterns : [patterns];
+		const regexes = values.map((pattern) => new RegExp(pattern));
+		return regexes.some((pattern) => pattern.test(input));
 	}
 }
