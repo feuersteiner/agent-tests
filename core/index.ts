@@ -1,6 +1,6 @@
 // TODO: Assemble the planned AgentTests composition facade; see ../PLAN.md for scope and open APIs.
-export { parseTestDefinition, parseTestYaml } from './src/parser/index.ts';
 export * from './src/types/index.ts';
+export { Validator } from './src/validator.ts';
 export { Source } from './src/shared/source.ts';
 export { Engine, ScoreSchema } from './src/check/engine/index.ts';
 export type { Score } from './src/check/engine/index.ts';
