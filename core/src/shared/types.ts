@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Source } from './source.ts';
 
 /** Lowercase kebab-case identifier. */
 export const IdSchema = z
@@ -13,3 +14,13 @@ export const TextSchema = z
 /** One param or a nonempty list; each feature defines how a list combines. */
 export const ParamSchema = z.union([TextSchema, z.array(TextSchema).min(1)]);
 export type Param = z.infer<typeof ParamSchema>;
+
+/**
+ * What happened when one source ran through one trigger, check, or eval.
+ * `flagged` means it fired: a trigger matched, a check found a violation, or an eval
+ * did not match its label. `trace` lists what failed along the way, such as `failed grep`.
+ */
+export type ResultEntry<T> = { source: Source; check: T; flagged: boolean; trace: string[] };
+
+/** Every entry of a run, split by whether it was flagged. */
+export type Result<T> = { flagged: ResultEntry<T>[]; cleared: ResultEntry<T>[] };
