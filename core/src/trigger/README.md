@@ -1,20 +1,33 @@
-# Trigger filters
+# Triggers
 
-[`Filter<Params>`](filter/index.ts) is abstract; readonly `run(input, params, config): Promise<boolean>`
-validates params before matching. Import concrete classes from their modules:
+Triggers select the sources a test inspects. Trace output remains WIP.
 
-- [PathMatchFilter](filter/path-match.ts): POSIX path globs via `node:path.posix.matchesGlob`.
-- [ContentMatchFilter](filter/content-match.ts): local, case-sensitive JavaScript regexes without flags.
-- [PathAskFilter](filter/path-ask.ts): AI evaluates the supplied path against a passing condition.
-- [ContentAskFilter](filter/content-ask.ts): AI evaluates supplied content against a passing condition.
+[`types.ts`](types.ts) owns the contract. `ParamSchema` is a nonblank string or a nonempty list
+of nonblank strings; a list holds **OR** alternatives. `TriggerSchema` requires an `id`,
+a `description`, and at least one of `glob`, `grep`, or `ask`.
+`TriggersSchema` validates a list of triggers and allows an empty list.
 
-Match params are a string or nonempty string array; arrays are alternatives.
-Path `*` stays within a segment; `**` crosses directories; ordinary wildcards exclude leading dots.
-Content filters compile every regex before matching. Validation, regex, and AI errors reject `run`.
+[`filters.ts`](filters.ts) default-exports `TriggerFilters`. Each filter is a `SourceFilter`,
+`(source, param, config) => Promise<boolean>`:
 
-Only ask constructors take an injected [AI](../shared/ai/index.ts); ask params are passing-condition strings.
-Every execution requires `{ threshold: number }`; ask returns `rawScore >= config.threshold`.
-Match filters ignore config. Threshold validation, defaults, and provider setup belong to the caller.
-Filters do not store config or threshold. The package root's `Trigger` remains the shared YAML type.
+- `GlobFilter` matches the path with `minimatch`. Its options are fixed, so neither the runtime
+  nor the OS changes the result. `*` stays within a segment, `**` crosses directories, and dotfiles
+  match. Parentheses are literal; `[id]` is a character class, so write `\[id\]` for a literal folder.
+- `GrepFilter` matches content with case-sensitive JavaScript regexes, without flags. Every regex
+  compiles before the source is read, and a bad regex throws.
+- `AskFilter` scores content with `config.ai`. Conditions run in list order; the first score at
+  `score >= config.threshold` passes. AI errors propagate.
 
-Trigger orchestration remains pending; no interface has been agreed.
+[`TestsTrigger`](index.ts) runs them: `new TestsTrigger(triggers, config).run(sources)`.
+`config` is `{ threshold, ai }`. Definitions must already be validated by the
+[`Validator`](../validator.ts). Pass the stub `ai` from
+[`shared/ai/stub.ts`](../shared/ai/stub.ts) until `DecisionAI` is connected.
+
+- No triggers selects every source.
+- Within a trigger, filters use **AND** and always run as `glob`, `grep`, then `ask`,
+  stopping at the first failure.
+- Between triggers, selection uses **OR**. Every trigger runs on every source concurrently.
+- Selected sources are collapsed by `path` and returned in trigger order.
+
+`GrepFilter` and `AskFilter` each call [`Source.open()`](../shared/source.ts); caching belongs to
+the getter.
