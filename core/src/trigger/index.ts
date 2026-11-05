@@ -3,7 +3,7 @@ import TriggerFilters from './filters.ts';
 import type { Result, ResultEntry } from '../shared/types.ts';
 import type { FilterConfig, Trigger } from './types.ts';
 
-export class TestsTrigger {
+export class TestTrigger {
 	constructor(
 		public readonly triggers: Trigger[],
 		public readonly config: FilterConfig

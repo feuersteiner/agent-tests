@@ -6,7 +6,7 @@
 
 - `types.ts`: Zod schemas with their inferred types, plus the config type and funcs interface when the feature has funcs.
 - Funcs file (`trigger/filters.ts`, `check/rules.ts`): const arrow functions, no classes, default-exported as one object. Evals have none.
-- `index.ts`: a `Tests<Feature>` class whose `run` returns a `Result<T>`.
+- `index.ts`: a `Test<Feature>` class whose `run` returns a `Result<T>`.
 
 ## Funcs
 

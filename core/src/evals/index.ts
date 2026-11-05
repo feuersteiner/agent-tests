@@ -1,14 +1,14 @@
-import type { TestsCheck } from '../check/index.ts';
+import type { TestCheck } from '../check/index.ts';
 import { Source } from '../shared/source.ts';
 import type { Result, ResultEntry } from '../shared/types.ts';
-import type { TestsTrigger } from '../trigger/index.ts';
+import type { TestTrigger } from '../trigger/index.ts';
 import type { Eval, TestOutcome } from './types.ts';
 
-export class TestsEval {
+export class TestEval {
 	constructor(public readonly evals: Eval[]) {}
 
 	/** An eval is flagged when its example does not match its label; `trace` says what happened. */
-	public readonly run = async (trigger: TestsTrigger, check: TestsCheck): Promise<Result<Eval>> => {
+	public readonly run = async (trigger: TestTrigger, check: TestCheck): Promise<Result<Eval>> => {
 		const flagged: ResultEntry<Eval>[] = [];
 		const cleared: ResultEntry<Eval>[] = [];
 
@@ -29,8 +29,8 @@ export class TestsEval {
 	/** Skip when no trigger selects the source; otherwise fail if any check fails it. */
 	public readonly outcome = async (
 		source: Source,
-		trigger: TestsTrigger,
-		check: TestsCheck
+		trigger: TestTrigger,
+		check: TestCheck
 	): Promise<TestOutcome> => {
 		const selected = trigger.selected([source], await trigger.run([source]));
 		if (selected.length === 0) return 'skip';

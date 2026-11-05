@@ -3,7 +3,7 @@ import CheckRules from './rules.ts';
 import type { Result, ResultEntry } from '../shared/types.ts';
 import type { Check, CheckConfig } from './types.ts';
 
-export class TestsCheck {
+export class TestCheck {
 	constructor(
 		public readonly checks: Check[],
 		public readonly config: CheckConfig
