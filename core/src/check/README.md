@@ -1,20 +1,30 @@
 # Check
 
-Check orchestration remains pending; scoring engines live in [`engine/`](engine/).
+Checks judge the sources a test selected. Findings output remains WIP.
 
-[`Engine<Params>`](engine/index.ts) exposes readonly `run(input, params): Promise<number>`.
-It validates params with Zod and returns a raw, finite score in `[0, 1]`.
-Validation, regex, and AI errors reject the promise.
+[`types.ts`](types.ts) owns the contract. `CheckSchema` requires an `id`, a `description`, an `error`,
+and at least one of `grep`, `ask`, or `reason`. Each is a string or a nonempty list of alternatives.
+`CheckConfig` is `{ threshold, reasoning, decisionAi, reasoningAi }`; thresholds and reasoning levels
+never live in a check.
 
-[FastEngine](engine/fast.ts) uses local, case-sensitive JavaScript regexes without flags.
-`match` and `maybe` accept nonempty strings or nonempty arrays of nonempty strings; at least one is required.
-All patterns compile before matching; each list contains alternatives.
-A `match` hit scores `1` with priority, a `maybe` hit scores `0.5`, otherwise `0`.
+[`rules.ts`](rules.ts) default-exports `CheckRules`. Each rule is a `SourceRule`,
+`(source, param, config) => Promise<boolean>`, where `true` means the source fails:
 
-[SmartEngine](engine/smart.ts) and [DeepEngine](engine/deep.ts) require constructor-injected [AI](../shared/ai/README.md).
-The caller configures providers; `ask` is a nonblank passing condition. Both return raw AI scores.
-Smart forwards only `{ input, ask }`; optional `bounds` are two increasing numbers in `[0, 1]`.
-Smart neither forwards nor applies bounds; interpretation belongs to check execution.
-Deep forwards `input`, `ask`, and optional `reasoning` (`low`, `medium`, `high`; no default), with no bounds.
+- `GrepRule` fails on any hit, using case-sensitive JavaScript regexes without flags.
+  Every regex compiles before the source is read, and a bad regex throws.
+- `AskRule` scores content with `config.decisionAi`. `ask` is a passing condition. Conditions run in
+  list order; the first score at `score >= config.threshold` passes, and otherwise the rule fails.
+  AI errors propagate.
+- `ReasonRule` works like `AskRule` with `config.reasoningAi`, and also forwards `config.reasoning`.
 
-Engine classes, params schemas/types, `ScoreSchema`, and `Score` export from `agent-tests`.
+Both AIs are typed as the abstract `AI`, so either can be the stub until real ones are connected.
+
+[`TestsCheck`](index.ts) runs them: `new TestsCheck(checks, config).run(sources)` returns the sources
+that pass, in their original order. Definitions must already be validated by the
+[`Validator`](../validator.ts).
+
+- Within a check, rules escalate in the order `grep`, `ask`, `reason`, and a check may start at any
+  of them. A passing rule passes the check; a failing rule moves on to the next rule present,
+  and the last rule's result is final.
+- Between checks, selection uses **AND**: a source must pass every check. All checks run on every
+  source concurrently.
