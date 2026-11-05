@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { CheckSchema } from './check/types.ts';
-import { EvalSchema } from './eval.ts';
+import { EvalSchema } from './evals/types.ts';
 import { IdSchema, TextSchema } from './shared/types.ts';
 import { TriggersSchema } from './trigger/types.ts';
 
 export { CheckSchema } from './check/types.ts';
 export type { Check } from './check/types.ts';
-export { EvalSchema, TestOutcomeSchema } from './eval.ts';
-export type { Eval, TestOutcome } from './eval.ts';
+export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
+export type { Eval, TestOutcome } from './evals/types.ts';
 export { ReasoningLevelSchema } from './shared/ai/types.ts';
 export type { ReasoningLevel } from './shared/ai/types.ts';
 export { ParamSchema } from './shared/types.ts';
