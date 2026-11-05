@@ -10,6 +10,6 @@ export const TextSchema = z
 	.string()
 	.refine((value) => value.trim().length > 0, 'Must not be blank');
 
-/** One param or a nonempty list of OR alternatives. */
+/** One param or a nonempty list; each feature defines how a list combines. */
 export const ParamSchema = z.union([TextSchema, z.array(TextSchema).min(1)]);
 export type Param = z.infer<typeof ParamSchema>;
