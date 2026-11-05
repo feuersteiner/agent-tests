@@ -9,8 +9,8 @@ export class TestCheck {
 		public readonly config: CheckConfig
 	) {}
 
-	/** One entry for every source and check, in the order they finish. */
-	public readonly run = async (sources: Source[]): Promise<Result<Check>> => {
+	/** One entry for every source and check, in the order they finish; verbose logs each as it does. */
+	public readonly run = async (sources: Source[], verbose = false): Promise<Result<Check>> => {
 		const flagged: ResultEntry<Check>[] = [];
 		const cleared: ResultEntry<Check>[] = [];
 
@@ -19,11 +19,17 @@ export class TestCheck {
 				this.checks.map(async (check) => {
 					const entry = await this.runCheck(source, check);
 					(entry.flagged ? flagged : cleared).push(entry);
+					if (verbose) this.log(entry);
 				})
 			)
 		);
 
 		return { flagged, cleared };
+	};
+
+	private readonly log = ({ source, check, flagged, trace }: ResultEntry<Check>): void => {
+		const status = flagged ? `flagged ${check.id}: ${check.error}` : `cleared ${check.id}`;
+		console.log(`check ${source.path} ${status} ${trace.join(', ')}`.trimEnd());
 	};
 
 	/** The first rule the source passes ends the check; failing every rule present fails it. */
