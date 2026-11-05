@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import { CheckSchema } from './check/types.ts';
+import type { Check, CheckConfig } from './check/types.ts';
 import { EvalSchema } from './evals/types.ts';
 import { IdSchema, TextSchema } from './shared/types.ts';
+import type { Result } from './shared/types.ts';
 import { TriggersSchema } from './trigger/types.ts';
+import type { FilterConfig, Trigger } from './trigger/types.ts';
 
 export { CheckSchema } from './check/types.ts';
 export type { Check, CheckConfig } from './check/types.ts';
@@ -26,6 +29,15 @@ export { ParamSchema } from './shared/types.ts';
 export type { Param, Result, ResultEntry } from './shared/types.ts';
 export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
 export type { FilterConfig, Trigger } from './trigger/types.ts';
+
+/** Settings for each stage; AgentTest creates the AI instances itself. */
+export type AgentTestConfig = {
+	trigger: Omit<FilterConfig, 'ai'>;
+	check: Omit<CheckConfig, 'decisionAi' | 'reasoningAi'>;
+};
+
+/** What each stage of a run produced. */
+export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };
 
 /** Test identity, description, and optional source digest. */
 export const MetadataSchema = z.strictObject({
