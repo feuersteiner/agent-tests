@@ -7,9 +7,9 @@ import type { Param } from '../shared/types.ts';
 /** Caller-owned dependencies; only ask uses them. */
 export type FilterConfig = { threshold: number; ai: AI };
 
-/** Pass function every filter imp lements: does this source satisfy any alternative in the param? */
+/** Every filter answers "did this source pass?": true means it passed, false means it failed. */
 export interface SourceFilter {
-	(source: Source, param: Param, config: FilterConfig): Promise<boolean>;
+	(source: Source, param: Param, config: FilterConfig, trace: string[]): Promise<boolean>;
 }
 
 /** AND filters, always run as glob, grep, then ask; at least one is required. */

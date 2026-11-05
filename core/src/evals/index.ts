@@ -22,7 +22,7 @@ export class TestsEval {
 		check: TestsCheck
 	): Promise<TestOutcome> => {
 		const source = new Source(example.path, async () => example.content);
-		const selected = await trigger.run([source]);
+		const selected = trigger.selected([source], await trigger.run([source]));
 		if (selected.length === 0) return 'skip';
 		const result = await check.run(selected);
 		return result.flagged.length > 0 ? 'fail' : 'pass';
