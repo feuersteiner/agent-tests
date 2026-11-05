@@ -13,6 +13,3 @@ export const EvalSchema = z.strictObject({
 	expect: TestOutcomeSchema
 });
 export type Eval = z.infer<typeof EvalSchema>;
-
-/** What one example was expected to do and what it actually did. */
-export type EvalResult = { name: string; expect: TestOutcome; actual: TestOutcome };
