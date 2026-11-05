@@ -12,7 +12,7 @@ export type CheckConfig = {
 	reasoningAi: AI;
 };
 
-/** Fail function every rule implements: does this source fail the rule? */
+/** Every rule answers "did this source fail?": true means it failed, false means it passed. */
 export interface SourceRule {
 	(source: Source, param: Param, config: CheckConfig): Promise<boolean>;
 }
@@ -32,3 +32,15 @@ export const CheckSchema = z
 		'Requires grep, ask, or reason'
 	);
 export type Check = z.infer<typeof CheckSchema>;
+
+/**
+ * What happened when one source ran through one check, whether it passed or failed.
+ * `rule` is the rule that made the final decision; `message` is the check's error, on failure only.
+ */
+export type CheckResult = {
+	source: Source;
+	check: Check;
+	outcome: 'pass' | 'fail';
+	rule: 'grep' | 'ask' | 'reason';
+	message?: string;
+};
