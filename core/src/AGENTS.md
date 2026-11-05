@@ -29,7 +29,7 @@ type Result<T> = { flagged: ResultEntry<T>[]; cleared: ResultEntry<T>[] };
 
 ## `run`
 
-Push each entry as it finishes, so entries arrive in finish order and printing must sort them:
+Push each entry as it finishes, and log it then when `verbose` is set, so output streams in finish order. Each class has its own private `log`:
 
 ```ts
 const flagged: ResultEntry<T>[] = [];
@@ -39,6 +39,7 @@ await Promise.all(
 	items.map(async (item) => {
 		const entry = await this.runItem(item);
 		(entry.flagged ? flagged : cleared).push(entry);
+		if (verbose) this.log(entry);
 	})
 );
 
