@@ -9,8 +9,8 @@ export class TestTrigger {
 		public readonly config: FilterConfig
 	) {}
 
-	/** One entry for every trigger and source, in the order they finish. */
-	public readonly run = async (sources: Source[]): Promise<Result<Trigger>> => {
+	/** One entry for every trigger and source, in the order they finish; verbose logs each as it does. */
+	public readonly run = async (sources: Source[], verbose = false): Promise<Result<Trigger>> => {
 		const flagged: ResultEntry<Trigger>[] = [];
 		const cleared: ResultEntry<Trigger>[] = [];
 
@@ -19,11 +19,17 @@ export class TestTrigger {
 				sources.map(async (source) => {
 					const entry = await this.runTrigger(source, trigger);
 					(entry.flagged ? flagged : cleared).push(entry);
+					if (verbose) this.log(entry);
 				})
 			)
 		);
 
 		return { flagged, cleared };
+	};
+
+	private readonly log = ({ source, check, flagged, trace }: ResultEntry<Trigger>): void => {
+		const status = flagged ? 'flagged' : 'cleared';
+		console.log(`trigger ${source.path} ${status} ${check.id} ${trace.join(', ')}`.trimEnd());
 	};
 
 	/** Every source when there are no triggers; otherwise those passing any trigger, once each. */
