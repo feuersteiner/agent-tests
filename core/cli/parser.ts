@@ -1,5 +1,5 @@
 import { LineCounter, parseAllDocuments } from 'yaml';
-import type { AgentTest } from '../src/types/index.ts';
+import type { AgentTest } from '../src/types.ts';
 import { Validator } from '../src/validator.ts';
 
 /** Parse one YAML document and validate its test contract; throws on invalid input. */

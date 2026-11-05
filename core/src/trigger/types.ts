@@ -1,9 +1,8 @@
 import { z } from 'zod';
 import type { AI } from '../shared/ai/index.ts';
 import type { Source } from '../shared/source.ts';
-import { IdSchema, ParamSchema } from '../types.ts';
-import type { Param } from '../types.ts';
-import { MetadataSchema } from '../types/metadata.ts';
+import { IdSchema, ParamSchema, TextSchema } from '../shared/types.ts';
+import type { Param } from '../shared/types.ts';
 
 /** Caller-owned dependencies; only ask uses them. */
 export type FilterConfig = { threshold: number; ai: AI };
@@ -28,7 +27,7 @@ export const FilterSchema = z
 /** One described inclusion rule; all configured filters must pass. */
 export const TriggerSchema = FilterSchema.safeExtend({
 	id: IdSchema,
-	description: MetadataSchema.shape.description
+	description: TextSchema
 });
 export type Trigger = z.infer<typeof TriggerSchema>;
 

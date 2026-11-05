@@ -1,9 +1,8 @@
 import { z } from 'zod';
 import type { AI, ReasoningLevel } from '../shared/ai/index.ts';
 import type { Source } from '../shared/source.ts';
-import { IdSchema, ParamSchema } from '../types.ts';
-import type { Param } from '../types.ts';
-import { MetadataSchema } from '../types/metadata.ts';
+import { IdSchema, ParamSchema, TextSchema } from '../shared/types.ts';
+import type { Param } from '../shared/types.ts';
 
 /** Caller-owned dependencies; ask uses the decision AI, reason the reasoning AI and level. */
 export type CheckConfig = {
@@ -22,8 +21,8 @@ export interface SourceRule {
 export const CheckSchema = z
 	.strictObject({
 		id: IdSchema,
-		description: MetadataSchema.shape.description,
-		error: MetadataSchema.shape.description,
+		description: TextSchema,
+		error: TextSchema,
 		grep: ParamSchema.optional(),
 		ask: ParamSchema.optional(),
 		reason: ParamSchema.optional()

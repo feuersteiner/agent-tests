@@ -30,9 +30,9 @@ id: user-text-french
 title: User text in French
 description: User-facing text is written in French.
 triggers:
-  path:
-    match: ['src/**/*.svelte', 'src/**/*.html']
-  content:
+  - id: user-facing-text
+    description: Svelte and HTML files with text shown to end users.
+    glob: ['src/**/*.svelte', 'src/**/*.html']
     ask: 'This file contains text displayed to an end user.'
 checks:
   - id: french-only
@@ -48,7 +48,7 @@ evals:
 ```
 
 Only Svelte and HTML files that a decision model judges to contain user-facing text
-are inspected. Every other file is skipped without a model call.
+are inspected. Paths outside those globs are skipped without a model call.
 
 ## Where it runs
 
@@ -86,29 +86,46 @@ and keep its credentials in `.env`.
 
 Design locked; implementation WIP.
 
-Triggers decide, per file, whether a test inspects it: yes or no. A trigger reads
-a file's `path`, its `content`, or both, and every filter it names must pass, in
-the order written. A list of triggers holds alternatives.
+Triggers decide whether a test inspects a file. `triggers` is optional;
+omitting it or setting `triggers: []` selects every file.
+Otherwise, it is a list of triggers, each with a lowercase kebab-case `id` and a `description`.
+Each trigger requires at least one filter:
 
-- `path.match`: a glob on the path.
-- `path.ask`: a decision model judging the path.
-- `content.match`: a regex on the file text.
-- `content.ask`: a decision model judging the file text.
+- `glob`: POSIX glob patterns on the path, including dotfiles.
+- `grep`: case-sensitive JavaScript regex patterns on the content, without flags.
+- `ask`: a decision model judging the content against a passing condition.
+
+Filters within one ID use **AND**: every configured filter must pass.
+Triggers use **OR**: trigger A or trigger B can qualify a file.
+Within each trigger, filters always run as `glob`, then `grep`, then `ask`, so a
+model is only called once the cheap filters pass. Omitted filters are skipped; the
+first failure stops that trigger. A file is excluded only if every trigger fails.
+
+`glob`, `grep`, and `ask` each accept a string or a nonempty list of alternatives (**OR**).
+For `glob` and `grep`, any matching pattern passes that filter.
+For `ask`, each string is a nonblank passing condition; prompts run in list order
+until one passes. If none passes, the filter fails.
 
 ```yaml
 # .agents/tests/brand-messaging/test.yaml: customer-facing copy follows Acme's brand voice.
 triggers:
   # Marketing pages are always brand copy: a glob is enough.
-  - path:
-      match: ['content/**/*.md', 'src/routes/(marketing)/**/*.svelte']
+  - id: marketing
+    description: Marketing pages.
+    glob: ['content/**/*.md', 'src/routes/(marketing)/**/*.svelte']
   # Elsewhere, cheap filters first and models last.
-  - path:
-      match: ['src/**/*.svelte', 'emails/**/*.html']
-      ask: 'This path belongs to a customer-facing page, component, or email.'
-    content:
-      match: '[Aa]cme'
-      ask: 'This file contains product or marketing copy shown to customers.'
+  - id: customer-copy
+    description: Product and marketing copy shown to customers.
+    glob: ['src/**/*.svelte', 'emails/**/*.html']
+    grep: '[Aa]cme'
+    ask:
+      - 'This file contains product copy shown to customers.'
+      - 'This file contains marketing copy shown to customers.'
 ```
+
+For debugging, trace outcomes by trigger ID and filter (`glob`, `grep`, or `ask`),
+with a pass, failure, or skipped status and reason. Later filters are skipped
+after one fails. Trace output remains WIP.
 
 Like `AGENTS.md`, any directory can have its own `.agents/tests/`. Its tests apply
 inside that directory, in addition to tests from parent directories, and its

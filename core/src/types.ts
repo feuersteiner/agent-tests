@@ -1,12 +1,48 @@
 import { z } from 'zod';
+import { CheckSchema } from './check/types.ts';
+import { EvalSchema } from './eval.ts';
+import { IdSchema, TextSchema } from './shared/types.ts';
+import { TriggersSchema } from './trigger/types.ts';
 
-/** Lowercase kebab-case identifier. */
-export const IdSchema = z
-	.string()
-	.regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Expected a lowercase kebab-case id');
+export { CheckSchema } from './check/types.ts';
+export type { Check } from './check/types.ts';
+export { EvalSchema, TestOutcomeSchema } from './eval.ts';
+export type { Eval, TestOutcome } from './eval.ts';
+export { ReasoningLevelSchema } from './shared/ai/types.ts';
+export type { ReasoningLevel } from './shared/ai/types.ts';
+export { ParamSchema } from './shared/types.ts';
+export type { Param } from './shared/types.ts';
+export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
+export type { Trigger } from './trigger/types.ts';
 
-const value = z.string().refine((param) => param.trim().length > 0, 'Must not be blank');
+/** Test identity, description, and optional source digest. */
+export const MetadataSchema = z.strictObject({
+	id: IdSchema,
+	title: TextSchema,
+	description: TextSchema,
+	source: z
+		.string()
+		.regex(/^sha256:[a-fA-F\d]{64}$/, 'Expected sha256: followed by 64 hexadecimal digits')
+		.optional()
+});
+export type Metadata = z.infer<typeof MetadataSchema>;
 
-/** One param or a nonempty list of OR alternatives. */
-export const ParamSchema = z.union([value, z.array(value).min(1)]);
-export type Param = z.infer<typeof ParamSchema>;
+/** Validated test.yaml data; optional fields have no implicit defaults. */
+export const AgentTestSchema = MetadataSchema.extend({
+	triggers: TriggersSchema.optional(),
+	checks: z.array(CheckSchema).min(1),
+	evals: z.array(EvalSchema)
+}).superRefine((value, context) => {
+	const ids = new Set<string>();
+	value.checks.forEach((entry, index) => {
+		if (ids.has(entry.id)) {
+			context.addIssue({
+				code: 'custom',
+				path: ['checks', index, 'id'],
+				message: 'Duplicate check id'
+			});
+		}
+		ids.add(entry.id);
+	});
+});
+export type AgentTest = z.infer<typeof AgentTestSchema>;

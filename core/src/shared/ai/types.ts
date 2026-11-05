@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MetadataSchema } from '../../types/metadata.ts';
+import { TextSchema } from '../types.ts';
 
 const scoreSchema = z.number().min(0).max(1);
 
@@ -9,7 +9,7 @@ export type ReasoningLevel = z.infer<typeof ReasoningLevelSchema>;
 /** Source input, passing condition, and optional SDK reasoning level. */
 export const AiRequestSchema = z.strictObject({
 	input: z.string(),
-	ask: MetadataSchema.shape.description,
+	ask: TextSchema,
 	reasoning: ReasoningLevelSchema.optional()
 });
 export type AiRequest = z.infer<typeof AiRequestSchema>;

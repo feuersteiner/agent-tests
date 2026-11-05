@@ -1,6 +1,6 @@
 import type { z } from 'zod';
-import { AgentTestSchema } from './types/index.ts';
-import type { AgentTest } from './types/index.ts';
+import { AgentTestSchema } from './types.ts';
+import type { AgentTest } from './types.ts';
 
 /** Validate test data without normalization, preserving all written key ordering. */
 export class Validator {
