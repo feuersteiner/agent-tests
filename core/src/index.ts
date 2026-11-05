@@ -1,5 +1,7 @@
 import { TestCheck } from './check/index.ts';
 import type { Check } from './check/types.ts';
+import { TestEval } from './evals/index.ts';
+import type { Eval } from './evals/types.ts';
 import { StubAI } from './shared/ai/stub.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
@@ -16,6 +18,7 @@ export class AgentTest {
 	public readonly test: AgentTestDefinition;
 	public readonly trigger: TestTrigger;
 	public readonly check: TestCheck;
+	public evals?: TestEval;
 
 	/**
 	 * @param sources - Files to inspect, as supplied by the caller.
@@ -44,6 +47,12 @@ export class AgentTest {
 		const check = await this.check.run(selected, verbose);
 		if (verbose) this.log(selected, check);
 		return { trigger, check };
+	};
+
+	/** Create the eval stage on first use and run it; verbose logs each entry as it finishes. */
+	public readonly eval = (verbose = false): Promise<Result<Eval>> => {
+		this.evals ??= new TestEval(this.test.evals);
+		return this.evals.run(this.trigger, this.check, verbose);
 	};
 
 	private readonly log = (selected: Source[], { flagged, cleared }: Result<Check>): void => {
