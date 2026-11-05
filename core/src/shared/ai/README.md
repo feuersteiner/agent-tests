@@ -1,6 +1,6 @@
 # AI
 
-AI scoring and explanations. `ask` is always a passing condition, and higher scores mean stronger support for passing. The package root exports `AI` and the schemas; concrete classes need direct imports.
+AI scoring and explanations. `ask` is always a passing condition, and higher scores mean stronger support for passing. The package root exports `AI`, `agent-tests/types` exports the schemas and types, and concrete classes need direct imports.
 
 - [`index.ts`](index.ts): abstract `AI` with `run(request, config?)`, which returns a score in `[0, 1]`, and `explain(request, score, config?)`, which keeps the score and requires exact source quotes. Errors reject the promise.
 - [`types.ts`](types.ts) and [`prompts.ts`](prompts.ts): the contracts and default prompts. `AiConfig.system` overrides a prompt, and an empty string removes it.
