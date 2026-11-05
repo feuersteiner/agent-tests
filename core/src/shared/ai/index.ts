@@ -5,9 +5,10 @@ export {
 	AiConfigSchema,
 	AiExplanationSchema,
 	AiRequestSchema,
-	FailInstanceSchema
+	FailInstanceSchema,
+	ReasoningLevelSchema
 } from './types.ts';
-export type { AiConfig, AiExplanation, AiRequest, FailInstance } from './types.ts';
+export type { AiConfig, AiExplanation, AiRequest, FailInstance, ReasoningLevel } from './types.ts';
 
 /**
  * Abstract AI with validated, public readonly scoring and explanation operations.

@@ -17,6 +17,3 @@ export class StubAI extends AI {
 		return { score, failures: [] };
 	}
 }
-
-/** Internal SmartEngine stub instance; real SDK implementations remain disconnected. */
-export const ai = new StubAI();
