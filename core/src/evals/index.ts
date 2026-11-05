@@ -24,7 +24,7 @@ export class TestsEval {
 		const source = new Source(example.path, async () => example.content);
 		const selected = await trigger.run([source]);
 		if (selected.length === 0) return 'skip';
-		const results = await check.run(selected);
-		return results.some((result) => result.outcome === 'fail') ? 'fail' : 'pass';
+		const result = await check.run(selected);
+		return result.flagged.length > 0 ? 'fail' : 'pass';
 	};
 }

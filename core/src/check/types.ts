@@ -14,7 +14,7 @@ export type CheckConfig = {
 
 /** Every rule answers "did this source fail?": true means it failed, false means it passed. */
 export interface SourceRule {
-	(source: Source, param: Param, config: CheckConfig): Promise<boolean>;
+	(source: Source, param: Param, config: CheckConfig, trace: string[]): Promise<boolean>;
 }
 
 /** One described rule set escalating grep, then ask, then reason; at least one is required. */
@@ -32,15 +32,3 @@ export const CheckSchema = z
 		'Requires grep, ask, or reason'
 	);
 export type Check = z.infer<typeof CheckSchema>;
-
-/**
- * What happened when one source ran through one check, whether it passed or failed.
- * `rule` is the rule that made the final decision; `message` is the check's error, on failure only.
- */
-export type CheckResult = {
-	source: Source;
-	check: Check;
-	outcome: 'pass' | 'fail';
-	rule: 'grep' | 'ask' | 'reason';
-	message?: string;
-};
