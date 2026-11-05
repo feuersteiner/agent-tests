@@ -5,15 +5,27 @@ import { IdSchema, TextSchema } from './shared/types.ts';
 import { TriggersSchema } from './trigger/types.ts';
 
 export { CheckSchema } from './check/types.ts';
-export type { Check } from './check/types.ts';
+export type { Check, CheckConfig } from './check/types.ts';
 export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
 export type { Eval, TestOutcome } from './evals/types.ts';
-export { ReasoningLevelSchema } from './shared/ai/types.ts';
-export type { ReasoningLevel } from './shared/ai/types.ts';
+export {
+	AiConfigSchema,
+	AiExplanationSchema,
+	AiRequestSchema,
+	FailInstanceSchema,
+	ReasoningLevelSchema
+} from './shared/ai/types.ts';
+export type {
+	AiConfig,
+	AiExplanation,
+	AiRequest,
+	FailInstance,
+	ReasoningLevel
+} from './shared/ai/types.ts';
 export { ParamSchema } from './shared/types.ts';
-export type { Param } from './shared/types.ts';
+export type { Param, Result, ResultEntry } from './shared/types.ts';
 export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
-export type { Trigger } from './trigger/types.ts';
+export type { FilterConfig, Trigger } from './trigger/types.ts';
 
 /** Test identity, description, and optional source digest. */
 export const MetadataSchema = z.strictObject({
