@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AiModelConfigSchema, ReasoningLevelSchema } from './shared/ai/types.ts';
 import { CheckSchema } from './check/types.ts';
 import type { Check, CheckConfig } from './check/types.ts';
 import { EvalSchema } from './evals/types.ts';
@@ -12,6 +13,7 @@ export type { Check, CheckConfig } from './check/types.ts';
 export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
 export type { Eval, TestOutcome } from './evals/types.ts';
 export {
+	AiModelConfigSchema,
 	AiConfigSchema,
 	AiExplanationSchema,
 	AiRequestSchema,
@@ -19,6 +21,7 @@ export {
 	ReasoningLevelSchema
 } from './shared/ai/types.ts';
 export type {
+	AiModelConfig,
 	AiConfig,
 	AiExplanation,
 	AiRequest,
@@ -30,11 +33,17 @@ export type { Param, Result, ResultEntry } from './shared/types.ts';
 export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
 export type { FilterConfig, Trigger } from './trigger/types.ts';
 
-/** Settings for each stage; AgentTest creates the AI instances itself. */
-export type AgentTestConfig = {
-	trigger: Omit<FilterConfig, 'ai'>;
-	check: Omit<CheckConfig, 'decisionAi' | 'reasoningAi'>;
-};
+/** Both providers are required even when a test uses only regexes. */
+export const AgentTestConfigSchema = z.strictObject({
+	decision: AiModelConfigSchema.extend({ api: z.enum(['openai', 'jev', 'clef']) }),
+	reasoning: AiModelConfigSchema.extend({ api: z.enum(['openai', 'anthropic']) }),
+	trigger: z.strictObject({ threshold: z.number().min(0).max(1) }),
+	check: z.strictObject({
+		threshold: z.number().min(0).max(1),
+		reasoning: ReasoningLevelSchema.optional()
+	})
+});
+export type AgentTestConfig = z.infer<typeof AgentTestConfigSchema>;
 
 /** What each stage of a run produced. */
 export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };

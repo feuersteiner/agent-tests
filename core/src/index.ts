@@ -2,7 +2,8 @@ import { TestCheck } from './check/index.ts';
 import type { Check } from './check/types.ts';
 import { TestEval } from './evals/index.ts';
 import type { Eval } from './evals/types.ts';
-import { StubAI } from './shared/ai/stub.ts';
+import { buildDecisionAI, buildReasoningAI } from './shared/ai/models.ts';
+import { AgentTestConfigSchema } from './types.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';
@@ -32,9 +33,11 @@ export class AgentTest {
 		config: AgentTestConfig
 	) {
 		this.test = new Validator().run(yaml);
-		// TODO: Stubs for now: DecisionAI and ReasoningAI need real SDK models, which are not connected yet.
-		const decisionAi = new StubAI();
-		const reasoningAi = new StubAI();
+		const parsed = AgentTestConfigSchema.safeParse(config);
+		if (!parsed.success) throw new Error('Invalid agent-tests configuration');
+		config = parsed.data;
+		const decisionAi = buildDecisionAI(config.decision);
+		const reasoningAi = buildReasoningAI(config.reasoning);
 		this.trigger = new TestTrigger(this.test.triggers ?? [], { ...config.trigger, ai: decisionAi });
 		this.check = new TestCheck(this.test.checks, { ...config.check, decisionAi, reasoningAi });
 	}
