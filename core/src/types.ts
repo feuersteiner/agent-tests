@@ -12,7 +12,7 @@ export type { Check, CheckConfig } from './check/types.ts';
 export { AgentTestConfigSchema } from './config/types.ts';
 export type { AgentTestConfig } from './config/types.ts';
 export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
-export type { Eval, TestOutcome } from './evals/types.ts';
+export type { Eval, EvalResult, EvalResultEntry, TestOutcome } from './evals/types.ts';
 export {
 	AiModelConfigSchema,
 	AiConfigSchema,

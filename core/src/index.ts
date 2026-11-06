@@ -2,7 +2,7 @@ import { TestCheck } from './check/index.ts';
 import type { Check } from './check/types.ts';
 import { validateConfig, validateTest } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
-import type { Eval } from './evals/types.ts';
+import type { EvalResult } from './evals/types.ts';
 import { AI } from './shared/ai/index.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
@@ -43,7 +43,7 @@ export class AgentTest {
 
 	/** Run triggers, then checks on the selected sources; verbose logs each entry and a summary. */
 	public readonly run = async (verbose = false): Promise<AgentTestResult> => {
-		console.log(`Agent test "${this.test.title}" running...`);
+		if (verbose) console.log(`Agent test "${this.test.title}" running...`);
 		const trigger = await this.trigger.run(this.sources, verbose);
 		const selected = this.trigger.selected(this.sources, trigger);
 		const check = await this.check.run(selected, verbose);
@@ -52,7 +52,7 @@ export class AgentTest {
 	};
 
 	/** Create the eval stage on first use and run it; verbose logs each entry as it finishes. */
-	public readonly eval = (verbose = false): Promise<Result<Eval>> => {
+	public readonly eval = (verbose = false): Promise<EvalResult> => {
 		this.evals ??= new TestEval(this.test.evals);
 		return this.evals.run(this.trigger, this.check, verbose);
 	};
