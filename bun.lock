@@ -13,22 +13,22 @@
     },
     "core": {
       "name": "agent-tests",
-      "version": "0.0.1",
+      "version": "0.8.0",
       "bin": {
-        "agent-tests": "./cli/index.js",
+        "agent-tests": "./dist/cli/index.js",
       },
       "dependencies": {
-        "ai": "7.0.162",
-        "minimatch": "^11.0.4",
-        "yaml": "^2.9.1",
         "zod": "^4.6.7",
       },
       "devDependencies": {
+        "@ai-sdk/anthropic": "4.0.96",
+        "@ai-sdk/openai": "4.0.108",
+        "@ai-sdk/typesafe-ai": "3.0.33",
         "@types/bun": "latest",
+        "ai": "7.0.162",
+        "minimatch": "11.0.4",
         "vitest": "^5.1.0",
-      },
-      "peerDependencies": {
-        "typescript": "^5 || ^6",
+        "yaml": "2.9.1",
       },
     },
     "docs": {
@@ -52,11 +52,17 @@
   "packages": {
     "@agent-tests/docs": ["@agent-tests/docs@workspace:docs"],
 
+    "@ai-sdk/anthropic": ["@ai-sdk/anthropic@4.0.96", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-eq6rKebpYwvOmFkvhbgrQ7J+TtPsGk3KoEDr+Hu0R1EANm562CAly4s0zaCAQW7Xzw1261oWhOnU8zYLPRxzhA=="],
+
     "@ai-sdk/gateway": ["@ai-sdk/gateway@4.0.135", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74", "@vercel/oidc": "3.2.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-gnMpZP42WIhy24fpnbbtV7SBqEhYY8ZSMsfgoNRh5r41D1HwnJTm1k7d4uYSIpiaEb5J8IPTHVSzwgWmGoSFEA=="],
+
+    "@ai-sdk/openai": ["@ai-sdk/openai@4.0.108", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-XmCnCVnahoFs9VUWsSzn4LyONdDkFivBVs5t7YUWi74giDRwh8VRX4hnk/BtBKEhiBNGRQd80/QTWlf6GsVtng=="],
 
     "@ai-sdk/provider": ["@ai-sdk/provider@4.0.35", "", { "dependencies": { "json-schema": "^0.4.0" } }, "sha512-yBz6fmLS8MSCIzy7NiHEUAq56ZLD4ZA1GR6bpXBxgbwUacP1La7LuwAr/xy9jSzthem4F8Xu2OrhvU/JrE9fYA=="],
 
     "@ai-sdk/provider-utils": ["@ai-sdk/provider-utils@5.0.74", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@standard-schema/spec": "^1.1.0", "@workflow/serde": "4.1.0", "eventsource-parser": "^3.0.8", "undici": "^7.29.1" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-42R/bzs520oy3PMj8FI1KGegjLEjaUsNcaEltb6yxN0KnmhihWvlgMb19pEF8CKKqv6Bq6+qMVji8mtyrMubSQ=="],
+
+    "@ai-sdk/typesafe-ai": ["@ai-sdk/typesafe-ai@3.0.33", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-0JMRuHy4o6N5Gt3iePYdU3H/m8UPcmKPx6rTcijD31zzZr3QfVoY80e14JGS951HfkocqHnLFMyplpquvm1xbA=="],
 
     "@fontsource-variable/material-symbols-outlined": ["@fontsource-variable/material-symbols-outlined@5.3.9", "", {}, "sha512-Q4rqYIHWgXJ07+mq8e+8/UOtfKjbi9EEwjJOdaXRtGpeMfmzujBjfeZn4hVewghPl8aljwOAQfTMXLLslP8EKg=="],
 

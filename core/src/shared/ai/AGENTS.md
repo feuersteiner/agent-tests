@@ -5,4 +5,5 @@
 - `prompts.ts`: shared defaults; `AiConfig.system` overrides the operation's default.
 - `reasoning.ts`: `ReasoningAI`, structured output with an injected SDK language model.
 - `decision.ts`: `DecisionAI`, native scoring and fragment decisions with an injected SDK model.
-- `stub.ts`: WIP Stub default; random scores.
+- `models.ts`: build providers from validated config and resolve required environment keys; Clef adapts the TypeSafe transport.
+- `stub.ts`: retained for step 9; random scores, unused by AgentTest.

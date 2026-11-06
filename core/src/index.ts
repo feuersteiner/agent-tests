@@ -3,7 +3,7 @@ import type { Check } from './check/types.ts';
 import { validateConfig, validateTest } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
 import type { Eval } from './evals/types.ts';
-import { StubAI } from './shared/ai/stub.ts';
+import { buildDecisionAI, buildReasoningAI } from './shared/ai/models.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';
@@ -23,8 +23,8 @@ export class AgentTest {
 	/**
 	 * @param sources - Files to inspect, as supplied by the caller.
 	 * @param yaml - The parsed test.yaml value; text parsing belongs to src/config.
-	 * @param config - Settings for the trigger and check stages.
-	 * @throws If the test definition or stage settings are invalid.
+	 * @param config - Provider models and settings for the trigger and check stages.
+	 * @throws If the test definition or config is invalid, or a required environment key is empty.
 	 */
 	constructor(
 		public readonly sources: Source[],
@@ -33,9 +33,8 @@ export class AgentTest {
 	) {
 		this.test = validateTest(yaml);
 		const settings = validateConfig(config);
-		// TODO: Stubs for now: DecisionAI and ReasoningAI need real SDK models, which are not connected yet.
-		const decisionAi = new StubAI();
-		const reasoningAi = new StubAI();
+		const decisionAi = buildDecisionAI(settings.decision);
+		const reasoningAi = buildReasoningAI(settings.reasoning);
 		this.trigger = new TestTrigger(this.test.triggers ?? [], {
 			...settings.trigger,
 			ai: decisionAi
