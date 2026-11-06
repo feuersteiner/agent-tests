@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ResultEntry } from '../shared/types.ts';
 import { TextSchema } from '../shared/types.ts';
 
 /** Expected result for a test's labeled file example. */
@@ -13,3 +14,7 @@ export const EvalSchema = z.strictObject({
 	expect: TestOutcomeSchema
 });
 export type Eval = z.infer<typeof EvalSchema>;
+
+/** Evals retain the actual outcome as well as the declared expectation. */
+export type EvalResultEntry = ResultEntry<Eval> & { actual: TestOutcome };
+export type EvalResult = { flagged: EvalResultEntry[]; cleared: EvalResultEntry[] };

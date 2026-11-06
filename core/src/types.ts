@@ -11,7 +11,7 @@ import type { FilterConfig, Trigger } from './trigger/types.ts';
 export { CheckSchema } from './check/types.ts';
 export type { Check, CheckConfig } from './check/types.ts';
 export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
-export type { Eval, TestOutcome } from './evals/types.ts';
+export type { Eval, EvalResult, EvalResultEntry, TestOutcome } from './evals/types.ts';
 export {
 	AiModelConfigSchema,
 	AiConfigSchema,
