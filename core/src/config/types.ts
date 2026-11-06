@@ -1,10 +1,12 @@
 import { z } from 'zod';
-import { ReasoningLevelSchema } from '../shared/ai/types.ts';
+import { AiModelConfigSchema, ReasoningLevelSchema } from '../shared/ai/types.ts';
 
 const ThresholdSchema = z.number().finite().min(0).max(1);
 
-/** Settings for each stage; AgentTest creates the AI instances itself. */
+/** Both provider models are required even for tests using only regexes. */
 export const AgentTestConfigSchema = z.strictObject({
+	decision: AiModelConfigSchema.extend({ api: z.enum(['openai', 'jev']) }),
+	reasoning: AiModelConfigSchema.extend({ api: z.enum(['openai', 'anthropic']) }),
 	trigger: z.strictObject({ threshold: ThresholdSchema }),
 	check: z.strictObject({
 		threshold: ThresholdSchema,

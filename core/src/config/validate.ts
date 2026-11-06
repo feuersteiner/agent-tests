@@ -4,7 +4,7 @@ import type { AgentTest } from '../types.ts';
 import { AgentTestConfigSchema } from './types.ts';
 import type { AgentTestConfig } from './types.ts';
 
-/** Validate schema structure and return its output; use validateTest for test semantics. */
+/** Validate schema structure and return its output; use validateTest/validateConfig for semantics. */
 export const validate = <Schema extends z.ZodType>(
 	value: unknown,
 	schema: Schema
@@ -48,9 +48,24 @@ export const validateTest = (value: unknown): AgentTest => {
 	return test;
 };
 
-/** Validate repository stage settings, including thresholds and optional reasoning. */
+/** Validate provider routes and stage settings before model construction. */
 export const validateConfig = (value: unknown): AgentTestConfig => {
-	return validate(value, AgentTestConfigSchema);
+	const config = validate(value, AgentTestConfigSchema);
+	const issues = (['decision', 'reasoning'] as const).flatMap((field) => {
+		const value = config[field].url;
+		const url = new URL(value);
+		const valid =
+			!url.username &&
+			!url.password &&
+			!value.includes('?') &&
+			!value.includes('#') &&
+			(url.protocol === 'https:' || (url.protocol === 'http:' && url.hostname === 'localhost'));
+		return valid
+			? []
+			: [`${field}.url: Expected HTTPS or HTTP localhost without credentials, query, or fragment`];
+	});
+	if (issues.length) throw new Error(`Invalid configuration:\n${issues.join('\n')}`);
+	return config;
 };
 
 const describeIssues = (issues: z.core.$ZodIssue[], parent: PropertyKey[] = []): string[] => {

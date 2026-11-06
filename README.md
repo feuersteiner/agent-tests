@@ -62,6 +62,10 @@ are inspected. Paths outside those globs are skipped without a model call.
 
 Not published yet.
 
+The package ships TypeScript source. Library imports require Bun or tooling that
+compiles TypeScript dependencies; plain Node does not execute TypeScript inside
+`node_modules`. The JavaScript CLI runs with Node.
+
 ```sh
 npm install -D agent-tests
 npx agent-tests init                          # config, .agents/tests/, pre-commit hook
@@ -79,8 +83,9 @@ npx agent-tests docs                          # skills that teach agents to writ
 npx agent-tests vote user-text-french         # toggle your vote for a library test
 ```
 
-Choose the decision model (Jev, Clef, or OpenAI) in `agent-tests.config.yaml`
+Choose the decision model (Jev or OpenAI) in `agent-tests.config.yaml`
 and keep its credentials in `.env`.
+Clef support is deferred pending standardized APIs for system-one models.
 
 ## Triggers
 
@@ -163,7 +168,7 @@ checks:
         - '\b(gonna|wanna|gotta)\b'
       maybe: # weak signal: a match escalates, with the hits as hints
         - '\b(hey|awesome|folks|no worries)\b'
-    smart: # classifier such as Jev or Clef
+    smart: # classifier such as Jev or OpenAI
       ask: 'Quote each phrase in this copy that uses familiar or casual language.'
       bounds: [0.3, 0.8] # below: pass, between: unsure, above: likely violation
     deep: # structured LLM call, the final word

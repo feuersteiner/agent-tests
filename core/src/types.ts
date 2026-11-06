@@ -14,6 +14,7 @@ export type { AgentTestConfig } from './config/types.ts';
 export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
 export type { Eval, TestOutcome } from './evals/types.ts';
 export {
+	AiModelConfigSchema,
 	AiConfigSchema,
 	AiExplanationSchema,
 	AiRequestSchema,
@@ -21,6 +22,8 @@ export {
 	ReasoningLevelSchema
 } from './shared/ai/types.ts';
 export type {
+	AiSettings,
+	AiModelConfig,
 	AiConfig,
 	AiExplanation,
 	AiRequest,

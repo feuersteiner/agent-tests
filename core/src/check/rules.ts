@@ -26,10 +26,10 @@ const GrepRule: SourceRule = async (source, param, _config, trace) => {
  * Returns `true` (failed) at the first condition scoring below the threshold,
  * `false` (passed) if every condition reaches it. Each `ask` states what must be true to pass.
  */
-const AskRule: SourceRule = async (source, param, { decisionAi, threshold }, trace) => {
+const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
-		if ((await decisionAi.run({ input, ask: condition })) < threshold) {
+		if ((await ai.decide.run({ input, ask: condition })) < threshold) {
 			trace.push('failed ask');
 			return true;
 		}
@@ -41,15 +41,10 @@ const AskRule: SourceRule = async (source, param, { decisionAi, threshold }, tra
  * Returns `true` (failed) at the first condition scoring below the threshold,
  * `false` (passed) if every condition reaches it. Uses the reasoning AI and level from the config.
  */
-const ReasonRule: SourceRule = async (
-	source,
-	param,
-	{ reasoningAi, threshold, reasoning },
-	trace
-) => {
+const ReasonRule: SourceRule = async (source, param, { ai, threshold, reasoning }, trace) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
-		if ((await reasoningAi.run({ input, ask: condition, reasoning })) < threshold) {
+		if ((await ai.reason.run({ input, ask: condition, reasoning })) < threshold) {
 			trace.push('failed reason');
 			return true;
 		}
