@@ -10,10 +10,22 @@ export class Validator {
 			const details = this.describeIssues(result.error.issues);
 			throw new Error(`Invalid test definition:\n${details.join('\n')}`);
 		}
+		for (const entry of [...(result.data.triggers ?? []), ...result.data.checks]) {
+			for (const pattern of [entry.grep ?? []].flat()) {
+				try {
+					new RegExp(pattern);
+				} catch {
+					throw new Error(`Invalid test definition: ${entry.id}.grep: invalid regular expression`);
+				}
+			}
+		}
 		return value as AgentTest;
 	};
 
-	private describeIssues(issues: z.core.$ZodIssue[], parent: PropertyKey[] = []): string[] {
+	private readonly describeIssues = (
+		issues: z.core.$ZodIssue[],
+		parent: PropertyKey[] = []
+	): string[] => {
 		return issues.flatMap((issue) => {
 			const path = [...parent, ...issue.path];
 			if (issue.code === 'invalid_union') {
@@ -21,5 +33,5 @@ export class Validator {
 			}
 			return [`${path.map(String).join('.') || 'test'}: ${issue.message}`];
 		});
-	}
+	};
 }
