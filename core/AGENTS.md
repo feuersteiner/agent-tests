@@ -2,7 +2,8 @@
 
 ## Module boundaries
 
-- YAML parsing and Git file selection belong to `core/cli/`; workflow-definition validation belongs to the main library `Validator` in `core/src/validator.ts`. The library must not import CLI code or run Git; the CLI passes sources in.
+- `core/src/config/parse.ts` owns pure YAML parsing with `parseYaml`. `validate.ts` owns test-definition and repository-config validation through `validateTest` and `validateConfig`, sharing generic `validate(value, schema)` for schema output. Duplicate check-ID and grep-regex mechanics belong here, not in schema declarations. File I/O, environment loading, and Git file selection belong to `core/cli/`. The library must not import CLI code or run Git; the CLI passes sources in.
+- Configuration boundary exception: `core/src/config/validate.ts` may import root test schemas from `core/src/types.ts`. Root types re-export the declarative config schema/type from `config/types.ts`; neither root types nor features may import validation or parsing implementations. The current config covers stage thresholds and optional check reasoning; PR #82 will extend it with provider settings.
 - Feature modules must not import each other's implementation/runtime code; `check` and `trigger` stay independent.
 - Composition root exception: the `AgentTest` class in `core/src/index.ts` may assemble source/trigger/check/eval modules. Features must never import it or use its exports to bypass feature boundaries.
 - Reusable cross-module code belongs in `core/src/shared/`, including AI, Source, and base schemas, and must be imported from there.
