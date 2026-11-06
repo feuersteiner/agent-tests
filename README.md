@@ -62,6 +62,10 @@ are inspected. Paths outside those globs are skipped without a model call.
 
 Not published yet.
 
+The package ships TypeScript source. Library imports require Bun or tooling that
+compiles TypeScript dependencies; plain Node does not execute TypeScript inside
+`node_modules`. The JavaScript CLI runs with Node.
+
 ```sh
 npm install -D agent-tests
 npx agent-tests init                          # config, .agents/tests/, pre-commit hook
