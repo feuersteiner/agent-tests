@@ -20,7 +20,16 @@ export type Param = z.infer<typeof ParamSchema>;
  * `flagged` means it fired: a trigger matched, a check found a violation, or an eval
  * did not match its label. `trace` lists what failed along the way, such as `failed grep`.
  */
-export type ResultEntry<T> = { source: Source; check: T; flagged: boolean; trace: string[] };
+export type ResultEntry<T> = {
+	source: Source;
+	check: T;
+	flagged: boolean;
+	trace: string[];
+	findings?: Finding[];
+};
+
+/** Grounded evidence with a one-based source location. */
+export type Finding = { quote: string; reason?: string; line: number; column: number };
 
 /** Every entry of a run, split by whether it was flagged. */
 export type Result<T> = { flagged: ResultEntry<T>[]; cleared: ResultEntry<T>[] };

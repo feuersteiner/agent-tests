@@ -14,11 +14,17 @@ import type { SourceRule } from './types.ts';
  * Returns `true` (failed) if any regex matches the content, `false` (passed) if none match.
  * Compiles every regex before reading the source.
  */
-const GrepRule: SourceRule = async (source, param, _config, trace) => {
+const GrepRule: SourceRule = async (source, param, config, trace) => {
 	const regexes = [param].flat().map((pattern) => new RegExp(pattern));
 	const content = await source.open();
 	const failed = regexes.some((regex) => regex.test(content));
-	if (failed) trace.push('failed grep');
+	if (failed) {
+		trace.push('failed grep');
+		for (const regex of regexes) {
+			for (const match of content.matchAll(new RegExp(regex.source, 'g')))
+				if (match[0]) config.report?.({ quote: match[0] });
+		}
+	}
 	return failed;
 };
 
@@ -26,10 +32,14 @@ const GrepRule: SourceRule = async (source, param, _config, trace) => {
  * Returns `true` (failed) at the first condition scoring below the threshold,
  * `false` (passed) if every condition reaches it. Each `ask` states what must be true to pass.
  */
-const AskRule: SourceRule = async (source, param, { decisionAi, threshold }, trace) => {
+const AskRule: SourceRule = async (source, param, { decisionAi, threshold, report }, trace) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
-		if ((await decisionAi.run({ input, ask: condition })) < threshold) {
+		const request = { input, ask: condition };
+		const score = await decisionAi.run(request);
+		if (score < threshold) {
+			if (report)
+				for (const failure of (await decisionAi.explain(request, score)).failures) report(failure);
 			trace.push('failed ask');
 			return true;
 		}
@@ -44,12 +54,16 @@ const AskRule: SourceRule = async (source, param, { decisionAi, threshold }, tra
 const ReasonRule: SourceRule = async (
 	source,
 	param,
-	{ reasoningAi, threshold, reasoning },
+	{ reasoningAi, threshold, reasoning, report },
 	trace
 ) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
-		if ((await reasoningAi.run({ input, ask: condition, reasoning })) < threshold) {
+		const request = { input, ask: condition, reasoning };
+		const score = await reasoningAi.run(request);
+		if (score < threshold) {
+			if (report)
+				for (const failure of (await reasoningAi.explain(request, score)).failures) report(failure);
 			trace.push('failed reason');
 			return true;
 		}
