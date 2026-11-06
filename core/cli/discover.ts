@@ -2,7 +2,8 @@ import { lstat, readdir, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import type { AgentTest } from '../src/types.ts';
-import { Parser } from './parser.ts';
+import { parseYaml } from '../src/config/parse.ts';
+import { validateTest } from '../src/config/validate.ts';
 import { safePath } from './files.ts';
 
 export type InstalledTest = {
@@ -35,7 +36,9 @@ export const discover = async (root: string, selectedId?: string): Promise<Insta
 					for (const name of ['test.yaml', 'TEST.md'])
 						if (!(await lstat(join(item.directory, name))).isFile())
 							throw new Error('Unsafe test file');
-					item.test = new Parser().run(await readFile(join(item.directory, 'test.yaml'), 'utf8'));
+					item.test = validateTest(
+						parseYaml(await readFile(join(item.directory, 'test.yaml'), 'utf8'))
+					);
 					if (item.test.id !== item.id) throw new Error('Test id must match its directory');
 					if (item.test.source) {
 						const digest = `sha256:${createHash('sha256')

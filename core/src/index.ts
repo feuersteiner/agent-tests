@@ -1,9 +1,9 @@
 import { TestCheck } from './check/index.ts';
 import type { Check } from './check/types.ts';
+import { validateConfig, validateTest } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
 import type { EvalResult } from './evals/types.ts';
-import { buildDecisionAI, buildReasoningAI } from './shared/ai/models.ts';
-import { AgentTestConfigSchema } from './types.ts';
+import { AI } from './shared/ai/index.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';
@@ -12,7 +12,6 @@ import type {
 	AgentTestConfig,
 	AgentTestResult
 } from './types.ts';
-import { Validator } from './validator.ts';
 
 /** Run one validated test over the sources: triggers select and checks judge. Evals run on demand. */
 export class AgentTest {
@@ -23,23 +22,23 @@ export class AgentTest {
 
 	/**
 	 * @param sources - Files to inspect, as supplied by the caller.
-	 * @param yaml - The parsed test.yaml value; parsing the text belongs to the CLI.
-	 * @param config - Settings for the trigger and check stages.
-	 * @throws If the test definition is invalid.
+	 * @param yaml - The parsed test.yaml value; text parsing belongs to src/config.
+	 * @param config - Provider models and settings for the trigger and check stages.
+	 * @throws If the test definition or config is invalid, or a required environment key is empty.
 	 */
 	constructor(
 		public readonly sources: Source[],
 		yaml: unknown,
 		config: AgentTestConfig
 	) {
-		this.test = new Validator().run(yaml);
-		const parsed = AgentTestConfigSchema.safeParse(config);
-		if (!parsed.success) throw new Error('Invalid agent-tests configuration');
-		config = parsed.data;
-		const decisionAi = buildDecisionAI(config.decision);
-		const reasoningAi = buildReasoningAI(config.reasoning);
-		this.trigger = new TestTrigger(this.test.triggers ?? [], { ...config.trigger, ai: decisionAi });
-		this.check = new TestCheck(this.test.checks, { ...config.check, decisionAi, reasoningAi });
+		this.test = validateTest(yaml);
+		const settings = validateConfig(config);
+		const ai = new AI(settings);
+		this.trigger = new TestTrigger(this.test.triggers ?? [], {
+			...settings.trigger,
+			ai
+		});
+		this.check = new TestCheck(this.test.checks, { ...settings.check, ai });
 	}
 
 	/** Run triggers, then checks on the selected sources; verbose logs each entry and a summary. */

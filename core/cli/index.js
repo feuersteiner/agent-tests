@@ -3,7 +3,8 @@ import { parseArgs } from './args.ts';
 import { execute } from './run.ts';
 import { executeLibrary } from './library/index.ts';
 import { LOGO } from './logo.js';
-import { version } from '../package.json';
+import packageInfo from '../package.json' with { type: 'json' };
+const { version } = packageInfo;
 
 try {
 	const command = parseArgs(process.argv.slice(2));
