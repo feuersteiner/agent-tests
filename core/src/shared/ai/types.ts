@@ -46,7 +46,7 @@ export type AiExplanation = z.infer<typeof AiExplanationSchema>;
 
 /** Explicit provider routing and an environment-variable reference, never a credential. */
 export const AiModelConfigSchema = z.strictObject({
-	api: z.enum(['openai', 'jev', 'clef', 'anthropic']),
+	api: z.enum(['openai', 'jev', 'anthropic']),
 	url: z.url(),
 	model: TextSchema,
 	apiKeyEnv: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/, 'Expected an environment variable name')

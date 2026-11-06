@@ -6,5 +6,7 @@ AI scoring and explanations. `ask` is always a passing condition, and higher sco
 - [`types.ts`](types.ts) and [`prompts.ts`](prompts.ts): the contracts and default prompts. `AiConfig.system` overrides a prompt, and an empty string removes it.
 - [`decision.ts`](decision.ts): `new DecisionAI(model)` needs a decision model. It scores with `P(true)` and explains source lines in one multi-question call.
 - [`reasoning.ts`](reasoning.ts): `new ReasoningAI(model)` needs a language model with structured output. Retries follow SDK defaults.
-- [`models.ts`](models.ts): construct decision and reasoning providers, resolving `apiKeyEnv`; missing or blank keys fail construction even for grep-only tests.
+- [`models.ts`](models.ts): construct OpenAI or Jev decision providers and OpenAI or Anthropic reasoning providers, resolving `apiKeyEnv`; missing or blank keys fail construction even for grep-only tests.
 - [`stub.ts`](stub.ts): `StubAI`, retained for step 9, with random `0.1` or `0.9` scores and no failures.
+
+Clef support is deferred pending standardized APIs for system-one models.
