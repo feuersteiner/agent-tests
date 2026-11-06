@@ -1,0 +1,15 @@
+decision:
+  api: openai
+  url: https://api.openai.com/v1
+  model: gpt-6-luna
+  apiKeyEnv: OPENAI_API_KEY
+reasoning:
+  api: openai
+  url: https://api.openai.com/v1
+  model: gpt-6-luna
+  apiKeyEnv: OPENAI_API_KEY
+trigger:
+  threshold: 0.7
+check:
+  threshold: 0.7
+  reasoning: medium

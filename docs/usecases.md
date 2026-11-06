@@ -2,8 +2,8 @@
 
 Agent-tests is intended to turn recurring review judgments into reusable,
 benchmarked repository checks. These are proposed uses of the design described
-in the [README](README.md); the CLI, compiler, and evaluation engine are not
-implemented.
+in the [README](../README.md). The CLI and evaluation engine are implemented;
+automatic compilation remains planned.
 
 ## 1. Preserve lessons from production incidents
 
