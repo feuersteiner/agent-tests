@@ -34,14 +34,8 @@ export class TestTrigger {
 
 	/** Every source when there are no triggers; otherwise those passing any trigger, once each. */
 	public readonly selected = (sources: Source[], result: Result<Trigger>): Source[] => {
-		const paths = new Set(result.flagged.map(({ source }) => source.path));
-		return [
-			...new Map(
-				sources
-					.filter((source) => this.triggers.length === 0 || paths.has(source.path))
-					.map((source) => [source.path, source])
-			).values()
-		];
+		if (this.triggers.length === 0) return sources;
+		return [...new Map(result.flagged.map(({ source }) => [source.path, source])).values()];
 	};
 
 	/** The first filter the source fails ends the trigger; passing every filter present passes it. */
