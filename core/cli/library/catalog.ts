@@ -4,7 +4,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { IdSchema } from '../../src/shared/types.ts';
-import { Parser } from '../parser.ts';
+import { parseYaml } from '../../src/config/parse.ts';
+import { validateTest } from '../../src/config/validate.ts';
 
 export const repository = 'feuersteiner/agent-tests';
 export const digest = (text: string): string => createHash('sha256').update(text).digest('hex');
@@ -65,7 +66,7 @@ export class Catalog {
 		} catch {
 			return undefined;
 		}
-		const test = new Parser().run(yaml);
+		const test = validateTest(parseYaml(yaml));
 		if (test.id !== id || test.source !== `sha256:${digest(prose)}`)
 			throw new Error('Invalid community source digest or id');
 		if (

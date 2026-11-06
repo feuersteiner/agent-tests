@@ -2,7 +2,8 @@ import { AgentTest } from '../../src/index.ts';
 import type { Command } from '../args.ts';
 import { loadConfig } from '../config.ts';
 import { discover } from '../discover.ts';
-import { Parser } from '../parser.ts';
+import { parseYaml } from '../../src/config/parse.ts';
+import { validateTest } from '../../src/config/validate.ts';
 import { Catalog } from './catalog.ts';
 import { destination, publish } from './install.ts';
 import { vote } from './vote.ts';
@@ -40,7 +41,7 @@ export const executeLibrary = async (root: string, command: Command): Promise<nu
 						output.push(`${target.id}: removed upstream; local copy retained`);
 						continue;
 					}
-					const model = new AgentTest([], new Parser().run(test.yaml), loadConfig(root));
+					const model = new AgentTest([], validateTest(parseYaml(test.yaml)), loadConfig(root));
 					const result = await model.eval();
 					if (result.flagged.length) throw new Error('Community evals failed; nothing installed');
 					await publish(
