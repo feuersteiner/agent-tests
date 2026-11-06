@@ -1,4 +1,4 @@
-import { lstat, readdir, readFile } from 'node:fs/promises';
+import { lstat, readdir, readFile, realpath } from 'node:fs/promises';
 import { join, relative, resolve, sep } from 'node:path';
 import { Source } from '../src/shared/source.ts';
 import type { Options } from './args.ts';
@@ -90,6 +90,12 @@ export const loadSources = async (
 		} else {
 			const source = new FileSource(root, path);
 			try {
+				const full = resolve(root, path);
+				if (
+					!(await lstat(full)).isFile() ||
+					(await realpath(full)) !== resolve(await realpath(root), path)
+				)
+					continue;
 				if (!(await source.open()).includes('\0')) selected.push(source);
 			} catch (error) {
 				if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;

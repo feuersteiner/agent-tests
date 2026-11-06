@@ -1,11 +1,17 @@
 import { AI } from './index.ts';
-import type { AiConfig, AiExplanation, AiRequest } from './types.ts';
+import type { AiConfig, AiExplanation, AiRequest, FailInstance } from './types.ts';
 
-/** WIP implementation: random dummy scoring and empty explanations without SDK imports. */
+/** Deterministic test double without SDK imports or network access. */
 export class StubAI extends AI {
-	/** Validated request/config are unused; preserve the current random scoring behavior. */
+	constructor(
+		private readonly value = 0.9,
+		private readonly failures: FailInstance[] = []
+	) {
+		super();
+	}
+	/** Return the configured score; the base class still validates its range. */
 	protected override async score(_request: AiRequest, _config: AiConfig): Promise<number> {
-		return Math.random() > 0.5 ? 0.9 : 0.1;
+		return this.value;
 	}
 
 	/** Preserve the supplied score without reasons, evidence, or a second scoring call. */
@@ -14,6 +20,6 @@ export class StubAI extends AI {
 		score: number,
 		_config: AiConfig
 	): Promise<AiExplanation> {
-		return { score, failures: [] };
+		return { score, failures: this.failures };
 	}
 }

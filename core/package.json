@@ -29,7 +29,7 @@
 	"type": "module",
 	"scripts": {
 		"check": "tsc --noEmit",
-		"test": "vitest run",
+		"test": "bun run build && vitest run",
 		"build": "bun run build.ts",
 		"prepack": "bun run build"
 	},
