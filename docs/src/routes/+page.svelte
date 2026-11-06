@@ -58,29 +58,29 @@ evals:
 	<section id="configure">
 		<h2>Configure</h2>
 		<p>
-			Use Node 22 or newer. Install the package, then create <code>agent-tests.config.yaml</code>
+			Use Bun to install and run the TypeScript package, then create <code>
+				agent-tests.config.yaml
+			</code>
 			:
 		</p>
-		<pre><code>npm install -D agent-tests</code></pre>
+		<pre><code>bun add -D agent-tests</code></pre>
 		<pre><code>{config}</code></pre>
 		<p>
 			Set <code>OPENAI_API_KEY</code>
 			in the environment or an untracked
 			<code>.env</code>
-			. Existing variables win. Both models and keys are required, even for regex checks. Model
-			calls can incur charges.
+			. Existing variables win. Both models and keys are required, even for regex checks. Model calls
+			can incur charges.
 		</p>
 		<p>
 			Decision APIs: <code>openai</code>
 			,
 			<code>jev</code>
-			,
-			<code>clef</code>
 			. Reasoning APIs:
 			<code>openai</code>
 			,
 			<code>anthropic</code>
-			. URLs require HTTPS, except HTTP on localhost. Clef takes its full Workers AI endpoint.
+			. URLs require HTTPS, except HTTP on localhost. Clef support is deferred.
 		</p>
 	</section>
 	<section id="write">
@@ -89,7 +89,7 @@ evals:
 			Create <code>.agents/tests/formal-prose/TEST.md</code>
 			describing the rule, then write
 			<code>test.yaml</code>
-			 beside it:
+			beside it:
 		</p>
 		<pre><code>{definition}</code></pre>
 		<p>
@@ -109,12 +109,12 @@ evals:
 	</section>
 	<section id="run">
 		<h2>Run</h2>
-		<pre><code>{`npx agent-tests validate
-npx agent-tests eval
-npx agent-tests run
-npx agent-tests run --changed
-npx agent-tests run --staged
-npx agent-tests run --base main`}</code></pre>
+		<pre><code>{`bun run --bun agent-tests validate
+bun run --bun agent-tests eval
+bun run --bun agent-tests run
+bun run --bun agent-tests run --changed
+bun run --bun agent-tests run --staged
+bun run --bun agent-tests run --base main`}</code></pre>
 		<p>
 			Changed mode reads working content, staged mode reads the index, and base mode reads committed
 			HEAD changes. Base mode loads config from the base commit to protect credentials.
@@ -123,7 +123,7 @@ npx agent-tests run --base main`}</code></pre>
 			Use <code>--json</code>
 			for a JSON report or
 			<code>--verbose</code>
-			 for stage traces. Exit codes: 0 passes, 1 reports findings or eval mismatches, 2 reports configuration
+			for stage traces. Exit codes: 0 passes, 1 reports findings or eval mismatches, 2 reports configuration
 			or runtime errors. Validation makes no model calls.
 		</p>
 		<p>
@@ -133,12 +133,12 @@ npx agent-tests run --base main`}</code></pre>
 	</section>
 	<section id="library">
 		<h2>Community library</h2>
-		<pre><code>{`npx agent-tests list --remote
-npx agent-tests add no-informal-english
-npx agent-tests update
-npx agent-tests list
-npx agent-tests remove no-informal-english
-npx agent-tests vote no-informal-english --up`}</code></pre>
+		<pre><code>{`bun run --bun agent-tests list --remote
+bun run --bun agent-tests add no-informal-english
+bun run --bun agent-tests update
+bun run --bun agent-tests list
+bun run --bun agent-tests remove no-informal-english
+bun run --bun agent-tests vote no-informal-english --up`}</code></pre>
 		<p>
 			Installations pin a catalog commit and evaluate the test before publishing its files. Adapt
 			globs to the project, then validate and evaluate again. Updates preserve locally edited tests;

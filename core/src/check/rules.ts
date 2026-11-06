@@ -20,9 +20,9 @@ const GrepRule: SourceRule = async (source, param, config, trace) => {
 	const failed = regexes.some((regex) => regex.test(content));
 	if (failed) {
 		trace.push('failed grep');
-		for (const regex of regexes) {
+		for (const regex of config.report ? regexes : []) {
 			for (const match of content.matchAll(new RegExp(regex.source, 'g')))
-				if (match[0]) config.report?.({ quote: match[0] });
+				config.report?.({ quote: match[0] }, match.index);
 		}
 	}
 	return failed;
@@ -32,14 +32,14 @@ const GrepRule: SourceRule = async (source, param, config, trace) => {
  * Returns `true` (failed) at the first condition scoring below the threshold,
  * `false` (passed) if every condition reaches it. Each `ask` states what must be true to pass.
  */
-const AskRule: SourceRule = async (source, param, { decisionAi, threshold, report }, trace) => {
+const AskRule: SourceRule = async (source, param, { ai, threshold, report }, trace) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
 		const request = { input, ask: condition };
-		const score = await decisionAi.run(request);
+		const score = await ai.decide.run(request);
 		if (score < threshold) {
 			if (report)
-				for (const failure of (await decisionAi.explain(request, score)).failures) report(failure);
+				for (const failure of (await ai.decide.explain(request, score)).failures) report(failure);
 			trace.push('failed ask');
 			return true;
 		}
@@ -54,16 +54,16 @@ const AskRule: SourceRule = async (source, param, { decisionAi, threshold, repor
 const ReasonRule: SourceRule = async (
 	source,
 	param,
-	{ reasoningAi, threshold, reasoning, report },
+	{ ai, threshold, reasoning, report },
 	trace
 ) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
 		const request = { input, ask: condition, reasoning };
-		const score = await reasoningAi.run(request);
+		const score = await ai.reason.run(request);
 		if (score < threshold) {
 			if (report)
-				for (const failure of (await reasoningAi.explain(request, score)).failures) report(failure);
+				for (const failure of (await ai.reason.explain(request, score)).failures) report(failure);
 			trace.push('failed reason');
 			return true;
 		}

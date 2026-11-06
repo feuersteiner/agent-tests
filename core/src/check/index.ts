@@ -36,9 +36,9 @@ export class TestCheck {
 	/** The first rule the source passes ends the check; failing every rule present fails it. */
 	public readonly runCheck = async (source: Source, check: Check): Promise<ResultEntry<Check>> => {
 		const trace: string[] = [];
-		const evidence: FailInstance[] = [];
-		const report = (failure: FailInstance): void => {
-			evidence.push(failure);
+		const evidence: (FailInstance & { offset?: number })[] = [];
+		const report = (failure: FailInstance, offset?: number): void => {
+			evidence.push({ ...failure, offset });
 		};
 		const failsGrep: boolean = check.grep
 			? await CheckRules.GrepRule(
@@ -62,7 +62,9 @@ export class TestCheck {
 			? await CheckRules.ReasonRule(source, check.reason, { ...this.config, report }, trace)
 			: true;
 		const located = (
-			await Promise.all(evidence.map(({ quote, reason }) => source.locate(quote, reason)))
+			await Promise.all(
+				evidence.map(({ quote, reason, offset }) => source.locate(quote, reason, offset))
+			)
 		).flat();
 		const findings = [
 			...new Map(
