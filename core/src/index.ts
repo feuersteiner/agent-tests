@@ -3,7 +3,7 @@ import type { Check } from './check/types.ts';
 import { validateConfig, validateTest } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
 import type { Eval } from './evals/types.ts';
-import { buildDecisionAI, buildReasoningAI } from './shared/ai/models.ts';
+import { AI } from './shared/ai/index.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';
@@ -33,13 +33,12 @@ export class AgentTest {
 	) {
 		this.test = validateTest(yaml);
 		const settings = validateConfig(config);
-		const decisionAi = buildDecisionAI(settings.decision);
-		const reasoningAi = buildReasoningAI(settings.reasoning);
+		const ai = new AI(settings);
 		this.trigger = new TestTrigger(this.test.triggers ?? [], {
 			...settings.trigger,
-			ai: decisionAi
+			ai
 		});
-		this.check = new TestCheck(this.test.checks, { ...settings.check, decisionAi, reasoningAi });
+		this.check = new TestCheck(this.test.checks, { ...settings.check, ai });
 	}
 
 	/** Run triggers, then checks on the selected sources; verbose logs each entry and a summary. */

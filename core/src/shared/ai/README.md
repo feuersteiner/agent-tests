@@ -1,11 +1,11 @@
 # AI
 
-AI scoring and explanations. `ask` is always a passing condition, and higher scores mean stronger support for passing. The package root exports `AI`, `agent-tests/types` exports the schemas and types, and `AgentTest` constructs concrete models from validated provider config.
+One configured `AI` instance scores passing conditions and explains existing scores; higher scores mean stronger support for passing.
 
-- [`index.ts`](index.ts): abstract `AI` with `run(request, config?)`, which returns a score in `[0, 1]`, and `explain(request, score, config?)`, which keeps the score and requires exact source quotes. Errors reject the promise.
-- [`types.ts`](types.ts) and [`prompts.ts`](prompts.ts): the contracts and default prompts. `AiConfig.system` overrides a prompt, and an empty string removes it.
-- [`decision.ts`](decision.ts): `new DecisionAI(model)` needs a decision model. It scores with `P(true)` and explains source lines in one multi-question call.
-- [`reasoning.ts`](reasoning.ts): `new ReasoningAI(model)` needs a language model with structured output. Retries follow SDK defaults.
-- [`models.ts`](models.ts): construct OpenAI or Jev decision providers and OpenAI or Anthropic reasoning providers, resolving `apiKeyEnv`; missing or blank keys fail construction even for grep-only tests.
+- [`index.ts`](index.ts): `new AI({ decision, reasoning })` builds SDK models once from validated config and resolves `apiKeyEnv` eagerly, including for grep-only tests. Decision APIs are OpenAI or Jev; reasoning APIs are OpenAI chat or Anthropic.
+- [`engines/index.ts`](engines/index.ts) exports abstract `AIEngine`, which owns `run`/`explain`, validation, default prompts, blank-input explanations, unchanged scores, and exact-quote grounding. `AI` exposes two readonly `AIEngine` members. Exported classes `DecideAIEngine` in [`engines/decide.ts`](engines/decide.ts) and `ReasonAIEngine` in [`engines/reason.ts`](engines/reason.ts) extend `AIEngine`, build their models once, and override only protected scoring/evidence hooks. The container in `index.ts` imports these classes; `engines/index.ts` never imports or runtime re-exports them, avoiding ESM initialization cycles. Each AI TypeScript file stays within 75 physical lines, aiming for about 50.
+- `ai.decide.run(request, options?)` returns the decision model's `P(true)` in `[0, 1]`; `ai.reason.run(request, options?)` returns the same score contract through structured output.
+- `ai.decide.explain(request, score, options?)` and `ai.reason.explain(request, score, options?)` use their respective models without rescoring, preserve the score, and require exact source quotes. Decision explanations classify source fragments in one call; reasoning explanations use structured evidence. Blank input returns no failures without a call. Errors reject the promise; retries follow SDK defaults.
+- [`types.ts`](types.ts) and [`prompts.ts`](prompts.ts): schemas, `AiSettings` provider config, and default prompts. `AiConfig.system` overrides a prompt; an empty string removes it. The package root exports `AI` and `AIEngine`; callers type-import `AI` from `shared/ai/index.ts`. `agent-tests/types` exports the schemas and contracts.
 
-Clef support is deferred pending standardized APIs for system-one models.
+`AgentTest` shares one `AI` instance between triggers and checks. Clef support is deferred pending standardized APIs for system-one models.
