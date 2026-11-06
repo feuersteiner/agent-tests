@@ -1,9 +1,10 @@
 # CLI
 
-The Node executable validates, runs, and evaluates installed tests and manages community installations.
+The Bun CLI validates, runs, and evaluates installed tests and manages community installations.
 
-Build with `bun run --cwd core build`, then run `node core/dist/cli/index.js --help`.
-YAML parsing and Git selection stay here; definition validation stays in the library.
+Run `bun --no-env-file core/cli/index.js --help` from the repository root.
+The CLI owns file I/O, environment loading, and Git selection. Pure YAML parsing
+lives in `src/config/parse.ts`; test and config validation live in `src/config/validate.ts`.
 
 - `args.ts` rejects unsupported commands, options, and combinations before I/O.
 - `config.ts` loads `.env` without overriding real variables and reads the model config.

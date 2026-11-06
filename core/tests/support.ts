@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach } from 'vitest';
+import { AIEngine } from '../src/shared/ai/engines/index.ts';
+import type { AiExplanation, AiRequest, FailInstance } from '../src/shared/ai/types.ts';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const directories: string[] = [];
@@ -74,9 +76,25 @@ export const project = (): string => {
 	return dir;
 };
 export const cli = (dir: string, args: string[], env: NodeJS.ProcessEnv = {}) =>
-	spawnSync(process.execPath, [join(root, 'core/dist/cli/index.js'), ...args], {
+	spawnSync('bun', ['--no-env-file', join(root, 'core/cli/index.js'), ...args], {
 		cwd: dir,
 		env: { ...process.env, AGENT_TESTS_FIXTURE_KEY: 'offline-fixture', ...env },
 		encoding: 'utf8',
 		timeout: 20000
 	});
+
+/** Deterministic engine fixture; shared validation remains active. */
+export class StubAIEngine extends AIEngine {
+	constructor(
+		private readonly value = 0.9,
+		private readonly failures: FailInstance[] = []
+	) {
+		super();
+	}
+	protected override async score(): Promise<number> {
+		return this.value;
+	}
+	protected override async evidence(_request: AiRequest, score: number): Promise<AiExplanation> {
+		return { score, failures: this.failures };
+	}
+}

@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { cli, commit, config, git, project, write, yaml } from './support.ts';
 
-describe('built Node CLI', () => {
+describe('source CLI through Bun', () => {
 	it('validates and evaluates without model calls and reports located findings as JSON', () => {
 		const dir = project();
 		expect(cli(dir, ['validate']).status).toBe(0);

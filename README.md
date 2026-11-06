@@ -9,10 +9,11 @@ triggers, checks, and labeled examples. Checks report findings without editing s
 
 ## Configure
 
-Use Node 22 or newer and install `agent-tests`:
+Use Bun to install and run `agent-tests`. The package ships TypeScript source;
+library imports require Bun or tooling that compiles TypeScript dependencies.
 
 ```sh
-npm install -D agent-tests
+bun add -D agent-tests
 ```
 
 Create `agent-tests.config.yaml` at the project root:
@@ -40,12 +41,10 @@ variables win, including empty values. Credentials never belong in YAML. Both mo
 configs and nonempty keys are required, including for regex-only tests and validation.
 An invalid config fails each test with exit code 2.
 
-Decision APIs are `openai`, `jev`, and `clef`. Reasoning APIs are `openai` (chat
-completions) and `anthropic`. Use `https://api.typesafe.ai/v1` for Jev and
-`https://api.anthropic.com/v1` for Anthropic. Clef's `url` is the complete Cloudflare
-Workers AI model endpoint, ending in `/ai/run/@cf/cloudflare/clef` or `clef-flash`;
-its model must match that endpoint. URLs require HTTPS, except HTTP on `localhost`.
-URLs cannot contain credentials, query parameters, or fragments.
+Decision APIs are `openai` and `jev`; Clef support is deferred. Reasoning APIs are
+`openai` (chat completions) and `anthropic`. Use `https://api.typesafe.ai/v1` for
+Jev and `https://api.anthropic.com/v1` for Anthropic. URLs require HTTPS, except
+HTTP on `localhost`, and cannot contain credentials, query parameters, or fragments.
 
 `check.reasoning` accepts `provider-default`, `none`, `minimal`, `low`, `medium`,
 `high`, `xhigh`, or `max`; the selected provider must support the level.
@@ -113,13 +112,13 @@ used for real sources; a mismatched expectation fails the eval.
 ## Run
 
 ```sh
-npx agent-tests validate [id]
-npx agent-tests eval [id]
-npx agent-tests run
-npx agent-tests run src/help
-npx agent-tests run --changed
-npx agent-tests run --staged
-npx agent-tests run --base main
+bun run --bun agent-tests validate [id]
+bun run --bun agent-tests eval [id]
+bun run --bun agent-tests run
+bun run --bun agent-tests run src/help
+bun run --bun agent-tests run --changed
+bun run --bun agent-tests run --staged
+bun run --bun agent-tests run --base main
 ```
 
 `run` reads tracked and nonignored untracked text files. Outside Git it walks the
@@ -140,13 +139,13 @@ A runtime error takes precedence over findings. Errors omit private configuratio
 ## Community library
 
 ```sh
-npx agent-tests list --remote
-npx agent-tests add no-informal-english
-npx agent-tests add no-informal-english apps/web
-npx agent-tests list
-npx agent-tests update [id]
-npx agent-tests remove no-informal-english [targetDir]
-npx agent-tests vote no-informal-english [--up | --down]
+bun run --bun agent-tests list --remote
+bun run --bun agent-tests add no-informal-english
+bun run --bun agent-tests add no-informal-english apps/web
+bun run --bun agent-tests list
+bun run --bun agent-tests update [id]
+bun run --bun agent-tests remove no-informal-english [targetDir]
+bun run --bun agent-tests vote no-informal-english [--up | --down]
 ```
 
 The CLI reads a pinned `main` commit from the [catalog](library/README.md), validates
@@ -173,9 +172,9 @@ const run = async (definition: unknown, config: AgentTestConfig) => {
 };
 ```
 
-The library validates definitions but never parses YAML or runs Git. Source reads
-are cached so every stage sees the same snapshot. Low-level `TestTrigger`,
-`TestCheck`, `TestEval`, and abstract `AI` exports support custom integrations.
+The library validates definitions but never parses YAML or runs Git. Resolved source reads
+are cached; concurrent reads may repeat and failed reads can retry. Low-level `TestTrigger`,
+`TestCheck`, `TestEval`, `AI`, and abstract `AIEngine` exports support custom integrations.
 
 ## Development
 
@@ -186,8 +185,8 @@ bun run build
 ```
 
 `core/` is the npm package, `docs/` is the static documentation site, and `library/`
-is the community catalog. Builds bundle the AI SDK and CLI dependencies; Zod is
-the only runtime dependency. Published entry points live under `dist/`.
+is the community catalog. The package publishes TypeScript source and keeps its AI SDK dependencies at runtime.
+`bun run build` builds the static docs and copies package prose.
 
 Automatic initialization, compilation assistants, exemptions, and Vitest integration
 remain planned. Test prose and compiled definitions are currently authored directly.

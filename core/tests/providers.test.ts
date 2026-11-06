@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildDecisionAI, buildReasoningAI } from '../src/shared/ai/models.ts';
+import { DecideAIEngine } from '../src/shared/ai/engines/decide.ts';
+import { ReasonAIEngine } from '../src/shared/ai/engines/reason.ts';
 import { AgentTest } from '../src/index.ts';
-import { Parser } from '../cli/parser.ts';
+import { parseYaml } from '../src/config/parse.ts';
+import { validateTest } from '../src/config/validate.ts';
 import { config, model, yaml } from './support.ts';
+const parseTest = (text: string) => validateTest(parseYaml(text));
 
 afterEach(() => {
 	vi.unstubAllGlobals();
@@ -33,42 +36,20 @@ const typeSafeReply = (body: any) => ({
 });
 
 describe('real SDK adapters with offline HTTP fixtures', () => {
-	it.each(['jev', 'clef'] as const)(
-		'scores and explains through %s without a gateway',
-		async (api) => {
-			const url =
-				api === 'clef'
-					? 'https://example.com/ai/run/@cf/cloudflare/clef'
-					: 'https://example.com/v1';
-			const fetcher = setup((target, body) => {
-				expect(target).toBe(api === 'clef' ? url : `${url}/systemone`);
-				return api === 'clef'
-					? { success: true, result: typeSafeReply(body) }
-					: typeSafeReply(body);
-			});
-			const ai = buildDecisionAI({ ...model, api, url });
-			const score = await ai.run(request);
-			expect(score).toBe(0.1);
-			expect(await ai.explain(request, score)).toEqual({
-				score: 0.1,
-				failures: [{ quote: 'gonna' }]
-			});
-			expect(fetcher).toHaveBeenCalledTimes(2);
-		}
-	);
-	it('batches long explanations within the Clef question limit without rescoring', async () => {
-		const sizes: number[] = [];
-		setup((_url, body) => {
-			sizes.push(Object.keys(body.questions).length);
-			if (Object.keys(body.questions).length > 64) throw new Error('Too many questions');
-			return { success: true, result: typeSafeReply(body) };
+	it('scores and explains through Jev without a gateway', async () => {
+		const url = 'https://example.com/v1';
+		const fetcher = setup((target, body) => {
+			expect(target).toBe(`${url}/systemone`);
+			return typeSafeReply(body);
 		});
-		const input = Array.from({ length: 65 }, (_, index) => `line ${index}`).join('\n');
-		const ai = buildDecisionAI({ ...model, api: 'clef' });
-		const result = await ai.explain({ ...request, input }, 0.1);
-		expect(sizes).toEqual([64, 1]);
-		expect(result.score).toBe(0.1);
-		expect(result.failures).toHaveLength(65);
+		const ai = new DecideAIEngine({ ...model, api: 'jev', url });
+		const score = await ai.run(request);
+		expect(score).toBe(0.1);
+		expect(await ai.explain(request, score)).toEqual({
+			score: 0.1,
+			failures: [{ quote: 'gonna' }]
+		});
+		expect(fetcher).toHaveBeenCalledTimes(2);
 	});
 	it('uses OpenAI Decisions and preserves probability and native choice answers', async () => {
 		setup((url, body) => {
@@ -89,7 +70,7 @@ describe('real SDK adapters with offline HTTP fixtures', () => {
 				)
 			};
 		});
-		const ai = buildDecisionAI(model);
+		const ai = new DecideAIEngine(model);
 		expect(await ai.run(request)).toBe(0.1);
 		expect((await ai.explain(request, 0.1)).failures).toEqual([{ quote: 'gonna' }]);
 	});
@@ -119,7 +100,7 @@ describe('real SDK adapters with offline HTTP fixtures', () => {
 				usage: { input_tokens: 10, output_tokens: 10 }
 			};
 		});
-		const ai = buildReasoningAI({
+		const ai = new ReasonAIEngine({
 			...model,
 			api,
 			url: 'https://example.com/v1',
@@ -128,15 +109,13 @@ describe('real SDK adapters with offline HTTP fixtures', () => {
 		expect(await ai.run(request)).toBe(0.1);
 		expect((await ai.explain(request, 0.1)).failures).toEqual([{ quote: 'gonna' }]);
 	});
-	it('composes AgentTest with a real SDK and fails closed on a Clef error envelope', async () => {
+	it('composes AgentTest with a real SDK and rejects malformed provider replies', async () => {
 		setup((_url, body) => typeSafeReply(body));
-		const definition = new Parser().run(yaml);
+		const definition = parseTest(yaml);
 		definition.checks[0]!.ask = 'Uses formal English';
 		const test = new AgentTest([], definition, { ...config, decision: { ...model, api: 'jev' } });
 		expect((await test.eval()).flagged.map((entry) => entry.check.name)).toEqual([]);
-		setup(() => ({ success: false, errors: [{ message: 'refused' }] }));
-		await expect(buildDecisionAI({ ...model, api: 'clef' }).run(request)).rejects.toThrow(
-			'Clef rejected'
-		);
+		setup(() => ({ errors: [{ message: 'refused' }] }));
+		await expect(new DecideAIEngine({ ...model, api: 'jev' }).run(request)).rejects.toThrow();
 	});
 });

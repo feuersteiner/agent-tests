@@ -40,7 +40,7 @@ const GrepFilter: SourceFilter = async (source, param, _config, trace) => {
 const AskFilter: SourceFilter = async (source, param, { ai, threshold }, trace) => {
 	const input = await source.open();
 	for (const condition of [param].flat()) {
-		if ((await ai.run({ input, ask: condition })) >= threshold) return true;
+		if ((await ai.decide.run({ input, ask: condition })) >= threshold) return true;
 	}
 	trace.push('failed ask');
 	return false;

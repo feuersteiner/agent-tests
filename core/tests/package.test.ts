@@ -1,12 +1,14 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { root, temporary } from './support.ts';
 
-describe('published Node distribution', () => {
-	it('packs and installs only runtime artifacts and exposes usable public declarations', () => {
+describe('published TypeScript source distribution', () => {
+	it('packs and installs only runtime artifacts and exposes usable public types', () => {
 		const dir = temporary();
+		for (const file of ['README.md', 'LICENSE'])
+			copyFileSync(join(root, file), join(root, 'core', file));
 		const packed = JSON.parse(
 			execFileSync('npm', ['pack', '--ignore-scripts', '--json', '--pack-destination', dir], {
 				cwd: join(root, 'core'),
@@ -14,16 +16,8 @@ describe('published Node distribution', () => {
 			})
 		)[0];
 		const files = packed.files.map((file: { path: string }) => file.path);
-		expect(files).toEqual(
-			expect.arrayContaining([
-				'dist/index.js',
-				'dist/index.d.ts',
-				'dist/types.js',
-				'dist/src/types.d.ts',
-				'dist/cli/index.js'
-			])
-		);
-		expect(files.some((file: string) => /^(src|cli|tests)\//.test(file))).toBe(false);
+		expect(files).toEqual(expect.arrayContaining(['index.ts', 'src/types.ts', 'cli/index.js']));
+		expect(files.some((file: string) => /^(dist|tests)\//.test(file))).toBe(false);
 		writeFileSync(join(dir, 'package.json'), '{"private":true,"type":"module"}');
 		execFileSync(
 			'npm',
@@ -41,21 +35,29 @@ describe('published Node distribution', () => {
 		const installed = JSON.parse(
 			readFileSync(join(dir, 'node_modules/agent-tests/package.json'), 'utf8')
 		);
-		expect(Object.keys(installed.dependencies)).toEqual(['zod']);
+		expect(Object.keys(installed.dependencies).sort()).toEqual([
+			'@ai-sdk/anthropic',
+			'@ai-sdk/openai',
+			'@ai-sdk/typesafe-ai',
+			'ai',
+			'minimatch',
+			'yaml',
+			'zod'
+		]);
 		const output = execFileSync(
-			process.execPath,
+			'bun',
 			[
-				'--input-type=module',
+				'--no-env-file',
 				'-e',
 				"import {AgentTest, Source} from 'agent-tests'; import {AgentTestConfigSchema} from 'agent-tests/types'; console.log(typeof AgentTest, typeof Source, typeof AgentTestConfigSchema.parse)"
 			],
 			{ cwd: dir, encoding: 'utf8' }
 		);
 		expect(output.trim()).toBe('function function function');
-		const entry = join(dir, 'node_modules/agent-tests/dist/cli/index.js');
+		const entry = join(dir, 'node_modules/agent-tests/cli/index.js');
 		expect(readFileSync(entry, 'utf8').startsWith('#!/usr/bin/env node')).toBe(true);
 		expect(
-			execFileSync(process.execPath, [entry, '--help'], { cwd: dir, encoding: 'utf8' })
+			execFileSync('bun', ['--no-env-file', entry, '--help'], { cwd: dir, encoding: 'utf8' })
 		).toContain('--staged');
 		writeFileSync(
 			join(dir, 'consumer.ts'),
@@ -68,11 +70,17 @@ describe('published Node distribution', () => {
 				'--noEmit',
 				'--strict',
 				'--target',
-				'ES2022',
+				'ESNext',
 				'--module',
-				'NodeNext',
+				'Preserve',
 				'--moduleResolution',
-				'NodeNext',
+				'Bundler',
+				'--allowImportingTsExtensions',
+				'--skipLibCheck',
+				'--types',
+				'node',
+				'--typeRoots',
+				join(root, 'node_modules/@types'),
 				'consumer.ts'
 			],
 			{ cwd: dir, stdio: 'pipe' }

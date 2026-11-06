@@ -15,20 +15,20 @@
       "name": "agent-tests",
       "version": "0.8.0",
       "bin": {
-        "agent-tests": "./dist/cli/index.js",
+        "agent-tests": "./cli/index.js",
       },
       "dependencies": {
-        "zod": "^4.6.7",
-      },
-      "devDependencies": {
         "@ai-sdk/anthropic": "4.0.96",
         "@ai-sdk/openai": "4.0.108",
         "@ai-sdk/typesafe-ai": "3.0.33",
-        "@types/bun": "latest",
         "ai": "7.0.162",
         "minimatch": "11.0.4",
-        "vitest": "^5.1.0",
         "yaml": "2.9.1",
+        "zod": "^4.6.7",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "vitest": "^5.1.0",
       },
     },
     "docs": {

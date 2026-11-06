@@ -1,17 +1,17 @@
 import { z } from 'zod';
-import type { AI, FailInstance, ReasoningLevel } from '../shared/ai/index.ts';
+import type { AI } from '../shared/ai/index.ts';
+import type { FailInstance, ReasoningLevel } from '../shared/ai/types.ts';
 import type { Source } from '../shared/source.ts';
 import { IdSchema, ParamSchema, TextSchema } from '../shared/types.ts';
 import type { Param } from '../shared/types.ts';
 
-/** Caller-owned dependencies; ask uses the decision AI, reason the reasoning AI and level. */
+/** Caller-owned AI; ask uses decide.run, reason uses reason.run and the configured level. */
 export type CheckConfig = {
 	threshold: number;
 	reasoning?: ReasoningLevel;
-	decisionAi: AI;
-	reasoningAi: AI;
-	/** Internal evidence sink; supplied only for the final configured rule. */
-	report?: (failure: FailInstance) => void;
+	ai: AI;
+	/** Internal evidence sink; grep supplies its exact offset, AI supplies quoted evidence. */
+	report?: (failure: FailInstance, offset?: number) => void;
 };
 
 /** Every rule answers "did this source fail?": true means it failed, false means it passed. */

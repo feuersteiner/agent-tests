@@ -10,7 +10,7 @@
 	],
 	"scripts": {
 		"dev": "bun run --cwd docs dev",
-		"build": "bun run --cwd core build && bun run --cwd docs build",
+		"build": "cp README.md LICENSE core/ && bun run --cwd docs build",
 		"preview": "bun run --cwd docs preview",
 		"check": "bun run --workspaces check",
 		"pack": "bun run build && cd core && npm pack",
