@@ -14,7 +14,8 @@
 		"preview": "bun run --cwd docs preview",
 		"check": "bun run --workspaces check",
 		"pack": "bun run build && cd core && npm pack",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"test": "bun run --cwd core test"
 	},
 	"devDependencies": {
 		"@types/node": "^22",
