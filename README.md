@@ -1,240 +1,195 @@
 # agent-tests
 
-Linting for intelligence: turn fuzzy business and code rules into tests.
+Turn repository rules into repeatable checks with regexes, decision models, and reasoning models.
 
-[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/kESK4bgEPW)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-An agent test is a rule your codebase must follow, packaged so a person, an agent,
-or CI can check it. Triggers pick the files the rule applies to; checks judge them.
-Both use globs and regex where a pattern is enough, and a decision model where the
-rule needs judgment. Tests report findings and never modify your code.
+An agent test contains `TEST.md`, the rule in prose, and `test.yaml`, its executable
+triggers, checks, and labeled examples. Checks report findings without editing sources.
 
-**Status:** WIP 🚧
+## Configure
 
-## Example
-
-Your app's interface must be in French, but agents keep adding English strings.
-A test is two files in `.agents/tests/user-text-french/`. `TEST.md` states the rule
-in plain prose:
-
-```md
-All user-facing text is written in French. Examples, exceptions, and how to fix a
-violation...
-```
-
-`test.yaml`, written by an agent from `TEST.md`, holds everything that runs:
-
-```yaml
-id: user-text-french
-title: User text in French
-description: User-facing text is written in French.
-triggers:
-  - id: user-facing-text
-    description: Svelte and HTML files with text shown to end users.
-    glob: ['src/**/*.svelte', 'src/**/*.html']
-    ask: 'This file contains text displayed to an end user.'
-checks:
-  - id: french-only
-    message: User-facing text is not in French.
-    fix: Translate the text into French.
-    smart:
-      ask: 'Quote each piece of user-facing text that is not in French.'
-evals:
-  - name: English button label
-    path: src/lib/Save.svelte
-    content: <button>Save</button>
-    expect: fail
-```
-
-Only Svelte and HTML files that a decision model judges to contain user-facing text
-are inspected. Paths outside those globs are skipped without a model call.
-
-## Where it runs
-
-- **While an agent works:** on the files it just edited.
-- **Before a commit:** on uncommitted changes.
-- **In CI:** on the whole repository, like `eslint .` or `prettier --check .`.
-- **In a test suite:** through a Vitest plugin, as pass/fail tests beside your own.
-- **In your own tools:** as a library from the npm package.
-
-## Get started (WIP)
-
-Not published yet.
+Use Node 22 or newer and install `agent-tests`:
 
 ```sh
 npm install -D agent-tests
-npx agent-tests init                          # config, .agents/tests/, pre-commit hook
-npx agent-tests add user-text-french          # install a community test at the root
-npx agent-tests add user-text-french apps/web # install it for apps/web/ only
-npx agent-tests validate user-text-french     # check a local test's structure
-npx agent-tests list                          # installed tests as a directory tree
-npx agent-tests targets user-text-french      # files that test would inspect
-npx agent-tests eval user-text-french         # run its labeled examples
-npx agent-tests run                           # check the whole repository
-npx agent-tests run --changed                 # uncommitted files
-npx agent-tests run --staged                  # pre-commit
-npx agent-tests run --base main               # pull requests
-npx agent-tests docs                          # skills that teach agents to write and run tests
-npx agent-tests vote user-text-french         # toggle your vote for a library test
 ```
 
-Choose the decision model (Jev, Clef, or OpenAI) in `agent-tests.config.yaml`
-and keep its credentials in `.env`.
-
-## Triggers
-
-Design locked; implementation WIP.
-
-Triggers decide whether a test inspects a file. `triggers` is optional;
-omitting it or setting `triggers: []` selects every file.
-Otherwise, it is a list of triggers, each with a lowercase kebab-case `id` and a `description`.
-Each trigger requires at least one filter:
-
-- `glob`: POSIX glob patterns on the path, including dotfiles.
-- `grep`: case-sensitive JavaScript regex patterns on the content, without flags.
-- `ask`: a decision model judging the content against a passing condition.
-
-Filters within one ID use **AND**: every configured filter must pass.
-Triggers use **OR**: trigger A or trigger B can qualify a file.
-Within each trigger, filters always run as `glob`, then `grep`, then `ask`, so a
-model is only called once the cheap filters pass. Omitted filters are skipped; the
-first failure stops that trigger. A file is excluded only if every trigger fails.
-
-`glob`, `grep`, and `ask` each accept a string or a nonempty list of alternatives (**OR**).
-For `glob` and `grep`, any matching pattern passes that filter.
-For `ask`, each string is a nonblank passing condition; prompts run in list order
-until one passes. If none passes, the filter fails.
+Create `agent-tests.config.yaml` at the project root:
 
 ```yaml
-# .agents/tests/brand-messaging/test.yaml: customer-facing copy follows Acme's brand voice.
+decision:
+  api: openai
+  url: https://api.openai.com/v1
+  model: gpt-6-luna
+  apiKeyEnv: OPENAI_API_KEY
+reasoning:
+  api: openai
+  url: https://api.openai.com/v1
+  model: gpt-6-luna
+  apiKeyEnv: OPENAI_API_KEY
+trigger:
+  threshold: 0.7
+check:
+  threshold: 0.7
+  reasoning: medium
+```
+
+Set `OPENAI_API_KEY` in the environment or an untracked `.env`. Existing environment
+variables win, including empty values. Credentials never belong in YAML. Both model
+configs and nonempty keys are required, including for regex-only tests and validation.
+An invalid config fails each test with exit code 2.
+
+Decision APIs are `openai`, `jev`, and `clef`. Reasoning APIs are `openai` (chat
+completions) and `anthropic`. Use `https://api.typesafe.ai/v1` for Jev and
+`https://api.anthropic.com/v1` for Anthropic. Clef's `url` is the complete Cloudflare
+Workers AI model endpoint, ending in `/ai/run/@cf/cloudflare/clef` or `clef-flash`;
+its model must match that endpoint. URLs require HTTPS, except HTTP on `localhost`.
+URLs cannot contain credentials, query parameters, or fragments.
+
+`check.reasoning` accepts `provider-default`, `none`, `minimal`, `low`, `medium`,
+`high`, `xhigh`, or `max`; the selected provider must support the level.
+Model calls can incur charges. Validation makes no model calls; `eval` and `run`
+call only the AI rules present in the selected test.
+
+## Write a test
+
+Create `.agents/tests/formal-prose/TEST.md`:
+
+```md
+Public help prose uses formal English. Replace “gonna” with “going to”.
+```
+
+Create `.agents/tests/formal-prose/test.yaml`:
+
+```yaml
+id: formal-prose
+title: Formal help prose
+description: Public help prose uses formal English.
 triggers:
-  # Marketing pages are always brand copy: a glob is enough.
-  - id: marketing
-    description: Marketing pages.
-    glob: ['content/**/*.md', 'src/routes/(marketing)/**/*.svelte']
-  # Elsewhere, cheap filters first and models last.
-  - id: customer-copy
-    description: Product and marketing copy shown to customers.
-    glob: ['src/**/*.svelte', 'emails/**/*.html']
-    grep: '[Aa]cme'
-    ask:
-      - 'This file contains product copy shown to customers.'
-      - 'This file contains marketing copy shown to customers.'
-```
-
-For debugging, trace outcomes by trigger ID and filter (`glob`, `grep`, or `ask`),
-with a pass, failure, or skipped status and reason. Later filters are skipped
-after one fails. Trace output remains WIP.
-
-Like `AGENTS.md`, any directory can have its own `.agents/tests/`. Its tests apply
-inside that directory, in addition to tests from parent directories, and its
-`.agents/tests/config.yaml` can opt out of specific parent tests.
-
-## Compilation
-
-Design locked; implementation WIP.
-
-Your agent turns `TEST.md` into `test.yaml`. `agent-tests compile <id>` hands it the
-rule, a test-generator skill, and your repository layout; the agent writes the
-triggers, checks, and evals, then loops on `agent-tests validate` and
-`agent-tests eval` until they pass. Edit `test.yaml` by hand whenever you like.
-When `TEST.md` changes, `validate` flags `test.yaml` as stale until it is recompiled.
-Library tests ship already compiled; after `add`, your agent adapts them to your
-repository.
-
-## Checks
-
-Design locked; implementation WIP.
-
-Checks judge each targeted file and report pass, warning, or error findings, through
-the CLI, Vitest, or the library. A check runs from `fast` to `smart` to `deep`,
-cheapest first, and escalates only what it cannot settle:
-
-```yaml
-# .agents/tests/brand-messaging/test.yaml
+  - id: help
+    description: Public help documents.
+    glob: 'src/help/**/*.md'
 checks:
-  - id: no-familiar-language
-    message: Copy uses familiar language.
-    fix: Rewrite in Acme's formal voice; see TEST.md.
-    human-tiebreak: true # if deep stays unsure, a person decides
-    fast: # patterns, no model
-      match: # any match fails
-        - '\b(gonna|wanna|gotta)\b'
-      maybe: # weak signal: a match escalates, with the hits as hints
-        - '\b(hey|awesome|folks|no worries)\b'
-    smart: # classifier such as Jev or Clef
-      ask: 'Quote each phrase in this copy that uses familiar or casual language.'
-      bounds: [0.3, 0.8] # below: pass, between: unsure, above: likely violation
-    deep: # structured LLM call, the final word
-      ask: 'Judge each quoted phrase against the brand voice in TEST.md.'
-      reasoning: medium # low, medium, or high
-```
-
-- **`fast`** fails on a `match`. A `maybe` hit escalates, and so does no hit when
-  `smart` or `deep` exists. The agent writes the patterns; `agent-tests validate`
-  checks them against the evals and flags risky ones. Patterns are regex today,
-  with room for other pattern types later.
-- **`smart`** passes, escalates, or flags violations by confidence bounds,
-  quoting each instance it finds.
-- **`deep`** confirms every violation a model flagged, with the `reasoning` effort
-  the check sets. If it stays unsure, the CLI shows a warning, or a person
-  reviews it with `human-tiebreak: true`.
-- A check uses only the levels it needs, and `maybe`, `bounds`, and `reasoning`
-  are optional.
-
-Every finding names its test, check, level, file, and line, with the fix:
-
-```text
-src/routes/+page.svelte:12:5  error  "Hey folks!" uses familiar language
-  brand-messaging/no-familiar-language (deep): Rewrite in Acme's formal voice.
-```
-
-## Evals
-
-Design locked; implementation WIP.
-
-Benchmarks that show whether a newer model or a regenerated test still makes the
-approved decisions before you upgrade. Each test keeps labeled examples under
-`evals` in its `test.yaml`:
-
-```yaml
+  - id: formal-words
+    description: Avoid informal vocabulary.
+    error: Replace gonna with going to.
+    grep: '\b[Gg]onna\b'
 evals:
-  - name: casual greeting on the homepage
-    path: src/routes/+page.svelte
-    content: <h1>Hey folks! Welcome to Acme.</h1>
+  - name: Informal prose
+    path: src/help/start.md
+    content: We are gonna save your changes.
     expect: fail
-  - name: formal copy
-    path: src/routes/about/+page.svelte
-    content: <p>Acme provides enterprise-grade testing.</p>
+  - name: Formal prose
+    path: src/help/start.md
+    content: We are going to save your changes.
     expect: pass
-  - name: billing code is not copy
-    path: src/billing/charge.ts
-    content: 'export const charge = (cents: number) => cents;'
-    expect: skip # the triggers should not select it
+  - name: Source code
+    path: src/internal.ts
+    content: const phrase = 'gonna';
+    expect: skip
 ```
 
-`expect` is `pass`, `fail`, `unsure`, or `skip`. `agent-tests eval <id>` runs the real triggers and checks on every example and reports any that disagree.
+`source` optionally records `sha256:` followed by the SHA-256 of the exact `TEST.md`
+bytes. Validation rejects a stale digest. Unknown fields, duplicate YAML keys,
+multiple documents, and malformed regexes are rejected.
+
+Each trigger needs an `id`, a `description`, and at least one of `glob`, `grep`, or
+`ask`. Filters use AND, always in that order; triggers use OR. A filter's list is
+OR. Omitted or empty triggers select every source. Globs use POSIX paths and
+include dotfiles. Regexes are case-sensitive JavaScript expressions without flags.
+
+Each check needs an `id`, a `description`, an `error`, and at least one of `grep`,
+`ask`, or `reason`. A grep match fails; `ask` and `reason` describe the **passing**
+condition and fail below the configured threshold. Lists of AI conditions use AND.
+Rules run as grep, ask, then reason. A passing rule ends the check; a failing rule
+escalates to the next configured rule. Only failure of the final rule flags the file.
+Every check must pass. Findings use one-based lines and columns derived from exact
+source text; an AI can fail without locating a quote.
+
+Evals expect `pass`, `fail`, or `skip`. They run the same trigger and check instances
+used for real sources; a mismatched expectation fails the eval.
+
+## Run
+
+```sh
+npx agent-tests validate [id]
+npx agent-tests eval [id]
+npx agent-tests run
+npx agent-tests run src/help
+npx agent-tests run --changed
+npx agent-tests run --staged
+npx agent-tests run --base main
+```
+
+`run` reads tracked and nonignored untracked text files. Outside Git it walks the
+project. It excludes dependency/build directories, `.agents`, `.env` files, binary
+files, and symlinks. Tests in a directory's `.agents/tests/` apply within that
+directory, alongside ancestor tests; trigger paths are relative to that owner.
+
+`--changed` reads uncommitted working content, including untracked files. `--staged`
+reads the index. `--base REF` compares committed HEAD to its merge base with REF and
+reads HEAD content. Deleted files are excluded. With `--base`, config comes from
+REF's commit, so PR changes cannot redirect credentials to a new endpoint.
+
+Use `--json` for one JSON report or `--verbose` for streaming stage traces on `run`
+and `eval`. Paths follow `--` when they resemble options. Exit codes are 0 for pass,
+1 for findings or eval mismatches, and 2 for usage, configuration, or runtime errors.
+A runtime error takes precedence over findings. Errors omit private configuration values.
 
 ## Community library
 
-The [`library/`](library/README.md) directory is a shared catalog of tests. Anyone can contribute one with a pull request containing its `TEST.md`, credited to the author's GitHub profile, and its compiled `test.yaml`. Every PR is screened for malware and prompt injection, and accounts that attempt either are banned. Every test merged into `main` is available to `npx agent-tests add [test-id]`.
+```sh
+npx agent-tests list --remote
+npx agent-tests add no-informal-english
+npx agent-tests add no-informal-english apps/web
+npx agent-tests list
+npx agent-tests update [id]
+npx agent-tests remove no-informal-english [targetDir]
+npx agent-tests vote no-informal-english [--up | --down]
+```
 
-Vote for a test with `npx agent-tests vote <test-id>` (WIP): it uses your GitHub CLI login to open a pull request that adds or removes your handle in the test's `score.csv`, and the PR merges automatically once its check passes. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
+The CLI reads a pinned `main` commit from the [catalog](library/README.md), validates
+its definition and source hash, runs evals, and installs only `TEST.md`, `test.yaml`,
+and an origin receipt. Adapt globs to the project, then validate and evaluate again.
+Updates and removals refuse local edits or extra files. Missing upstream tests stay
+installed. Votes never affect availability.
 
-## Repository structure
+Voting uses the signed-in GitHub CLI account to create or close a one-row vote PR.
+It uses repository write access or a fork, and leaves the local checkout untouched.
+Vote auto-merge remains planned. Contribution rules are in [library/AGENTS.md](library/AGENTS.md).
 
-- [`core`](core): the `agent-tests` npm package.
-- [`docs`](docs): the documentation site, built with [Bref-ui](https://github.com/feuersteiner/bref-ui).
-- [`library`](library): community tests.
-- [`docs/usecases.md`](docs/usecases.md): proposed use cases.
+## Library API
 
-## Community and contributing
+```ts
+import { AgentTest, Source } from 'agent-tests';
+import type { AgentTestConfig } from 'agent-tests/types';
 
-For questions and ideas, join [Discord](https://discord.gg/kESK4bgEPW). Report bugs
-and suggest features through [GitHub Issues](https://github.com/feuersteiner/agent-tests/issues).
-Contributors and their agents start with [`AGENTS.md`](AGENTS.md).
+const sources = [new Source('src/help/start.md', async () => 'We are gonna save.')];
+// definition is a parsed test.yaml value; config matches the YAML model configuration.
+const run = async (definition: unknown, config: AgentTestConfig) => {
+	const test = new AgentTest(sources, definition, config);
+	return { run: await test.run(), eval: await test.eval() };
+};
+```
 
-## License
+The library validates definitions but never parses YAML or runs Git. Source reads
+are cached so every stage sees the same snapshot. Low-level `TestTrigger`,
+`TestCheck`, `TestEval`, and abstract `AI` exports support custom integrations.
 
-[MIT](LICENSE).
+## Development
+
+```sh
+bun install --frozen-lockfile
+bun run check
+bun run build
+```
+
+`core/` is the npm package, `docs/` is the static documentation site, and `library/`
+is the community catalog. Builds bundle the AI SDK and CLI dependencies; Zod is
+the only runtime dependency. Published entry points live under `dist/`.
+
+Automatic initialization, compilation assistants, exemptions, and Vitest integration
+remain planned. Test prose and compiled definitions are currently authored directly.
+
+[Discord](https://discord.gg/kESK4bgEPW) · [Issues](https://github.com/feuersteiner/agent-tests/issues) · [MIT](LICENSE)
