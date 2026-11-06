@@ -52,3 +52,9 @@ export const AiModelConfigSchema = z.strictObject({
 	apiKeyEnv: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/, 'Expected an environment variable name')
 });
 export type AiModelConfig = z.infer<typeof AiModelConfigSchema>;
+
+/** Validated provider settings needed by the service; stage settings belong to repository config. */
+export type AiSettings = {
+	decision: AiModelConfig & { api: 'openai' | 'jev' };
+	reasoning: AiModelConfig & { api: 'openai' | 'anthropic' };
+};

@@ -22,6 +22,7 @@ export {
 	ReasoningLevelSchema
 } from './shared/ai/types.ts';
 export type {
+	AiSettings,
 	AiModelConfig,
 	AiConfig,
 	AiExplanation,
