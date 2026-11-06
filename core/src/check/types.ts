@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { AI } from '../shared/ai/index.ts';
-import type { ReasoningLevel } from '../shared/ai/types.ts';
+import type { FailInstance, ReasoningLevel } from '../shared/ai/types.ts';
 import type { Source } from '../shared/source.ts';
 import { IdSchema, ParamSchema, TextSchema } from '../shared/types.ts';
 import type { Param } from '../shared/types.ts';
@@ -10,6 +10,8 @@ export type CheckConfig = {
 	threshold: number;
 	reasoning?: ReasoningLevel;
 	ai: AI;
+	/** Internal evidence sink; grep supplies its exact offset, AI supplies quoted evidence. */
+	report?: (failure: FailInstance, offset?: number) => void;
 };
 
 /** Every rule answers "did this source fail?": true means it failed, false means it passed. */

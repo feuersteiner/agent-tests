@@ -31,7 +31,7 @@ export type {
 	ReasoningLevel
 } from './shared/ai/types.ts';
 export { ParamSchema } from './shared/types.ts';
-export type { Param, Result, ResultEntry } from './shared/types.ts';
+export type { Finding, Param, Result, ResultEntry } from './shared/types.ts';
 export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
 export type { FilterConfig, Trigger } from './trigger/types.ts';
 
