@@ -64,7 +64,7 @@ Not published yet.
 
 The package ships TypeScript source. Library imports require Bun or tooling that
 compiles TypeScript dependencies; plain Node does not execute TypeScript inside
-`node_modules`. The JavaScript CLI runs with Node.
+`node_modules`. The TypeScript CLI requires Bun on `PATH`.
 
 ```sh
 npm install -D agent-tests
