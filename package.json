@@ -13,6 +13,7 @@
 		"build": "cp README.md LICENSE core/ && bun run --cwd docs build",
 		"preview": "bun run --cwd docs preview",
 		"check": "bun run --workspaces check",
+		"test:agents": "agent-tests run",
 		"pack": "bun run build && cd core && npm pack",
 		"format": "prettier --write ."
 	},
