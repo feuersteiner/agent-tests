@@ -4,5 +4,7 @@ export { TestEval } from './src/evals/index.ts';
 export { AI } from './src/shared/ai/index.ts';
 export { AIEngine } from './src/shared/ai/engines/index.ts';
 export { Source } from './src/shared/source.ts';
+export { FileSource, DirectorySource } from './src/shared/source.ts';
+export type { TypedSource, DirectoryChild, DirectorySnapshot } from './src/shared/source.ts';
 export { TestTrigger } from './src/trigger/index.ts';
 export { validate, validateConfig, validateTest, validateTests } from './src/config/validate.ts';
