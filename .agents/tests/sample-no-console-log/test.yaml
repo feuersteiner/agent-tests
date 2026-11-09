@@ -1,0 +1,28 @@
+id: sample-no-console-log
+title: 'Sample: no console.log calls'
+description: Smoke definition rejecting console.log calls in JavaScript and TypeScript.
+tags: [sample]
+triggers:
+  - id: javascript-typescript
+    description: Select JavaScript and TypeScript source files.
+    glob: '**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'
+checks:
+  - id: no-console-log
+    description: Reject text resembling a console.log call.
+    error: Remove the console.log call before shipping the source file.
+    grep: '\bconsole\s*\.\s*log\s*\('
+evals:
+  - name: Returning a value passes
+    path: src/answer.js
+    content: |
+      export const answer = () => 42;
+    expect: pass
+  - name: Console log with whitespace fails
+    path: src/answer.js
+    content: |
+      console . log (42);
+    expect: fail
+  - name: Markdown console example is out of scope
+    path: docs/logging.md
+    content: 'console.log(42);'
+    expect: skip
