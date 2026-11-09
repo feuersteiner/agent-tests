@@ -3,18 +3,18 @@ title: No informal English
 description: Customer-facing English prose uses formal vocabulary.
 source: sha256:8750e6112cce3226eb5bdb6fe6bc1b96dc16a66a3c5d4d58e2d1978b47090dbd
 triggers:
-  path:
-    match:
-      # Reference layout: customer-facing prose lives in src/help/.
-      # Installing agents adapt these globs to the repository's public prose.
+  - id: customer-prose
+    # Reference layout: customer-facing prose lives in src/help/.
+    # Installing agents adapt these globs to the repository's public prose.
+    description: Customer-facing Markdown and plain-text documentation.
+    glob:
       - 'src/help/**/*.md'
       - 'src/help/**/*.txt'
 checks:
   - id: formal-vocabulary
-    message: Customer-facing prose contains informal English.
-    fix: Replace gonna, wanna, or gotta with going to, want to, or have to.
-    fast:
-      match: '\b([Gg]onna|[Ww]anna|[Gg]otta)\b'
+    description: Finds gonna, wanna, and gotta.
+    error: Customer-facing prose contains informal English. Replace gonna, wanna, or gotta with going to, want to, or have to.
+    grep: '\b([Gg]onna|[Ww]anna|[Gg]otta)\b'
 evals:
   - name: Informal customer documentation
     path: src/help/getting-started.md
