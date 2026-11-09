@@ -38,11 +38,12 @@ export type { FilterConfig, Trigger } from './trigger/types.ts';
 /** What each stage of a run produced. */
 export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };
 
-/** Test identity, description, and optional source digest. */
+/** Test identity, description, optional tags, and optional source digest. */
 export const MetadataSchema = z.strictObject({
 	id: IdSchema,
 	title: TextSchema,
 	description: TextSchema,
+	tags: z.array(z.string()).optional(),
 	source: z
 		.string()
 		.regex(/^sha256:[a-fA-F\d]{64}$/, 'Expected sha256: followed by 64 hexadecimal digits')
