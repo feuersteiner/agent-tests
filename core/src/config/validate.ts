@@ -3,6 +3,40 @@ import { AgentTestSchema } from '../types.ts';
 import type { AgentTest } from '../types.ts';
 import { AgentTestConfigSchema } from './types.ts';
 import type { AgentTestConfig } from './types.ts';
+import { SelectSchema } from '../select/types.ts';
+import type { Select, SelectStep } from '../select/types.ts';
+
+/** Validate nested regexes and reject file-only filters on directory selection steps. */
+export const validateSelect = (value: unknown): Select => {
+	const select = validate(value, SelectSchema);
+	const issues: string[] = [];
+	let step: SelectStep | undefined = select;
+	let path = 'select';
+	while (step) {
+		if (step.grep !== undefined && (step.where || select.type === 'directories')) {
+			issues.push(`${path}.grep: grep requires file targets and cannot precede where`);
+		}
+		for (const [index, pattern] of (step.grep === undefined ? [] : [step.grep].flat()).entries()) {
+			try {
+				new RegExp(pattern);
+			} catch {
+				issues.push(`${path}.grep.${index}: Invalid regular expression`);
+			}
+		}
+		if (
+			!step.where &&
+			select.type === 'files' &&
+			step.glob !== undefined &&
+			[step.glob].flat().every((pattern) => pattern.endsWith('/'))
+		) {
+			issues.push(`${path}.glob: Directory-only glob cannot return files without where`);
+		}
+		step = step.where;
+		path += '.where';
+	}
+	if (issues.length) throw new Error(`Invalid selection:\n${issues.join('\n')}`);
+	return select;
+};
 
 /** Validate schema structure; use validateTest/validateTests/validateConfig for semantics. */
 export const validate = <Schema extends z.ZodType>(

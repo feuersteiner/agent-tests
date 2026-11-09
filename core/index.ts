@@ -14,4 +14,10 @@ export { Source } from './src/shared/source.ts';
 export { FileSource, DirectorySource } from './src/shared/source.ts';
 export type { TypedSource, DirectoryChild, DirectorySnapshot } from './src/shared/source.ts';
 export { TestTrigger } from './src/trigger/index.ts';
-export { validate, validateConfig, validateTest, validateTests } from './src/config/validate.ts';
+export {
+	validate,
+	validateConfig,
+	validateTest,
+	validateTests,
+	validateSelect
+} from './src/config/validate.ts';

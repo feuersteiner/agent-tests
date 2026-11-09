@@ -35,6 +35,8 @@ export { ParamSchema } from './shared/types.ts';
 export type { Param, Result, ResultEntry } from './shared/types.ts';
 export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
 export type { FilterConfig, Trigger } from './trigger/types.ts';
+export { SelectSchema, SelectStepSchema } from './select/types.ts';
+export type { Select, SelectStep, SelectConfig, SelectResult, EngineSet } from './select/types.ts';
 
 /** What each stage of a run produced. */
 export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };
