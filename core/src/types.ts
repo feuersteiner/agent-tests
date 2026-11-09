@@ -31,9 +31,7 @@ export type {
 	FailInstance,
 	ReasoningLevel
 } from './shared/ai/types.ts';
-export { Source } from './shared/sources/index.ts';
-export { FileSource } from './shared/sources/file.ts';
-export { DirectorySource } from './shared/sources/dir.ts';
+export * from './shared/sources/index.ts';
 export { ParamSchema } from './shared/types.ts';
 export type { Param, Result, ResultEntry } from './shared/types.ts';
 export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';

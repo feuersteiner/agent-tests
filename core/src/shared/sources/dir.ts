@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { Source } from './index.ts';
+import { Source } from './source.ts';
 
 /** A lazy text listing of immediate children. */
 export class DirectorySource extends Source<string> {
