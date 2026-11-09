@@ -7,4 +7,4 @@
 - `types.ts`: shared schemas and `AiSettings` provider config; use inferred operation types or type-import `AI` from `index.ts` in callers. Never import root feature contracts here. Repository config validation stays in `config/validate.ts`.
 - `prompts.ts`: shared defaults; `AiConfig.system` overrides the operation's default, including an explicit empty string.
 - Decision APIs are OpenAI or Jev; reasoning APIs are OpenAI chat or Anthropic. Use pinned SDKs directly; Clef is deferred.
-- `AgentTest` shares one configured `AI` instance between trigger and check; independent runs may use different config.
+- `AgentTests` lazily creates one configured `AI` on first run/eval and reuses it across every test's separate trigger/check stages and repeated calls. Constructor validation needs no environment keys; AI construction still resolves both provider keys eagerly, including for grep-only execution.

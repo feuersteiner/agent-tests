@@ -1,65 +1,78 @@
 import { TestCheck } from './check/index.ts';
 import type { Check } from './check/types.ts';
-import { validateConfig, validateTest } from './config/validate.ts';
+import { validateConfig, validateTests } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
-import type { Eval } from './evals/types.ts';
 import { AI } from './shared/ai/index.ts';
 import type { Source } from './shared/source.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';
-import type {
-	AgentTest as AgentTestDefinition,
-	AgentTestConfig,
-	AgentTestResult
-} from './types.ts';
+import type { AgentTest, AgentTestConfig, AgentTestEvalResult, AgentTestResult } from './types.ts';
 
-/** Run one validated test over the sources: triggers select and checks judge. Evals run on demand. */
-export class AgentTest {
-	public readonly test: AgentTestDefinition;
-	public readonly trigger: TestTrigger;
-	public readonly check: TestCheck;
-	public evals?: TestEval;
+/** Run each validated test's triggers and checks independently over shared sources. */
+export class AgentTests {
+	public readonly tests: AgentTest[];
+	private readonly config: AgentTestConfig;
+	private ai?: AI;
 
 	/**
-	 * @param sources - Files to inspect, as supplied by the caller.
-	 * @param yaml - The parsed test.yaml value; text parsing belongs to src/config.
-	 * @param config - Provider models and settings for the trigger and check stages.
-	 * @throws If the test definition or config is invalid, or a required environment key is empty.
+	 * @param sources - Shared base files supplied by the caller; each test selects its own targets.
+	 * @param definitions - Parsed test definitions; text parsing belongs to src/config.
+	 * @param config - Shared provider models and stage settings, validated here.
+	 * @throws If any definition or config is invalid, including duplicate test IDs.
 	 */
 	constructor(
 		public readonly sources: Source[],
-		yaml: unknown,
-		config: AgentTestConfig
+		definitions: unknown,
+		config: unknown
 	) {
-		this.test = validateTest(yaml);
-		const settings = validateConfig(config);
-		const ai = new AI(settings);
-		this.trigger = new TestTrigger(this.test.triggers ?? [], {
-			...settings.trigger,
-			ai
-		});
-		this.check = new TestCheck(this.test.checks, { ...settings.check, ai });
+		this.tests = validateTests(definitions);
+		this.config = validateConfig(config);
 	}
 
-	/** Run triggers, then checks on the selected sources; verbose logs each entry and a summary. */
-	public readonly run = async (verbose = false): Promise<AgentTestResult> => {
-		console.log(`Agent test "${this.test.title}" running...`);
-		const trigger = await this.trigger.run(this.sources, verbose);
-		const selected = this.trigger.selected(this.sources, trigger);
-		const check = await this.check.run(selected, verbose);
-		if (verbose) this.log(selected, check);
-		return { trigger, check };
+	/** Run each test over the shared base; return groups in definition order. */
+	public readonly run = async (verbose = false): Promise<(AgentTestResult & { id: string })[]> => {
+		return Promise.all(
+			this.tests.map(async (test) => {
+				const ai = (this.ai ??= new AI(this.config));
+				const trigger = new TestTrigger(test.triggers ?? [], { ...this.config.trigger, ai });
+				const check = new TestCheck(test.checks, { ...this.config.check, ai });
+				console.log(`Agent test "${test.title}" (${test.id}) running...`);
+				const triggered = await trigger.run(this.sources, verbose);
+				const selected = trigger.selected(this.sources, triggered);
+				const checked = await check.run(selected, verbose);
+				if (verbose) this.log(test.id, selected, checked);
+				return { id: test.id, trigger: triggered, check: checked };
+			})
+		);
 	};
 
-	/** Create the eval stage on first use and run it; verbose logs each entry as it finishes. */
-	public readonly eval = (verbose = false): Promise<Result<Eval>> => {
-		this.evals ??= new TestEval(this.test.evals);
-		return this.evals.run(this.trigger, this.check, verbose);
+	/** Run each test's labeled examples using fresh stages and the shared AI. */
+	public readonly eval = async (verbose = false): Promise<AgentTestEvalResult[]> => {
+		return Promise.all(
+			this.tests.map(async (test) => {
+				const ai = (this.ai ??= new AI(this.config));
+				const trigger = new TestTrigger(test.triggers ?? [], { ...this.config.trigger, ai });
+				const check = new TestCheck(test.checks, { ...this.config.check, ai });
+				const evals = new TestEval(test.evals);
+				const { id } = test;
+				if (verbose) console.log(`Agent test ${id} evaluating...`);
+				const result = await evals.run(trigger, check, verbose);
+				if (verbose)
+					console.log(
+						`Summary ${id}: evals: ${result.flagged.length} flagged, ${result.cleared.length} cleared`
+					);
+				return { id, result };
+			})
+		);
 	};
 
-	private readonly log = (selected: Source[], { flagged, cleared }: Result<Check>): void => {
+	private readonly log = (
+		id: string,
+		selected: Source[],
+		{ flagged, cleared }: Result<Check>
+	): void => {
 		console.log(
-			`Summary: ${selected.length} of ${this.sources.length} sources selected; ` +
+			`Summary ${id}: ${selected.length} of ${this.sources.length} sources selected; ` +
 				`checks: ${flagged.length} flagged, ${cleared.length} cleared`
 		);
 	};

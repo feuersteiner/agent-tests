@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { CheckSchema } from './check/types.ts';
 import type { Check } from './check/types.ts';
 import { EvalSchema } from './evals/types.ts';
+import type { Eval } from './evals/types.ts';
 import { IdSchema, TextSchema } from './shared/types.ts';
 import type { Result } from './shared/types.ts';
 import { TriggersSchema } from './trigger/types.ts';
@@ -37,6 +38,9 @@ export type { FilterConfig, Trigger } from './trigger/types.ts';
 
 /** What each stage of a run produced. */
 export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };
+
+/** A test's labeled-example results within a suite. */
+export type AgentTestEvalResult = { id: string; result: Result<Eval> };
 
 /** Test identity, description, optional tags, and optional source digest. */
 export const MetadataSchema = z.strictObject({

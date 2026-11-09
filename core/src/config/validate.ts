@@ -1,10 +1,10 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 import { AgentTestSchema } from '../types.ts';
 import type { AgentTest } from '../types.ts';
 import { AgentTestConfigSchema } from './types.ts';
 import type { AgentTestConfig } from './types.ts';
 
-/** Validate schema structure and return its output; use validateTest/validateConfig for semantics. */
+/** Validate schema structure; use validateTest/validateTests/validateConfig for semantics. */
 export const validate = <Schema extends z.ZodType>(
 	value: unknown,
 	schema: Schema
@@ -26,10 +26,12 @@ export const validateTest = (value: unknown): AgentTest => {
 			ids.add(entry.id);
 			return duplicate ? [`checks.${index}.id: Duplicate check id`] : [];
 		}),
-		...([
-			['triggers', test.triggers ?? []],
-			['checks', test.checks]
-		] as const).flatMap(([field, entries]) =>
+		...(
+			[
+				['triggers', test.triggers ?? []],
+				['checks', test.checks]
+			] as const
+		).flatMap(([field, entries]) =>
 			entries.flatMap((entry, index) => {
 				const patterns = entry.grep === undefined ? [] : [entry.grep].flat();
 				return patterns.flatMap((pattern, patternIndex) => {
@@ -46,6 +48,19 @@ export const validateTest = (value: unknown): AgentTest => {
 	];
 	if (issues.length) throw new Error(`Invalid test definition:\n${issues.join('\n')}`);
 	return test;
+};
+
+/** Validate every definition and reject duplicate test IDs within the collection. */
+export const validateTests = (value: unknown): AgentTest[] => {
+	const tests = validate(value, z.array(z.unknown())).map(validateTest);
+	const ids = new Set<string>();
+	const issues = tests.flatMap((test, index) => {
+		const duplicate = ids.has(test.id);
+		ids.add(test.id);
+		return duplicate ? [`${index}.id: Duplicate test id`] : [];
+	});
+	if (issues.length) throw new Error(`Invalid test definitions:\n${issues.join('\n')}`);
+	return tests;
 };
 
 /** Validate provider routes and stage settings before model construction. */
