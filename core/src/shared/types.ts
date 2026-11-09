@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Source } from './source.ts';
+import type { Source } from './sources/index.ts';
 
 /** Lowercase kebab-case identifier. */
 export const IdSchema = z

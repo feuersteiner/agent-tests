@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { AI } from '../shared/ai/index.ts';
-import type { Source } from '../shared/source.ts';
+import type { Source } from '../shared/sources/index.ts';
 import { IdSchema, ParamSchema, TextSchema } from '../shared/types.ts';
 import type { Param } from '../shared/types.ts';
 

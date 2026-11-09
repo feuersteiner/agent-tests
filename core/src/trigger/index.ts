@@ -1,4 +1,4 @@
-import type { Source } from '../shared/source.ts';
+import type { Source } from '../shared/sources/index.ts';
 import TriggerFilters from './filters.ts';
 import type { Result, ResultEntry } from '../shared/types.ts';
 import type { FilterConfig, Trigger } from './types.ts';

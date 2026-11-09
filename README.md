@@ -118,9 +118,9 @@ Clef support is deferred pending standardized APIs for system-one models.
 For library use, pass parsed definitions as an array and parsed shared config:
 
 ```ts
-import { AgentTests, Source } from 'agent-tests';
+import { AgentTests, FileSource } from 'agent-tests';
 
-const sources = [new Source('src/app.ts', async () => 'console.log("hello");')];
+const sources = [new FileSource('src/app.ts')];
 const suite = new AgentTests(sources, definitions, config);
 const results = await suite.run(); // [{ id, trigger, check }]
 const evals = await suite.eval(); // [{ id, result }]
@@ -129,6 +129,15 @@ const evals = await suite.eval(); // [{ id, result }]
 Each test filters the same source base independently. Construction validates every
 definition and config; AI and provider keys are required only when execution starts.
 Use `[definition]` for one test. Results follow definition order.
+
+Sources read their paths synchronously through Node filesystem APIs. `FileSource.open()` caches UTF-8 file content;
+`DirectorySource.open()` caches a text listing with a directory header and
+immediate child paths, kinds, and file line counts, without opening child directories.
+Both return strings directly, cache successful results, and allow retries after I/O failures. Both expose `path`
+and `kind`, and extend the abstract `Source<Content = string>` class. Runners and
+results accept `Source`, including independent subclasses returning strings. Glob filters match any
+source path without opening it. Current grep, ask, and reason functions require
+`open()` to return a string, so they work with both file text and directory listings.
 
 ## Triggers
 

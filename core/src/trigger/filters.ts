@@ -27,7 +27,9 @@ const GlobFilter: SourceFilter = async (source, param, _config, trace) => {
  */
 const GrepFilter: SourceFilter = async (source, param, _config, trace) => {
 	const regexes = [param].flat().map((pattern) => new RegExp(pattern));
-	const content = await source.open();
+	if (source.kind === 'directory')
+		console.warn(`Grep filter is not designed for directory output: "${source.path}"`);
+	const content = source.open();
 	const passed = regexes.some((regex) => regex.test(content));
 	if (!passed) trace.push('failed grep');
 	return passed;
@@ -38,7 +40,7 @@ const GrepFilter: SourceFilter = async (source, param, _config, trace) => {
  * `false` (failed) if every condition scores below it.
  */
 const AskFilter: SourceFilter = async (source, param, { ai, threshold }, trace) => {
-	const input = await source.open();
+	const input = source.open();
 	for (const condition of [param].flat()) {
 		if ((await ai.decide.run({ input, ask: condition })) >= threshold) return true;
 	}
