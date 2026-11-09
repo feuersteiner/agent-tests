@@ -1,9 +1,9 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText, Output } from 'ai';
-import { AIEngine, providerSettings } from './index.ts';
-import { AiExplanationSchema, FailInstanceSchema } from '../types.ts';
-import type { AiRequest, AiSettings } from '../types.ts';
+import { AIEngine, providerSettings } from './ai.ts';
+import { AiExplanationSchema, FailInstanceSchema } from './types.ts';
+import type { AiRequest, AiSettings } from './types.ts';
 
 const ReasoningScoreSchema = AiExplanationSchema.pick({ score: true });
 const ReasoningEvidenceSchema = AiExplanationSchema.omit({ score: true }).extend({
@@ -14,7 +14,7 @@ const ReasoningEvidenceSchema = AiExplanationSchema.omit({ score: true }).extend
 });
 
 /** Reason engine using one configured SDK model for scores and evidence. */
-export class ReasonAIEngine extends AIEngine {
+export class ReasoningAiEngine extends AIEngine {
 	protected readonly model: ReturnType<ReturnType<typeof createOpenAI>['chat']>;
 
 	constructor(config: AiSettings['reasoning']) {

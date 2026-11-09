@@ -1,4 +1,7 @@
 import type { SourceRule } from './types.ts';
+import { GrepEngine } from '../shared/engines/grep.ts';
+
+const grep = new GrepEngine();
 
 /**
  * Every rule answers one question: did this source fail?
@@ -15,9 +18,7 @@ import type { SourceRule } from './types.ts';
  * Compiles every regex before reading the source.
  */
 const GrepRule: SourceRule = async (source, param, _config, trace) => {
-	const regexes = [param].flat().map((pattern) => new RegExp(pattern));
-	const content = await source.open();
-	const failed = regexes.some((regex) => regex.test(content));
+	const failed = await grep.run(source, param);
 	if (failed) trace.push('failed grep');
 	return failed;
 };

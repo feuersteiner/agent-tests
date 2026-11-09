@@ -1,5 +1,5 @@
-import { minimatch } from 'minimatch';
-import type { MinimatchOptions } from 'minimatch';
+import { GlobEngine } from '../shared/engines/glob.ts';
+import { GrepEngine } from '../shared/engines/grep.ts';
 import type { SourceFilter } from './types.ts';
 
 /**
@@ -11,12 +11,12 @@ import type { SourceFilter } from './types.ts';
  *   The source has failed the trigger, and later filters do not run.
  */
 
-/** Fixed so that neither the runtime nor the OS changes which paths match. */
-const GLOB_OPTIONS: MinimatchOptions = { dot: true, platform: 'linux' };
+const glob = new GlobEngine();
+const grep = new GrepEngine();
 
 /** Returns `true` (passed) if any glob matches the path, `false` (failed) if none match. */
 const GlobFilter: SourceFilter = async (source, param, _config, trace) => {
-	const passed = [param].flat().some((pattern) => minimatch(source.path, pattern, GLOB_OPTIONS));
+	const passed = glob.run(source, param);
 	if (!passed) trace.push('failed glob');
 	return passed;
 };
@@ -26,9 +26,7 @@ const GlobFilter: SourceFilter = async (source, param, _config, trace) => {
  * Compiles every regex before reading the source.
  */
 const GrepFilter: SourceFilter = async (source, param, _config, trace) => {
-	const regexes = [param].flat().map((pattern) => new RegExp(pattern));
-	const content = await source.open();
-	const passed = regexes.some((regex) => regex.test(content));
+	const passed = await grep.run(source, param);
 	if (!passed) trace.push('failed grep');
 	return passed;
 };

@@ -1,12 +1,12 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { createTypeSafeAi } from '@ai-sdk/typesafe-ai';
 import { experimental_decide } from 'ai';
-import { AIEngine, providerSettings } from './index.ts';
-import { DECISION_EXPLAIN_CRITERIA } from '../prompts.ts';
-import type { AiRequest, AiSettings } from '../types.ts';
+import { AIEngine, providerSettings } from './ai.ts';
+import { DECISION_EXPLAIN_CRITERIA } from './prompts.ts';
+import type { AiRequest, AiSettings } from './types.ts';
 
 /** Decide engine using one configured SDK model for scores and evidence. */
-export class DecideAIEngine extends AIEngine {
+export class DecisionalAiEngine extends AIEngine {
 	protected readonly model: ReturnType<ReturnType<typeof createOpenAI>['decisionModel']>;
 
 	constructor(config: AiSettings['decision']) {

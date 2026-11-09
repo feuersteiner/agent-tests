@@ -1,17 +1,13 @@
-import { DecideAIEngine } from './engines/decide.ts';
-import { AIEngine } from './engines/index.ts';
-import { ReasonAIEngine } from './engines/reason.ts';
-import type { AiSettings } from './types.ts';
+import { Engines } from '../engines/index.ts';
 
 export * from './types.ts';
 
 /** One configured pair of engines; required environment keys are resolved eagerly. */
-export class AI {
-	public readonly decide: AIEngine;
-	public readonly reason: AIEngine;
-
-	constructor(config: AiSettings) {
-		this.decide = new DecideAIEngine(config.decision);
-		this.reason = new ReasonAIEngine(config.reasoning);
+export class AI extends Engines {
+	public get decide() {
+		return this.decision;
+	}
+	public get reason() {
+		return this.reasoning;
 	}
 }
