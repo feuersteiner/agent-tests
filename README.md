@@ -15,7 +15,7 @@ rule needs judgment. Tests report findings and never modify your code.
 ## Example
 
 Your app's interface must be in French, but agents keep adding English strings.
-A test is two files in `.agents/tests/user-text-french/`. `TEST.md` states the rule
+A test is two files in the repository-root `.agents/tests/user-text-french/`. `TEST.md` states the rule
 in plain prose:
 
 ```md
@@ -29,6 +29,7 @@ violation...
 id: user-text-french
 title: User text in French
 description: User-facing text is written in French.
+tags: ['ui', 'language'] # optional metadata
 triggers:
   - id: user-facing-text
     description: Svelte and HTML files with text shown to end users.
@@ -50,6 +51,12 @@ evals:
 Only Svelte and HTML files that a decision model judges to contain user-facing text
 are inspected. Paths outside those globs are skipped without a model call.
 
+Tests live only in the repository-root `.agents/tests/<id>/`, following the
+project `.agents/skills/` convention. IDs are unique within `.agents/tests/`.
+Use triggers and globs to scope tests to files or subdirectories.
+Optional `tags` accepts an array of strings, including `[]`, with no default or
+tag filtering. Existing definitions can omit it.
+
 ## Where it runs
 
 - **While an agent works:** on the files it just edited.
@@ -66,22 +73,43 @@ The package ships TypeScript source. Library imports require Bun or tooling that
 compiles TypeScript dependencies; plain Node does not execute TypeScript inside
 `node_modules`. The TypeScript CLI requires Bun on `PATH`.
 
+All documented commands have scaffolded help and dispatch. Functionality is pending:
+each stub prints its command name, ID when supplied, and parsed values with runtime
+types, then exits 0. Undefined values are omitted; Clinguini supplies `false` for
+omitted boolean flags. Invalid arguments exit 2. Stubs do not load test/config/env
+files, run Git, or make model calls.
+`validate [id]`, `run [id]`, and `eval [id]` accept an optional exact test ID;
+omission will select all tests when implemented, without `--all`.
+
 ```sh
 npm install -D agent-tests
 npx agent-tests init                          # config, .agents/tests/, pre-commit hook
 npx agent-tests add user-text-french          # install a community test at the root
-npx agent-tests add user-text-french apps/web # install it for apps/web/ only
-npx agent-tests validate user-text-french     # check a local test's structure
-npx agent-tests list                          # installed tests as a directory tree
+npx agent-tests list                          # installed tests
+npx agent-tests validate user-text-french     # check one local test
+npx agent-tests validate                      # check all local tests
 npx agent-tests targets user-text-french      # files that test would inspect
+npx agent-tests compile user-text-french      # compile TEST.md into test.yaml
 npx agent-tests eval user-text-french         # run its labeled examples
-npx agent-tests run                           # check the whole repository
+npx agent-tests eval                          # run all tests' labeled examples
+npx agent-tests run user-text-french          # run one test
+npx agent-tests run                           # run all tests on the whole repository
 npx agent-tests run --changed                 # uncommitted files
 npx agent-tests run --staged                  # pre-commit
 npx agent-tests run --base main               # pull requests
 npx agent-tests docs                          # skills that teach agents to write and run tests
 npx agent-tests vote user-text-french         # toggle your vote for a library test
 ```
+
+The root `package.json` includes this script:
+
+```json
+{ "scripts": { "test:agents": "agent-tests run" } }
+```
+
+Use `npm run test:agents` for all tests or `npm run test:agents -- user-text-french`
+for one (`npm run test:agents [-- id]`). Bun must still be on `PATH`.
+The script currently prints the parsed `run` values and exits 0; functionality is pending.
 
 Choose the decision model (Jev or OpenAI) in `agent-tests.config.yaml`
 and keep its credentials in `.env`.
@@ -131,10 +159,6 @@ triggers:
 For debugging, trace outcomes by trigger ID and filter (`glob`, `grep`, or `ask`),
 with a pass, failure, or skipped status and reason. Later filters are skipped
 after one fails. Trace output remains WIP.
-
-Like `AGENTS.md`, any directory can have its own `.agents/tests/`. Its tests apply
-inside that directory, in addition to tests from parent directories, and its
-`.agents/tests/config.yaml` can opt out of specific parent tests.
 
 ## Compilation
 
@@ -219,7 +243,9 @@ evals:
     expect: skip # the triggers should not select it
 ```
 
-`expect` is `pass`, `fail`, `unsure`, or `skip`. `agent-tests eval <id>` runs the real triggers and checks on every example and reports any that disagree.
+`expect` is `pass`, `fail`, `unsure`, or `skip`. The planned `agent-tests eval [id]`
+will run the real triggers and checks on every example and report disagreements.
+An ID selects one test; omission selects all tests.
 
 ## Community library
 
