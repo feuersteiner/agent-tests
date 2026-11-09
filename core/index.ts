@@ -1,7 +1,6 @@
 export { AgentTests } from './src/index.ts';
 export { TestCheck } from './src/check/index.ts';
 export { TestEval } from './src/evals/index.ts';
-export { AI } from './src/shared/ai/index.ts';
 export {
 	Engines,
 	DecisionalAiEngine,
@@ -9,11 +8,10 @@ export {
 	GlobEngine,
 	GrepEngine
 } from './src/shared/engines/index.ts';
-export { AIEngine } from './src/shared/ai/engines/index.ts';
-export { Source } from './src/shared/source.ts';
+export { AIEngine } from './src/shared/engines/ai.ts';
+export type { Source } from './src/shared/source.ts';
 export { FileSource, DirectorySource } from './src/shared/source.ts';
 export type { TypedSource, DirectoryChild, DirectorySnapshot } from './src/shared/source.ts';
-export { TestTrigger } from './src/trigger/index.ts';
 export { TestSelect } from './src/select/index.ts';
 export {
 	validate,

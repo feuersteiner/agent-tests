@@ -2,10 +2,9 @@ id: sample-no-todo
 title: 'Sample: no TODO markers'
 description: Smoke definition rejecting uppercase TODO markers in JavaScript and TypeScript.
 tags: [sample]
-triggers:
-  - id: javascript-typescript
-    description: Select JavaScript and TypeScript source files.
-    glob: '**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'
+select:
+  type: files
+  glob: '**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'
 checks:
   - id: no-todo
     description: Reject the uppercase word TODO anywhere in source text.

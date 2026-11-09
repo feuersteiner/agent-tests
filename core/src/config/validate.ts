@@ -53,6 +53,7 @@ export const validate = <Schema extends z.ZodType>(
 /** Validate test structure, unique check IDs, and grep expressions before execution. */
 export const validateTest = (value: unknown): AgentTest => {
 	const test = validate(value, AgentTestSchema);
+	validateSelect(test.select);
 	const ids = new Set<string>();
 	const issues = [
 		...test.checks.flatMap((entry, index) => {
@@ -60,12 +61,7 @@ export const validateTest = (value: unknown): AgentTest => {
 			ids.add(entry.id);
 			return duplicate ? [`checks.${index}.id: Duplicate check id`] : [];
 		}),
-		...(
-			[
-				['triggers', test.triggers ?? []],
-				['checks', test.checks]
-			] as const
-		).flatMap(([field, entries]) =>
+		...([['checks', test.checks]] as const).flatMap(([field, entries]) =>
 			entries.flatMap((entry, index) => {
 				const patterns = entry.grep === undefined ? [] : [entry.grep].flat();
 				return patterns.flatMap((pattern, patternIndex) => {
@@ -80,6 +76,11 @@ export const validateTest = (value: unknown): AgentTest => {
 			})
 		)
 	];
+	if (test.select.type === 'directories') {
+		for (const [index, check] of test.checks.entries()) {
+			if (check.grep !== undefined) issues.push(`checks.${index}.grep: grep requires file targets`);
+		}
+	}
 	if (issues.length) throw new Error(`Invalid test definition:\n${issues.join('\n')}`);
 	return test;
 };

@@ -1,3 +1,6 @@
+import type { AIEngine } from './ai.ts';
+import type { GlobEngine } from './glob.ts';
+import type { GrepEngine } from './grep.ts';
 import { z } from 'zod';
 import { TextSchema } from '../types.ts';
 
@@ -57,4 +60,12 @@ export type AiModelConfig = z.infer<typeof AiModelConfigSchema>;
 export type AiSettings = {
 	decision: AiModelConfig & { api: 'openai' | 'jev' };
 	reasoning: AiModelConfig & { api: 'openai' | 'anthropic' };
+};
+
+/** Public operations shared by selection and checks, including injectable AI scorers. */
+export type EngineSet = {
+	glob: GlobEngine;
+	grep: GrepEngine;
+	decision: Pick<AIEngine, 'run'>;
+	reasoning: Pick<AIEngine, 'run'>;
 };

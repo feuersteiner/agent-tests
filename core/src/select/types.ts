@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import type { AIEngine } from '../shared/engines/ai.ts';
-import type { Engines } from '../shared/engines/index.ts';
+import type { EngineSet } from '../shared/engines/types.ts';
+export type { EngineSet } from '../shared/engines/types.ts';
 import { ParamSchema } from '../shared/types.ts';
 import type { Param } from '../shared/types.ts';
 import type { TypedSource } from '../shared/source.ts';
@@ -25,10 +25,6 @@ export const SelectSchema = z.strictObject({
 	where: SelectStepSchema.optional()
 });
 export type Select = z.infer<typeof SelectSchema>;
-export type EngineSet = Pick<Engines, 'glob' | 'grep'> & {
-	decision: Pick<AIEngine, 'run'>;
-	reasoning: Pick<AIEngine, 'run'>;
-};
 export type SelectConfig = { threshold: number; engines: EngineSet };
 export type SelectEntry = {
 	source: TypedSource;

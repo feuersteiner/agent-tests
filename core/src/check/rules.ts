@@ -1,7 +1,5 @@
 import type { SourceRule } from './types.ts';
-import { GrepEngine } from '../shared/engines/grep.ts';
-
-const grep = new GrepEngine();
+import { sourceInput } from '../shared/source.ts';
 
 /**
  * Every rule answers one question: did this source fail?
@@ -17,8 +15,8 @@ const grep = new GrepEngine();
  * Returns `true` (failed) if any regex matches the content, `false` (passed) if none match.
  * Compiles every regex before reading the source.
  */
-const GrepRule: SourceRule = async (source, param, _config, trace) => {
-	const failed = await grep.run(source, param);
+const GrepRule: SourceRule = async (source, param, { engines }, trace) => {
+	const failed = await engines.grep.run(source, param);
 	if (failed) trace.push('failed grep');
 	return failed;
 };
@@ -27,10 +25,10 @@ const GrepRule: SourceRule = async (source, param, _config, trace) => {
  * Returns `true` (failed) at the first condition scoring below the threshold,
  * `false` (passed) if every condition reaches it. Each `ask` states what must be true to pass.
  */
-const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
-	const input = await source.open();
+const AskRule: SourceRule = async (source, param, { engines, threshold }, trace) => {
+	const input = await sourceInput(source);
 	for (const condition of [param].flat()) {
-		if ((await ai.decide.run({ input, ask: condition })) < threshold) {
+		if ((await engines.decision.run({ input, ask: condition })) < threshold) {
 			trace.push('failed ask');
 			return true;
 		}
@@ -42,10 +40,10 @@ const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
  * Returns `true` (failed) at the first condition scoring below the threshold,
  * `false` (passed) if every condition reaches it. Uses the reasoning AI and level from the config.
  */
-const ReasonRule: SourceRule = async (source, param, { ai, threshold, reasoning }, trace) => {
-	const input = await source.open();
+const ReasonRule: SourceRule = async (source, param, { engines, threshold, reasoning }, trace) => {
+	const input = await sourceInput(source);
 	for (const condition of [param].flat()) {
-		if ((await ai.reason.run({ input, ask: condition, reasoning })) < threshold) {
+		if ((await engines.reasoning.run({ input, ask: condition, reasoning })) < threshold) {
 			trace.push('failed reason');
 			return true;
 		}

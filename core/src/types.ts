@@ -5,8 +5,8 @@ import { EvalSchema } from './evals/types.ts';
 import type { Eval } from './evals/types.ts';
 import { IdSchema, TextSchema } from './shared/types.ts';
 import type { Result } from './shared/types.ts';
-import { TriggersSchema } from './trigger/types.ts';
-import type { Trigger } from './trigger/types.ts';
+import { SelectSchema } from './select/types.ts';
+import type { SelectResult } from './select/types.ts';
 
 export { CheckSchema } from './check/types.ts';
 export type { Check, CheckConfig } from './check/types.ts';
@@ -21,7 +21,7 @@ export {
 	AiRequestSchema,
 	FailInstanceSchema,
 	ReasoningLevelSchema
-} from './shared/ai/types.ts';
+} from './shared/engines/types.ts';
 export type {
 	AiSettings,
 	AiModelConfig,
@@ -30,16 +30,14 @@ export type {
 	AiRequest,
 	FailInstance,
 	ReasoningLevel
-} from './shared/ai/types.ts';
+} from './shared/engines/types.ts';
 export { ParamSchema } from './shared/types.ts';
 export type { Param, Result, ResultEntry } from './shared/types.ts';
-export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
-export type { FilterConfig, Trigger } from './trigger/types.ts';
 export { SelectSchema, SelectStepSchema } from './select/types.ts';
 export type { Select, SelectStep, SelectConfig, SelectResult, EngineSet } from './select/types.ts';
 
 /** What each stage of a run produced. */
-export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };
+export type AgentTestResult = { select: SelectResult; check: Result<Check> };
 
 /** A test's labeled-example results within a suite. */
 export type AgentTestEvalResult = { id: string; result: Result<Eval> };
@@ -57,9 +55,9 @@ export const MetadataSchema = z.strictObject({
 });
 export type Metadata = z.infer<typeof MetadataSchema>;
 
-/** test.yaml structure; optional fields have no implicit defaults. */
+/** test.yaml structure; select and select.type are required. */
 export const AgentTestSchema = MetadataSchema.extend({
-	triggers: TriggersSchema.optional(),
+	select: SelectSchema,
 	checks: z.array(CheckSchema).min(1),
 	evals: z.array(EvalSchema)
 });

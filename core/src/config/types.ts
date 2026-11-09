@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AiModelConfigSchema, ReasoningLevelSchema } from '../shared/ai/types.ts';
+import { AiModelConfigSchema, ReasoningLevelSchema } from '../shared/engines/types.ts';
 
 const ThresholdSchema = z.number().finite().min(0).max(1);
 
@@ -7,7 +7,7 @@ const ThresholdSchema = z.number().finite().min(0).max(1);
 export const AgentTestConfigSchema = z.strictObject({
 	decision: AiModelConfigSchema.extend({ api: z.enum(['openai', 'jev']) }),
 	reasoning: AiModelConfigSchema.extend({ api: z.enum(['openai', 'anthropic']) }),
-	trigger: z.strictObject({ threshold: ThresholdSchema }),
+	select: z.strictObject({ threshold: ThresholdSchema }),
 	check: z.strictObject({
 		threshold: ThresholdSchema,
 		reasoning: ReasoningLevelSchema.optional()

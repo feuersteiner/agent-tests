@@ -16,8 +16,8 @@ export const ParamSchema = z.union([TextSchema, z.array(TextSchema).min(1)]);
 export type Param = z.infer<typeof ParamSchema>;
 
 /**
- * What happened when one source ran through one trigger, check, or eval.
- * `flagged` means it fired: a trigger matched, a check found a violation, or an eval
+ * What happened when one source ran through one selection step, check, or eval.
+ * `flagged` means it fired: a selection matched, a check found a violation, or an eval
  * did not match its label. `trace` lists what failed along the way, such as `failed grep`.
  */
 export type ResultEntry<T> = { source: Source; check: T; flagged: boolean; trace: string[] };

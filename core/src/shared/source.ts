@@ -28,7 +28,8 @@ export class FileSource {
 	};
 }
 
-export type TypedSource = FileSource | DirectorySource;
+export type Source = FileSource | DirectorySource;
+export type TypedSource = Source;
 export type DirectoryChild =
 	{ name: string; kind: 'file'; lines: number } | { name: string; kind: 'directory' };
 export type DirectorySnapshot = { name: string; children: DirectoryChild[] };
@@ -72,9 +73,6 @@ export class DirectorySource {
 		)
 	});
 }
-
-/** Temporary compatibility export while callers migrate to typed sources. */
-export { FileSource as Source };
 
 /** AI sees structured directory metadata; file input remains unchanged. */
 export const sourceInput = async (source: TypedSource): Promise<string> => {

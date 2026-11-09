@@ -2,10 +2,9 @@ id: sample-no-debugger
 title: 'Sample: no debugger statements'
 description: Smoke definition rejecting debugger statements ending with a semicolon.
 tags: [sample]
-triggers:
-  - id: javascript-typescript
-    description: Select JavaScript and TypeScript source files.
-    glob: '**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'
+select:
+  type: files
+  glob: '**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}'
 checks:
   - id: no-debugger
     description: Reject the word debugger followed by optional whitespace and a semicolon.
