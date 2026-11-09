@@ -52,7 +52,7 @@ loading. When invoking source directly, use
 
 The agreed layout is repository-root `.agents/tests/<id>/`, following the project
 `.agents/skills/` convention, with unique IDs in that location. Root resolution and file loading are pending. Tests use
-triggers and globs to scope files and subdirectories. There is no nested discovery,
+`select` and nested `where` steps to scope files and directories. There is no nested discovery,
 inheritance, or parent-test opt-out design.
 
 Test metadata accepts optional `tags: string[]`, including an empty array, without

@@ -6,7 +6,7 @@ Linting for intelligence: turn fuzzy business and code rules into tests.
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 An agent test is a rule your codebase must follow, packaged so a person, an agent,
-or CI can check it. Triggers pick the files the rule applies to; checks judge them.
+or CI can check it. `select` picks typed file or directory targets; checks judge them.
 Both use globs and regex where a pattern is enough, and a decision model where the
 rule needs judgment. Tests report findings and never modify your code.
 
@@ -30,17 +30,15 @@ id: user-text-french
 title: User text in French
 description: User-facing text is written in French.
 tags: ['ui', 'language'] # optional metadata
-triggers:
-  - id: user-facing-text
-    description: Svelte and HTML files with text shown to end users.
-    glob: ['src/**/*.svelte', 'src/**/*.html']
-    ask: 'This file contains text displayed to an end user.'
+select:
+  type: files
+  glob: ['src/**/*.svelte', 'src/**/*.html']
+  ask: 'This file contains text displayed to an end user.'
 checks:
   - id: french-only
-    message: User-facing text is not in French.
-    fix: Translate the text into French.
-    smart:
-      ask: 'Quote each piece of user-facing text that is not in French.'
+    description: All user-facing text is French.
+    error: Translate user-facing text into French.
+    ask: 'All user-facing text is written in French.'
 evals:
   - name: English button label
     path: src/lib/Save.svelte
@@ -53,7 +51,7 @@ are inspected. Paths outside those globs are skipped without a model call.
 
 Tests live only in the repository-root `.agents/tests/<id>/`, following the
 project `.agents/skills/` convention. IDs are unique within `.agents/tests/`.
-Use triggers and globs to scope tests to files or subdirectories.
+Use `select` and nested `where` steps to scope tests to files or directories.
 Optional `tags` accepts an array of strings, including `[]`, with no default or
 tag filtering. Existing definitions can omit it.
 
@@ -118,11 +116,11 @@ Clef support is deferred pending standardized APIs for system-one models.
 For library use, pass parsed definitions as an array and parsed shared config:
 
 ```ts
-import { AgentTests, Source } from 'agent-tests';
+import { AgentTests, FileSource } from 'agent-tests';
 
-const sources = [new Source('src/app.ts', async () => 'console.log("hello");')];
+const sources = [new FileSource('src/app.ts', async () => 'console.log("hello");')];
 const suite = new AgentTests(sources, definitions, config);
-const results = await suite.run(); // [{ id, trigger, check }]
+const results = await suite.run(); // [{ id, select, check }]
 const evals = await suite.eval(); // [{ id, result }]
 ```
 
@@ -130,50 +128,64 @@ Each test filters the same source base independently. Construction validates eve
 definition and config; AI and provider keys are required only when execution starts.
 Use `[definition]` for one test. Results follow definition order.
 
-## Triggers
+## Selection
 
-Design locked; implementation WIP.
-
-Triggers decide whether a test inspects a file. `triggers` is optional;
-omitting it or setting `triggers: []` selects every file.
-Otherwise, it is a list of triggers, each with a lowercase kebab-case `id` and a `description`.
-Each trigger requires at least one filter:
-
-- `glob`: POSIX glob patterns on the path, including dotfiles.
-- `grep`: case-sensitive JavaScript regex patterns on the content, without flags.
-- `ask`: a decision model judging the content against a passing condition.
-
-Filters within one ID use **AND**: every configured filter must pass.
-Triggers use **OR**: trigger A or trigger B can qualify a file.
-Within each trigger, filters always run as `glob`, then `grep`, then `ask`, so a
-model is only called once the cheap filters pass. Omitted filters are skipped; the
-first failure stops that trigger. A file is excluded only if every trigger fails.
-
-`glob`, `grep`, and `ask` each accept a string or a nonempty list of alternatives (**OR**).
-For `glob` and `grep`, any matching pattern passes that filter.
-For `ask`, each string is a nonblank passing condition; prompts run in list order
-until one passes. If none passes, the filter fails.
+Every test requires `select` with an explicit `type: files` or `type: directories`.
+The type describes the final targets. Without filters, selection returns all
+supplied descendants of that type.
 
 ```yaml
-# .agents/tests/brand-messaging/test.yaml: customer-facing copy follows Acme's brand voice.
-triggers:
-  # Marketing pages are always brand copy: a glob is enough.
-  - id: marketing
-    description: Marketing pages.
-    glob: ['content/**/*.md', 'src/routes/(marketing)/**/*.svelte']
-  # Elsewhere, cheap filters first and models last.
-  - id: customer-copy
-    description: Product and marketing copy shown to customers.
-    glob: ['src/**/*.svelte', 'emails/**/*.html']
-    grep: '[Aa]cme'
-    ask:
-      - 'This file contains product copy shown to customers.'
-      - 'This file contains marketing copy shown to customers.'
+select:
+  type: files
+  glob: '**/*-ui/'
+  where:
+    glob: '*.svelte'
+    ask: 'This file displays user-facing text.'
 ```
 
-For debugging, trace outcomes by trigger ID and filter (`glob`, `grep`, or `ask`),
-with a pass, failure, or skipped status and reason. Later filters are skipped
-after one fails. Trace output remains WIP.
+This first selects matching directories, then their immediate Svelte files.
+A trailing `/` restricts a glob to directories. Each `where` operates relative to
+its parent directory; another `where` adds another directory-selection step.
+Use `**` to match nested descendants. Intermediate targets are directories even
+when the final type is `files`.
+
+Filters run as `glob`, then `grep`, then `ask`, using AND and stopping at the
+first failure. Each accepts a string or a nonempty list of alternatives (OR):
+
+- `glob`: POSIX path patterns, including dotfiles.
+- `grep`: case-sensitive JavaScript content regexes without flags; files only.
+- `ask`: passing conditions scored by the decision engine; alternatives run in
+  order until one reaches `config.select.threshold`.
+
+Empty branches stop immediately. Other matching branches continue. Final targets
+are deduplicated by path before checks run. Verbose output records scopes,
+matching counts, and filter outcomes.
+
+A directory remains a directory target throughout execution:
+
+```ts
+import { DirectorySource, FileSource } from 'agent-tests';
+
+const directory = new DirectorySource('src/ui', async () => [
+	new FileSource('src/ui/Button.svelte', async () => '<button>Save</button>')
+]);
+await directory.open();
+// { name: 'ui', children: [{ name: 'Button.svelte', kind: 'file', lines: 1 }] }
+const children = await directory.children(); // traversable typed sources
+```
+
+Paths are normalized repository-relative POSIX paths. Children use full paths
+and must be immediate children of their directory. Flat file inputs infer their
+ancestor directories without filesystem I/O. Explicit directory sources supply
+their own child lists, including empty directories.
+
+File `open()` returns text. Directory `open()` summarizes immediate children;
+file entries have line counts, directory entries do not. Empty files have zero
+lines; a terminal newline does not add an empty line. Reads and snapshots are
+cached, including concurrent reads; failed reads may retry. AI engines receive
+file text or a JSON directory snapshot.
+
+Directory count/name predicates (`DirectoryEngine`) remain deferred.
 
 ## Compilation
 
@@ -181,7 +193,7 @@ Design locked; implementation WIP.
 
 Your agent turns `TEST.md` into `test.yaml`. `agent-tests compile <id>` hands it the
 rule, a test-generator skill, and your repository layout; the agent writes the
-triggers, checks, and evals, then loops on `agent-tests validate` and
+selection, checks, and evals, then loops on `agent-tests validate` and
 `agent-tests eval` until they pass. Edit `test.yaml` by hand whenever you like.
 When `TEST.md` changes, `validate` flags `test.yaml` as stale until it is recompiled.
 Library tests ship already compiled; after `add`, your agent adapts them to your
@@ -189,78 +201,70 @@ repository.
 
 ## Checks
 
-Design locked; implementation WIP.
-
-Checks judge each targeted file and report pass, warning, or error findings, through
-the CLI, Vitest, or the library. A check runs from `fast` to `smart` to `deep`,
-cheapest first, and escalates only what it cannot settle:
+Checks run on each final target and escalate through `grep`, `ask`, then `reason`.
+A passing rule clears the check; a failing rule continues to the next configured
+rule. The final configured rule determines whether the check reports a finding.
 
 ```yaml
-# .agents/tests/brand-messaging/test.yaml
 checks:
-  - id: no-familiar-language
-    message: Copy uses familiar language.
-    fix: Rewrite in Acme's formal voice; see TEST.md.
-    human-tiebreak: true # if deep stays unsure, a person decides
-    fast: # patterns, no model
-      match: # any match fails
-        - '\b(gonna|wanna|gotta)\b'
-      maybe: # weak signal: a match escalates, with the hits as hints
-        - '\b(hey|awesome|folks|no worries)\b'
-    smart: # classifier such as Jev or OpenAI
-      ask: 'Quote each phrase in this copy that uses familiar or casual language.'
-      bounds: [0.3, 0.8] # below: pass, between: unsure, above: likely violation
-    deep: # structured LLM call, the final word
-      ask: 'Judge each quoted phrase against the brand voice in TEST.md.'
-      reasoning: medium # low, medium, or high
+  - id: formal-language
+    description: Customer-facing text uses formal language.
+    error: Rewrite casual expressions in formal language.
+    grep: '\b(gonna|wanna|gotta)\b'
+    ask: 'All customer-facing text uses formal language.'
+    reason: 'All customer-facing text uses formal language.'
 ```
 
-- **`fast`** fails on a `match`. A `maybe` hit escalates, and so does no hit when
-  `smart` or `deep` exists. The agent writes the patterns; `agent-tests validate`
-  checks them against the evals and flags risky ones. Patterns are regex today,
-  with room for other pattern types later.
-- **`smart`** passes, escalates, or flags violations by confidence bounds,
-  quoting each instance it finds.
-- **`deep`** confirms every violation a model flagged, with the `reasoning` effort
-  the check sets. If it stays unsure, the CLI shows a warning, or a person
-  reviews it with `human-tiebreak: true`.
-- A check uses only the levels it needs, and `maybe`, `bounds`, and `reasoning`
-  are optional.
+Any `grep` match fails its rule. Every `ask` or `reason` condition in a list must
+reach `config.check.threshold` to pass. Reasoning uses `config.check.reasoning`.
+Directory checks support AI conditions on directory snapshots; `grep` on a
+directory is rejected during configuration validation. Custom callers can
+traverse directory children and read their contents through the source API.
 
-Every finding names its test, check, level, file, and line, with the fix:
-
-```text
-src/routes/+page.svelte:12:5  error  "Hey folks!" uses familiar language
-  brand-messaging/no-familiar-language (deep): Rewrite in Acme's formal voice.
-```
+`Engines` shares `DecisionalAiEngine`, `ReasoningAiEngine`, `GrepEngine`, and
+`GlobEngine` across selection and checks. Both AI provider configurations remain
+required. Provider credentials are resolved when execution first creates the
+engines, including for grep-only tests.
 
 ## Evals
 
-Design locked; implementation WIP.
-
-Benchmarks that show whether a newer model or a regenerated test still makes the
-approved decisions before you upgrade. Each test keeps labeled examples under
-`evals` in its `test.yaml`:
+Evals run selection and checks against labeled examples. Expected outcomes are
+`pass`, `fail`, or `skip`.
 
 ```yaml
 evals:
-  - name: casual greeting on the homepage
-    path: src/routes/+page.svelte
-    content: <h1>Hey folks! Welcome to Acme.</h1>
+  - name: Informal file
+    path: src/help.md
+    content: We are gonna save your changes.
     expect: fail
-  - name: formal copy
-    path: src/routes/about/+page.svelte
-    content: <p>Acme provides enterprise-grade testing.</p>
+  - name: Directory layout
+    path: src/ui
+    children:
+      - path: src/ui/Button.svelte
+        content: <button>Save</button>
+      - path: src/ui/nested
+        children: []
     expect: pass
-  - name: billing code is not copy
-    path: src/billing/charge.ts
-    content: 'export const charge = (cents: number) => cents;'
-    expect: skip # the triggers should not select it
 ```
 
-`expect` is `pass`, `fail`, `unsure`, or `skip`. The planned `agent-tests eval [id]`
-will run the real triggers and checks on every example and report disagreements.
-An ID selects one test; omission selects all tests.
+Each example supplies either `content` for a file or `children` for a directory.
+Child paths are repository-relative. Each example is evaluated independently
+against its test's selection; an empty selection produces `skip`.
+
+## Migration
+
+Replace each test's `triggers` with `select` and its required final `type`.
+Move the old filter fields into `select`; nested directory scopes use `where`.
+Filter arrays continue to represent alternatives. Separate trigger IDs and
+cross-trigger OR groups are removed; split distinct selection pipelines into
+separate test definitions.
+
+Rename repository configuration `trigger.threshold` to `select.threshold`.
+Use `FileSource` instead of constructing `Source`; `Source` is now the union type
+of `FileSource` and `DirectorySource`. Replace `TestTrigger` with `TestSelect`
+and result `.trigger` with `.select`. Replace `AI` with `Engines`,
+`.decide` with `.decision`, and `.reason` with `.reasoning`; stage configs receive
+`engines` instead of `ai`.
 
 ## Community library
 

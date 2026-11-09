@@ -1,0 +1,10 @@
+# Engines directory
+
+- `ai.ts`: abstract `AIEngine` owns readonly arrow-field `run` and `explain`, request/options/score validation, default prompts, blank-input explanations, unchanged scores, and exact-quote grounding. Shared provider settings resolve required environment keys synchronously. Keep runtime imports and re-exports of `Engines`, `DecisionalAiEngine`, and `ReasoningAiEngine` out of this module.
+- `decision.ts` and `reasoning.ts`: exported named classes `DecisionalAiEngine` and `ReasoningAiEngine` extend `AIEngine`, construct their SDK model once, and override only protected scoring/evidence hooks. `index.ts` exports the `Engines` container, eagerly constructing one `decision: DecisionalAiEngine` and one `reasoning: ReasoningAiEngine`. This dependency direction avoids ESM initialization cycles. No separate AI validation helper or service interface.
+- Keep each AI TypeScript file at 75 physical lines or fewer, aiming for about 50; preserve readable formatting and exported prompt text.
+- Both members expose `run(request, options?)` for passing-condition scores in `[0, 1]` and `explain(request, score, options?)` using the same model without rescoring. Validate requests/options, preserve scores, and require exact quotes.
+- `types.ts`: shared schemas and `AiSettings` provider config; use inferred operation types or type-import `EngineSet` from `index.ts` in callers. Never import root feature contracts here. Repository config validation stays in `config/validate.ts`.
+- `prompts.ts`: shared defaults; `AiConfig.system` overrides the operation's default, including an explicit empty string.
+- Decision APIs are OpenAI or Jev; reasoning APIs are OpenAI chat or Anthropic. Use pinned SDKs directly; Clef is deferred.
+- `AgentTests` lazily creates one configured `Engines` on first run/eval and reuses it across every test's separate selection/check stages and repeated calls. Constructor validation needs no environment keys; Engine construction still resolves both provider keys eagerly, including for grep-only execution.

@@ -1,11 +1,11 @@
 # src agent guide
 
-`trigger/`, `check/`, and `evals/` follow one pattern.
+`select/`, `check/`, and `evals/` follow one pattern.
 
 ## Files
 
 - `types.ts`: Zod schemas with their inferred types, plus the config type and funcs interface when the feature has funcs.
-- Funcs file (`trigger/filters.ts`, `check/rules.ts`): const arrow functions, no classes, default-exported as one object. Evals have none.
+- Funcs file (`select/filters.ts`, `check/rules.ts`): const arrow functions, no classes, default-exported as one object. Evals have none.
 - `index.ts`: a `Test<Feature>` class whose `run` returns a `Result<T>`.
 
 ## Funcs
@@ -23,8 +23,8 @@ type ResultEntry<T> = { source: Source; check: T; flagged: boolean; trace: strin
 type Result<T> = { flagged: ResultEntry<T>[]; cleared: ResultEntry<T>[] };
 ```
 
-- `check` holds the trigger, check, or eval that ran.
-- `flagged` means it fired: a trigger matched, a check found a violation, or an eval did not match its label.
+- `check` holds the selection step, check, or eval that ran.
+- `flagged` means it fired: a selection matched, a check found a violation, or an eval did not match its label.
 - `trace` lists what failed along the way, for verbose output.
 
 ## `run`

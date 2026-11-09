@@ -1,7 +1,7 @@
 # Shared
 
-Reusable code shared by feature modules.
+Reusable contracts and engines used across feature modules.
 
-- [`ai/`](ai/README.md): AI scoring, explanations, and SDK implementations.
-- [`source.ts`](source.ts): `new Source(path, getter)`, where `open()` calls the getter. Sources make no filesystem assumptions, so callers supply how content is read.
-- [`types.ts`](types.ts): `IdSchema`, `TextSchema`, and `ParamSchema`, plus `Result<T>`, `{ flagged, cleared }`, returned by triggers, checks, and evals.
+- `engines/`: AI scoring and explanations, grep matching, and glob matching.
+- `source.ts`: `FileSource`, `DirectorySource`, the `Source` union, and AI input serialization. Callers supply reads; sources perform no filesystem I/O themselves.
+- `types.ts`: shared schemas and `Result<T>`, split into flagged and cleared entries.

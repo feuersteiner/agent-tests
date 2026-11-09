@@ -42,7 +42,7 @@ rules bind contributors, their agents, and maintainers alike.
    The credited handle must be the PR author.
 
 4. Compile `test.yaml` with your agent: `id` matching the directory, `title`,
-   `description`, `source`, `triggers`, `checks`, and `evals`. Evals include at
+   `description`, `source`, `select` (with required `type`), `checks`, and `evals`. Evals include at
    least one `fail`, one `pass`, and one `skip` example.
 5. Run `agent-tests validate <id>` and `agent-tests eval <id>`, and paste the
    eval output into the PR. Never commit credentials or run outputs; tests may
