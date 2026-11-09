@@ -14,6 +14,7 @@ export { Source } from './src/shared/source.ts';
 export { FileSource, DirectorySource } from './src/shared/source.ts';
 export type { TypedSource, DirectoryChild, DirectorySnapshot } from './src/shared/source.ts';
 export { TestTrigger } from './src/trigger/index.ts';
+export { TestSelect } from './src/select/index.ts';
 export {
 	validate,
 	validateConfig,
