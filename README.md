@@ -100,15 +100,15 @@ npx agent-tests docs                          # skills that teach agents to writ
 npx agent-tests vote user-text-french         # toggle your vote for a library test
 ```
 
-The root `package.json` includes this script:
+Run the standalone fixture repository:
 
-```json
-{ "scripts": { "test:agents": "agent-tests run" } }
+```sh
+bun run demo
 ```
 
-Use `npm run test:agents` for all tests or `npm run test:agents -- user-text-french`
-for one (`npm run test:agents [-- id]`). Bun must still be on `PATH`.
-The script currently prints the parsed `run` values and exits 0; functionality is pending.
+This executes every CLI command from [`core/fixtures/repository`](core/fixtures/README.md).
+Config and definitions are loaded and validated before constructing the runner.
+`list`, `validate`, `run`, and `eval` work; unfinished actions are labelled as scaffolds.
 
 Choose the decision model (Jev or OpenAI) in `agent-tests.config.yaml`
 and keep its credentials in `.env`.

@@ -1,0 +1,14 @@
+decision:
+  api: openai
+  url: https://models.invalid/v1
+  model: fixture-decision
+  apiKeyEnv: AGENT_TESTS_FIXTURE_KEY
+reasoning:
+  api: openai
+  url: https://models.invalid/v1
+  model: fixture-reasoning
+  apiKeyEnv: AGENT_TESTS_FIXTURE_KEY
+trigger:
+  threshold: 0.5
+check:
+  threshold: 0.5

@@ -1,6 +1,14 @@
 # CLI
 
-The CLI requires Bun. Run it from a configured repository.
+The CLI requires Bun. Run the standalone fixture workflow from the workspace:
+
+```sh
+bun run demo
+```
+
+This invokes every command from `core/fixtures/repository`, which contains a valid
+YAML config, one agent-test definition, and a TypeScript source file.
+Interactive runs pause before each command.
 
 Config loading resolves `agent-tests.config.yaml`, reads it, parses YAML, and
 calls the existing `validateConfig`. Repository commands then load and validate
@@ -55,3 +63,4 @@ configuration/read failures also fail the command. Invalid CLI arguments exit 2.
 
 Help works without repository configuration. The executable disables automatic
 dotenv loading; provider keys must be in the process environment.
+The demo supplies a dummy key; its regex rule makes no AI calls.
