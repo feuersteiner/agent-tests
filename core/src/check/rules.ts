@@ -30,12 +30,12 @@ const GrepRule: SourceRule = async (source, param, _config, trace) => {
  */
 const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
 	const input = source.open();
-	for (const condition of [param].flat()) {
+	for (const condition of [param].flat())
 		if ((await ai.decide.run({ input, ask: condition })) < threshold) {
 			trace.push('failed ask');
 			return true;
 		}
-	}
+
 	return false;
 };
 
@@ -45,12 +45,12 @@ const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
  */
 const ReasonRule: SourceRule = async (source, param, { ai, threshold, reasoning }, trace) => {
 	const input = source.open();
-	for (const condition of [param].flat()) {
+	for (const condition of [param].flat())
 		if ((await ai.reason.run({ input, ask: condition, reasoning })) < threshold) {
 			trace.push('failed reason');
 			return true;
 		}
-	}
+
 	return false;
 };
 

@@ -10,9 +10,9 @@ export const validate = <Schema extends z.ZodType>(
 	schema: Schema
 ): z.output<Schema> => {
 	const result = schema.safeParse(value);
-	if (!result.success) {
+	if (!result.success)
 		throw new Error(`Invalid configuration:\n${describeIssues(result.error.issues).join('\n')}`);
-	}
+
 	return result.data;
 };
 
@@ -86,9 +86,9 @@ export const validateConfig = (value: unknown): AgentTestConfig => {
 const describeIssues = (issues: z.core.$ZodIssue[], parent: PropertyKey[] = []): string[] => {
 	return issues.flatMap((issue) => {
 		const path = [...parent, ...issue.path];
-		if (issue.code === 'invalid_union') {
+		if (issue.code === 'invalid_union')
 			return issue.errors.flatMap((errors) => describeIssues(errors, path));
-		}
+
 		return [`${path.map(String).join('.') || 'value'}: ${issue.message}`];
 	});
 };

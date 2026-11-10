@@ -6,11 +6,11 @@ import { IdSchema, ParamSchema, TextSchema } from '../shared/types.ts';
 import type { Param } from '../shared/types.ts';
 
 /** Caller-owned AI; ask uses decide.run, reason uses reason.run and the configured level. */
-export type CheckConfig = {
+export interface CheckConfig {
 	threshold: number;
 	reasoning?: ReasoningLevel;
 	ai: AI;
-};
+}
 
 /** Every rule answers "did this source fail?": true means it failed, false means it passed. */
 export interface SourceRule {

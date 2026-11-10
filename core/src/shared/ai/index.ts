@@ -1,5 +1,5 @@
 import { DecideAIEngine } from './engines/decide.ts';
-import { AIEngine } from './engines/index.ts';
+import type { AIEngine } from './engines/index.ts';
 import { ReasonAIEngine } from './engines/reason.ts';
 import type { AiSettings } from './types.ts';
 

@@ -54,7 +54,7 @@ export const AiModelConfigSchema = z.strictObject({
 export type AiModelConfig = z.infer<typeof AiModelConfigSchema>;
 
 /** Validated provider settings needed by the service; stage settings belong to repository config. */
-export type AiSettings = {
+export interface AiSettings {
 	decision: AiModelConfig & { api: 'openai' | 'jev' };
 	reasoning: AiModelConfig & { api: 'openai' | 'anthropic' };
-};
+}

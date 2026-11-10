@@ -38,10 +38,16 @@ export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts'
 export type { FilterConfig, Trigger } from './trigger/types.ts';
 
 /** What each stage of a run produced. */
-export type AgentTestResult = { trigger: Result<Trigger>; check: Result<Check> };
+export interface AgentTestResult {
+	trigger: Result<Trigger>;
+	check: Result<Check>;
+}
 
 /** A test's labeled-example results within a suite. */
-export type AgentTestEvalResult = { id: string; result: Result<Eval> };
+export interface AgentTestEvalResult {
+	id: string;
+	result: Result<Eval>;
+}
 
 /** Test identity, description, optional tags, and optional source digest. */
 export const MetadataSchema = z.strictObject({
