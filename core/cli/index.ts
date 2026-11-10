@@ -1,16 +1,16 @@
 #!/usr/bin/env -S bun --no-env-file
 import { clinguini } from 'clinguini';
-import { initCommand } from './init.ts';
-import { addCommand } from './add.ts';
-import { listCommand } from './list.ts';
-import { validateCommand } from './validate.ts';
-import { targetsCommand } from './targets.ts';
-import { compileCommand } from './compile.ts';
-import { evalCommand } from './eval.ts';
-import { runCommand } from './run.ts';
-import { docsCommand } from './docs.ts';
-import { voteCommand } from './vote.ts';
-import { LOGO } from './logo.ts';
+import { initCommand } from './commands/init.ts';
+import { addCommand } from './commands/add.ts';
+import { listCommand } from './commands/list.ts';
+import { validateCommand } from './commands/validate.ts';
+import { targetsCommand } from './commands/targets.ts';
+import { compileCommand } from './commands/compile.ts';
+import { evalCommand } from './commands/eval.ts';
+import { runCommand } from './commands/run.ts';
+import { docsCommand } from './commands/docs.ts';
+import { voteCommand } from './commands/vote.ts';
+import { LOGO } from './config/banner.ts';
 
 await clinguini({
 	name: 'agent-tests',

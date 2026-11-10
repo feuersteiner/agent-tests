@@ -1,5 +1,5 @@
 import { command } from 'clinguini';
-import { stubHandler } from './stub.ts';
+import { stubHandler } from '../stub.ts';
 
 export const evalCommand = command({
 	name: 'eval',
