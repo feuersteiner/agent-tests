@@ -6,3 +6,4 @@ export { AIEngine } from './src/shared/ai/engines/index.ts';
 export * from './src/shared/sources/index.ts';
 export { TestTrigger } from './src/trigger/index.ts';
 export { validate, validateConfig, validateTest, validateTests } from './src/config/validate.ts';
+export { loadConfig } from './src/config/index.ts';
