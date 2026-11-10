@@ -28,17 +28,17 @@ export abstract class AIEngine {
 		if (!parsed.input.trim()) return { score, failures: [] };
 		const explanation = AiExplanationSchema.parse(await this.evidence(parsed, score, system));
 		if (explanation.score !== score) throw new Error('AI changed the existing score');
-		for (const { quote } of explanation.failures) {
+		for (const { quote } of explanation.failures)
 			if (!parsed.input.includes(quote))
 				throw new Error('AI returned a quote absent from the input');
-		}
+
 		return explanation;
 	};
 
-	protected abstract score(request: AiRequest, system: string): Promise<number>;
-	protected abstract evidence(
+	protected abstract readonly score: (request: AiRequest, system: string) => Promise<number>;
+	protected abstract readonly evidence: (
 		request: AiRequest,
 		score: number,
 		system: string
-	): Promise<AiExplanation>;
+	) => Promise<AiExplanation>;
 }

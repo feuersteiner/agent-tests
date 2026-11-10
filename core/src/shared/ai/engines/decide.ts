@@ -18,7 +18,8 @@ export class DecideAIEngine extends AIEngine {
 				: createTypeSafeAi(options).decisionModel(config.model);
 	}
 
-	protected override async score({ input, ask, reasoning }: AiRequest, system: string) {
+	protected override readonly score = async (request: AiRequest, system: string) => {
+		const { input, ask, reasoning } = request;
 		const result = await experimental_decide({
 			model: this.model,
 			reasoning,
@@ -31,13 +32,13 @@ export class DecideAIEngine extends AIEngine {
 			}
 		});
 		return result.answers.criterion.probability;
-	}
+	};
 
-	protected override async evidence(
+	protected override readonly evidence = async (
 		{ input, ask, reasoning }: AiRequest,
 		score: number,
 		system: string
-	) {
+	) => {
 		const candidates = input
 			.split(/\r\n|\n|\r/)
 			.map((quote, index) => ({ id: `fragment_${index}`, quote }))
@@ -70,5 +71,5 @@ export class DecideAIEngine extends AIEngine {
 				.filter((candidate) => result.answers[candidate.id]!.choice === 'fail')
 				.map(({ quote }) => ({ quote }))
 		};
-	}
+	};
 }
