@@ -1,0 +1,29 @@
+id: shared-pricing
+title: Reuse the pricing policy
+description: Checkout must reuse the approved pricing policy rather than duplicate its discount calculation.
+triggers:
+  - id: scope
+    description: Checkout must reuse the approved pricing policy rather than duplicate its discount calculation.
+    glob: src/checkout/pricing.ts
+checks:
+  - id: shared-pricing
+    description: Checkout must reuse the approved pricing policy rather than duplicate its discount calculation.
+    error: Checkout must reuse the approved pricing policy rather than duplicate its discount calculation.
+    ask: The checkout uses the shared pricing policy instead of duplicating discount logic.
+evals:
+  - name: approved example
+    path: src/checkout/pricing.ts
+    content: |
+      import { price } from '../pricing/policy';
+      export const checkoutPrice = price;
+    expect: pass
+  - name: violation
+    path: src/checkout/pricing.ts
+    content: |
+      export const checkoutPrice = (subtotal: number) => subtotal * 0.8;
+    expect: fail
+  - name: outside scope
+    path: unrelated/example.txt
+    content: |
+      export const checkoutPrice = (subtotal: number) => subtotal * 0.8;
+    expect: skip

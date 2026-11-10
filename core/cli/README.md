@@ -6,10 +6,10 @@ The CLI requires Bun. Run the standalone fixture workflow from the workspace:
 bun run demo
 ```
 
-This invokes every command from `core/fixtures/repository`, which contains a valid
-YAML config, one agent-test definition, and a TypeScript source file.
-Interactive runs pause before each command.
-
+This executes every command against a temporary copy of `core/fixtures/repository`,
+which contains a real YAML config, 13 agent-test definitions, code, and business
+documents. The demo injects failures, verifies their exit codes and output,
+restores each change, and checks recovery. Interactive runs pause before each step.
 Config loading resolves `agent-tests.config.yaml`, reads it, parses YAML, and
 calls the existing `validateConfig`. Repository commands then load and validate
 definitions, collect file and directory sources, and construct `AgentTests`.
@@ -62,5 +62,7 @@ are performed by scaffold commands. Violations and eval mismatches exit 1;
 configuration/read failures also fail the command. Invalid CLI arguments exit 2.
 
 Help works without repository configuration. The executable disables automatic
-dotenv loading; provider keys must be in the process environment.
-The demo supplies a dummy key; its regex rule makes no AI calls.
+dotenv loading; provider keys must be in the process environment. The demo supplies
+a dummy key and a local stub model. Semantic fixture examples verify execution,
+not the accuracy of an AI model. See [`../fixtures/README.md`](../fixtures/README.md)
+for the scenario list and current limitations.

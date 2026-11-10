@@ -1,0 +1,31 @@
+id: renewal-risk
+title: Reflect renewal uncertainty
+description: A conditional renewal must remain uncertain in the revenue forecast.
+triggers:
+  - id: scope
+    description: A conditional renewal must remain uncertain in the revenue forecast.
+    glob: business/forecast.md
+checks:
+  - id: renewal-risk
+    description: A conditional renewal must remain uncertain in the revenue forecast.
+    error: A conditional renewal must remain uncertain in the revenue forecast.
+    reason: The forecast treats the conditional renewal as uncertain revenue.
+evals:
+  - name: approved example
+    path: business/forecast.md
+    content: |
+      Renewal: conditional on migration.
+      Forecast: renewal revenue is uncertain.
+    expect: pass
+  - name: violation
+    path: business/forecast.md
+    content: |
+      Renewal: conditional on migration.
+      Forecast: renewal revenue is guaranteed.
+    expect: fail
+  - name: outside scope
+    path: unrelated/example.txt
+    content: |
+      Renewal: conditional on migration.
+      Forecast: renewal revenue is guaranteed.
+    expect: skip

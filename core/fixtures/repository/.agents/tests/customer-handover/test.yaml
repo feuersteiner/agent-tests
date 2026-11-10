@@ -1,0 +1,34 @@
+id: customer-handover
+title: Preserve customer commitments
+description: Handovers must retain the EU residency commitment and the unresolved migration.
+triggers:
+  - id: scope
+    description: Handovers must retain the EU residency commitment and the unresolved migration.
+    glob: business/handover.md
+checks:
+  - id: customer-handover
+    description: Handovers must retain the EU residency commitment and the unresolved migration.
+    error: Handovers must retain the EU residency commitment and the unresolved migration.
+    ask: The handover carries forward the promised EU data residency and unresolved migration.
+evals:
+  - name: approved example
+    path: business/handover.md
+    content: |
+      Customer commitment: EU residency.
+      Migration: unresolved.
+      Handover: EU residency; migration unresolved.
+    expect: pass
+  - name: violation
+    path: business/handover.md
+    content: |
+      Customer commitment: EU residency.
+      Migration: unresolved.
+      Handover: no outstanding commitments.
+    expect: fail
+  - name: outside scope
+    path: unrelated/example.txt
+    content: |
+      Customer commitment: EU residency.
+      Migration: unresolved.
+      Handover: no outstanding commitments.
+    expect: skip
