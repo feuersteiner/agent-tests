@@ -10,7 +10,7 @@ import { evalCommand } from './commands/eval.ts';
 import { runCommand } from './commands/run.ts';
 import { docsCommand } from './commands/docs.ts';
 import { voteCommand } from './commands/vote.ts';
-import { LOGO } from './config/banner.ts';
+import { banner } from './config/banner.ts';
 
 await clinguini({
 	name: 'agent-tests',
@@ -29,6 +29,6 @@ await clinguini({
 	],
 	utils: {
 		help: true,
-		header: LOGO
+		header: banner()
 	}
 });
