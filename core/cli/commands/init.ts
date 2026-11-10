@@ -1,8 +1,9 @@
-import { command } from 'clinguini';
-import { stubHandler } from '../stub.ts';
+import { command, type Command } from 'clinguini';
 
-export const initCommand = command({
+export const initCommand: Command = command({
 	name: 'init',
 	description: 'Initialize repository test configuration and setup.',
-	handler: stubHandler('init')
+	handler: (): void => {
+		console.log('init: scaffold only.');
+	}
 });

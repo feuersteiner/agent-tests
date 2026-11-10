@@ -1,8 +1,9 @@
-import { command } from 'clinguini';
-import { stubHandler } from '../stub.ts';
+import { command, type Command } from 'clinguini';
 
-export const docsCommand = command({
+export const docsCommand: Command = command({
 	name: 'docs',
 	description: 'Show skills for writing and running tests.',
-	handler: stubHandler('docs')
+	handler: (): void => {
+		console.log('docs: scaffold only.');
+	}
 });

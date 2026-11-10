@@ -1,9 +1,10 @@
-import { command } from 'clinguini';
-import { stubHandler } from '../stub.ts';
+import { command, type Command } from 'clinguini';
 
-export const voteCommand = command({
+export const voteCommand: Command = command({
 	name: 'vote',
 	description: 'Toggle a vote for a community test.',
 	params: [{ name: 'id', description: 'Exact test ID.' }],
-	handler: stubHandler('vote')
+	handler: ({ params }): void => {
+		console.log(`vote ${params.id}: scaffold only.`);
+	}
 });
