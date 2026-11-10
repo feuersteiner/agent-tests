@@ -1,0 +1,7 @@
+pre-commit:
+  jobs:
+    - name: format
+      run: bunx --no-install prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+    - name: check
+      run: bun run lint && bun run check

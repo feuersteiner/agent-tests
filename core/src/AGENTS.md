@@ -23,6 +23,10 @@ type ResultEntry<T> = { source: Source; check: T; flagged: boolean; trace: strin
 type Result<T> = { flagged: ResultEntry<T>[]; cleared: ResultEntry<T>[] };
 ```
 
+Runners and results accept the abstract `Source` contract, including independent
+subclasses returning string content. Glob matches paths without opening sources;
+grep, ask, and reason consume the text returned by `open()` directly.
+
 - `check` holds the trigger, check, or eval that ran.
 - `flagged` means it fired: a trigger matched, a check found a violation, or an eval did not match its label.
 - `trace` lists what failed along the way, for verbose output.

@@ -3,7 +3,7 @@ import type { Check } from './check/types.ts';
 import { validateConfig, validateTests } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
 import { AI } from './shared/ai/index.ts';
-import type { Source } from './shared/source.ts';
+import type { Source } from './shared/sources/index.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';
 import type { AgentTest, AgentTestConfig, AgentTestEvalResult, AgentTestResult } from './types.ts';
@@ -15,7 +15,7 @@ export class AgentTests {
 	private ai?: AI;
 
 	/**
-	 * @param sources - Shared base files supplied by the caller; each test selects its own targets.
+	 * @param sources - Shared base sources supplied by the caller; each test selects its own targets.
 	 * @param definitions - Parsed test definitions; text parsing belongs to src/config.
 	 * @param config - Shared provider models and stage settings, validated here.
 	 * @throws If any definition or config is invalid, including duplicate test IDs.

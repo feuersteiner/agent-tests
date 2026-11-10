@@ -1,71 +1,68 @@
 # CLI
 
-The `agent-tests` core package includes a TypeScript CLI that requires Bun.
-From the repository root:
+The CLI requires Bun. Run the standalone fixture workflow from the workspace:
 
 ```sh
-bun install --ignore-scripts --frozen-lockfile --linker=hoisted
-./node_modules/.bin/agent-tests
-./node_modules/.bin/agent-tests --help
+bun run demo
 ```
 
-Clinguini generates help with the existing logo, shown with no arguments or
-`--help` (`-h`), and per-command help. All commands have scaffolded dispatch;
-functionality is pending. Each stub prints its command name, ID when supplied,
-and parsed values with runtime types, then exits 0. Undefined values are omitted;
-Clinguini supplies `false` for omitted boolean flags. Invalid arguments exit 2.
+This executes every command against a temporary copy of `core/fixtures/repository`,
+which contains a real YAML config, 13 agent-test definitions, code, and business
+documents. The demo injects failures, verifies their exit codes and output,
+restores each change, and checks recovery. Interactive runs pause before each step.
+Config loading resolves `agent-tests.config.yaml`, reads it, parses YAML, and
+calls the existing `validateConfig`. Repository commands then load and validate
+definitions, collect file and directory sources, and construct `AgentTests`.
+Directory sources expose immediate-child listings; globs scope which source paths
+each test inspects.
 
-| Command         | Selection                                   |
-| --------------- | ------------------------------------------- |
-| `init`          | No ID                                       |
-| `add <id>`      | Required exact ID                           |
-| `list`          | No ID                                       |
-| `validate [id]` | Optional exact ID; omission will select all |
-| `targets <id>`  | Required exact ID                           |
-| `compile <id>`  | Required exact ID                           |
-| `eval [id]`     | Optional exact ID; omission will select all |
-| `run [id]`      | Optional exact ID; omission will select all |
-| `docs`          | No ID                                       |
-| `vote <id>`     | Required exact ID                           |
+Source discovery uses the config's top-level `ignore` glob list:
 
-`run` accepts `--changed` and `--staged` boolean flags and `--base <ref>`.
-These selectors are only parsed; no selection or flag-combination semantics exist
-yet. Clinguini rejects boolean values such as `--changed=false` with exit 2.
-No `--all` is required.
-
-```sh
-agent-tests run --help
-agent-tests validate user-text-french
-agent-tests run --base main
+```yaml
+ignore: ['**/.git', '**/.agents', '**/node_modules']
 ```
 
-For example, `agent-tests run example --changed --base main` prints:
+These are the defaults when omitted. An explicit list replaces the defaults;
+`ignore: []` disables ignoring. All other files and directories are discovered.
+Paths are relative to the repository root, and patterns can match dotfiles.
+Ignored directories are not traversed. Definition loading remains independent of
+this list.
+Selected directory listings still show their complete immediate contents.
 
-```text
-run example has been called, with params: [id: string = "example", changed: boolean = true, staged: boolean = false, base: string = "main"]
-```
+CLI code is grouped by responsibility:
 
-Stubs and help do not load test/config/env files, run Git, modify repositories,
-or make network/model calls. The executable disables Bun's automatic dotenv
-loading. When invoking source directly, use
-`bun --no-env-file /path/to/core/cli/index.ts`.
+- `index.ts`: registers commands and runs Clinguini.
+- `commands/`: each command owns its arguments and handler in one TypeScript file.
+- `config/`: loads config and definitions, gathers sources, and constructs the runner.
+- `sources/`: discovers file and directory sources.
+- `config/banner.ts`: terminal banner.
 
-The agreed layout is repository-root `.agents/tests/<id>/`, following the project
-`.agents/skills/` convention, with unique IDs in that location. Root resolution and file loading are pending. Tests use
-triggers and globs to scope files and subdirectories. There is no nested discovery,
-inheritance, or parent-test opt-out design.
+Git selectors (`--staged`, `--changed`, `--base`) and propagation of descendant
+changes to directory eligibility belong in `sources/`; implementation remains WIP.
+Changed descendants should make a directory eligible while checks inspect its
+complete current contents, including unchanged siblings.
 
-Test metadata accepts optional `tags: string[]`, including an empty array, without
-defaults or tag filtering. Existing definitions can omit it.
+| Command         | Current behavior                        |
+| --------------- | --------------------------------------- |
+| `init`          | Scaffold                                |
+| `add <id>`      | Scaffold                                |
+| `list`          | Load and list definitions               |
+| `validate [id]` | Validate config and definitions         |
+| `targets <id>`  | Load runner; action remains scaffolded  |
+| `compile <id>`  | Load runner; action remains scaffolded  |
+| `eval [id]`     | Execute labeled examples                |
+| `run [id]`      | Execute checks on files and directories |
+| `docs`          | Scaffold                                |
+| `vote <id>`     | Scaffold                                |
 
-The root `package.json` includes `{"scripts":{"test:agents":"agent-tests run"}}`.
-Use `npm run test:agents` for all tests or
-`npm run test:agents -- user-text-french` for one (`npm run test:agents [-- id]`).
-Bun is required on `PATH`. The script currently prints the parsed `run` values
-and exits 0; functionality is pending.
+Omitting an optional ID selects all definitions. An unknown ID fails.
+`run` accepts `--changed`, `--staged`, and `--base <ref>` but reports that Git scope
+selection is pending and runs the full source set. No Git or network operations
+are performed by scaffold commands. Violations and eval mismatches exit 1;
+configuration/read failures also fail the command. Invalid CLI arguments exit 2.
 
-Future CLI implementation owns file I/O, environment loading, and Git selection. Pure YAML parsing
-lives in [`parse.ts`](../src/config/parse.ts); `validateTest` and `validateConfig`
-live in [`validate.ts`](../src/config/validate.ts). Config covers required decision
-and reasoning provider models, stage thresholds, and optional check reasoning.
-`validateConfig` checks provider URLs; shared AI resolves required environment keys.
+Help works without repository configuration. The executable disables automatic
+dotenv loading; provider keys must be in the process environment. The demo supplies
+a dummy key and a local stub model. Semantic fixture examples verify execution,
+not the accuracy of an AI model. See [`../fixtures/README.md`](../fixtures/README.md)
+for the scenario list and current limitations.

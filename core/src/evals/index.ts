@@ -1,5 +1,5 @@
 import type { TestCheck } from '../check/index.ts';
-import { Source } from '../shared/source.ts';
+import { type Source, InMemorySource } from '../shared/sources/index.ts';
 import type { Result, ResultEntry } from '../shared/types.ts';
 import type { TestTrigger } from '../trigger/index.ts';
 import type { Eval, TestOutcome } from './types.ts';
@@ -18,7 +18,7 @@ export class TestEval {
 
 		await Promise.all(
 			this.evals.map(async (example) => {
-				const source = new Source(example.path, async () => example.content);
+				const source = new InMemorySource(example.path, example.content);
 				const actual = await this.outcome(source, trigger, check);
 				const isFlagged = actual !== example.expect;
 				const trace = isFlagged ? [`expected ${example.expect}, got ${actual}`] : [];

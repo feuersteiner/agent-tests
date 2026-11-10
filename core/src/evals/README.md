@@ -6,3 +6,4 @@ Evals test a test's triggers and checks against labeled examples.
 - [`index.ts`](index.ts): `new TestEval(evals).run(trigger, check, verbose)` returns a `Result<Eval>`, where flagged means the example did not match its label and `trace` says what happened.
 
 An example's outcome is `skip` if no trigger selects it, `fail` if any check flags it, and `pass` otherwise.
+Examples use in-memory sources: their paths do not need to exist on disk.

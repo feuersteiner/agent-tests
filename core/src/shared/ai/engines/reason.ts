@@ -26,7 +26,10 @@ export class ReasonAIEngine extends AIEngine {
 				: createAnthropic(options)(config.model);
 	}
 
-	protected override async score({ input, ask, reasoning }: AiRequest, system: string) {
+	protected override readonly score = async (
+		{ input, ask, reasoning }: AiRequest,
+		system: string
+	) => {
 		const result = await generateText({
 			model: this.model,
 			reasoning,
@@ -35,13 +38,13 @@ export class ReasonAIEngine extends AIEngine {
 			prompt: JSON.stringify({ input, ask })
 		});
 		return result.output.score;
-	}
+	};
 
-	protected override async evidence(
+	protected override readonly evidence = async (
 		{ input, ask, reasoning }: AiRequest,
 		score: number,
 		system: string
-	) {
+	) => {
 		const result = await generateText({
 			model: this.model,
 			reasoning,
@@ -58,5 +61,5 @@ export class ReasonAIEngine extends AIEngine {
 				...(reason === null ? {} : { reason })
 			}))
 		};
-	}
+	};
 }

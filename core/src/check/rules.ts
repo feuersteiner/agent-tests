@@ -16,7 +16,9 @@ import type { SourceRule } from './types.ts';
  */
 const GrepRule: SourceRule = async (source, param, _config, trace) => {
 	const regexes = [param].flat().map((pattern) => new RegExp(pattern));
-	const content = await source.open();
+	if (source.kind === 'directory')
+		console.warn(`Grep rule is not designed for directory output: "${source.path}"`);
+	const content = source.open();
 	const failed = regexes.some((regex) => regex.test(content));
 	if (failed) trace.push('failed grep');
 	return failed;
@@ -27,13 +29,13 @@ const GrepRule: SourceRule = async (source, param, _config, trace) => {
  * `false` (passed) if every condition reaches it. Each `ask` states what must be true to pass.
  */
 const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
-	const input = await source.open();
-	for (const condition of [param].flat()) {
+	const input = source.open();
+	for (const condition of [param].flat())
 		if ((await ai.decide.run({ input, ask: condition })) < threshold) {
 			trace.push('failed ask');
 			return true;
 		}
-	}
+
 	return false;
 };
 
@@ -42,13 +44,13 @@ const AskRule: SourceRule = async (source, param, { ai, threshold }, trace) => {
  * `false` (passed) if every condition reaches it. Uses the reasoning AI and level from the config.
  */
 const ReasonRule: SourceRule = async (source, param, { ai, threshold, reasoning }, trace) => {
-	const input = await source.open();
-	for (const condition of [param].flat()) {
+	const input = source.open();
+	for (const condition of [param].flat())
 		if ((await ai.reason.run({ input, ask: condition, reasoning })) < threshold) {
 			trace.push('failed reason');
 			return true;
 		}
-	}
+
 	return false;
 };
 

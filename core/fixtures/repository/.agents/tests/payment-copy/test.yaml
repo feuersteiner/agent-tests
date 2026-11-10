@@ -1,0 +1,71 @@
+id: payment-copy
+title: Clear French payment errors
+description: Payment errors must be in French, explain charge status and next steps, and preserve uncertainty.
+triggers:
+  - id: customer-payment-copy
+    description: Customer-facing payment errors in the UI or email.
+    glob:
+      - src/copy/**/*.svelte
+      - emails/**/*.html
+    grep: <p\b
+    ask:
+      - This source displays payment-error text to a customer.
+      - This source displays payment-error text in an email.
+checks:
+  - id: clear-french-copy
+    description:
+      Payment errors must be in French, explain charge status and next steps, and preserve
+      uncertainty.
+    error: Payment errors must be in French, explain charge status and next steps, and preserve
+      uncertainty.
+    ask:
+      - All customer-facing text is in French.
+      - The payment error explains the charge status and the next action.
+  - id: preserve-uncertainty
+    description: An unknown charge status must stay unknown.
+    error: Explain the uncertainty instead of promising no charge.
+    reason: An unknown payment status is described as unknown, without promising no charge.
+evals:
+  - name: approved example
+    path: src/copy/payment-error.svelte
+    content: >
+      <p data-channel="web" status="declined">Le paiement a échoué. Aucun débit effectué.
+      Réessayez.</p>
+    expect: pass
+  - name: violation
+    path: src/copy/payment-error.svelte
+    content: |
+      <p data-channel="web" status="declined">Payment failed. No money was taken. Try again.</p>
+    expect: fail
+  - name: outside scope
+    path: unrelated/example.txt
+    content: |
+      <p data-channel="web" status="declined">Payment failed. No money was taken. Try again.</p>
+    expect: skip
+  - name: missing charge status and next action
+    path: src/copy/payment-error.svelte
+    content: |
+      <p data-channel="web" status="declined">Le paiement a échoué. Une erreur est survenue.</p>
+    expect: fail
+  - name: unsupported certainty
+    path: src/copy/payment-error.svelte
+    content: |
+      <p data-channel="web" status="unknown">Aucun montant débité. Réessayez.</p>
+    expect: fail
+  - name: unknown status explained
+    path: src/copy/payment-error.svelte
+    content: >
+      <p data-channel="web" status="unknown">Le paiement est en cours de vérification. Aucun montant
+      confirmé. Vérifiez votre compte.</p>
+    expect: pass
+  - name: non-customer code is excluded
+    path: src/copy/internal.svelte
+    content: |
+      <p>const spacing = 8;</p>
+    expect: skip
+  - name: email uses the second trigger alternative
+    path: emails/payment.html
+    content: >
+      <p data-channel="email" status="declined">Le paiement a échoué. Aucun débit effectué.
+      Réessayez.</p>
+    expect: pass

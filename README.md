@@ -62,7 +62,6 @@ tag filtering. Existing definitions can omit it.
 - **While an agent works:** on the files it just edited.
 - **Before a commit:** on uncommitted changes.
 - **In CI:** on the whole repository, like `eslint .` or `prettier --check .`.
-- **In a test suite:** through a Vitest plugin, as pass/fail tests beside your own.
 - **In your own tools:** as a library from the npm package.
 
 ## Get started (WIP)
@@ -101,15 +100,15 @@ npx agent-tests docs                          # skills that teach agents to writ
 npx agent-tests vote user-text-french         # toggle your vote for a library test
 ```
 
-The root `package.json` includes this script:
+Run the standalone fixture repository:
 
-```json
-{ "scripts": { "test:agents": "agent-tests run" } }
+```sh
+bun run demo
 ```
 
-Use `npm run test:agents` for all tests or `npm run test:agents -- user-text-french`
-for one (`npm run test:agents [-- id]`). Bun must still be on `PATH`.
-The script currently prints the parsed `run` values and exits 0; functionality is pending.
+This executes every CLI command from [`core/fixtures/repository`](core/fixtures/README.md).
+Config and definitions are loaded and validated before constructing the runner.
+`list`, `validate`, `run`, and `eval` work; unfinished actions are labelled as scaffolds.
 
 Choose the decision model (Jev or OpenAI) in `agent-tests.config.yaml`
 and keep its credentials in `.env`.
@@ -118,9 +117,9 @@ Clef support is deferred pending standardized APIs for system-one models.
 For library use, pass parsed definitions as an array and parsed shared config:
 
 ```ts
-import { AgentTests, Source } from 'agent-tests';
+import { AgentTests, FileSource } from 'agent-tests';
 
-const sources = [new Source('src/app.ts', async () => 'console.log("hello");')];
+const sources = [new FileSource('src/app.ts')];
 const suite = new AgentTests(sources, definitions, config);
 const results = await suite.run(); // [{ id, trigger, check }]
 const evals = await suite.eval(); // [{ id, result }]
@@ -129,6 +128,15 @@ const evals = await suite.eval(); // [{ id, result }]
 Each test filters the same source base independently. Construction validates every
 definition and config; AI and provider keys are required only when execution starts.
 Use `[definition]` for one test. Results follow definition order.
+
+Sources read their paths synchronously through Node filesystem APIs. `FileSource.open()` caches UTF-8 file content;
+`DirectorySource.open()` caches a text listing with a directory header and
+immediate child paths, kinds, and file line counts, without opening child directories.
+Both return strings directly, cache successful results, and allow retries after I/O failures. Both expose `path`
+and `kind`, and extend the abstract `Source<Content = string>` class. Runners and
+results accept `Source`, including independent subclasses returning strings. Glob filters match any
+source path without opening it. Current grep, ask, and reason functions require
+`open()` to return a string, so they work with both file text and directory listings.
 
 ## Triggers
 
@@ -192,7 +200,7 @@ repository.
 Design locked; implementation WIP.
 
 Checks judge each targeted file and report pass, warning, or error findings, through
-the CLI, Vitest, or the library. A check runs from `fast` to `smart` to `deep`,
+the CLI or the library. A check runs from `fast` to `smart` to `deep`,
 cheapest first, and escalates only what it cannot settle:
 
 ```yaml

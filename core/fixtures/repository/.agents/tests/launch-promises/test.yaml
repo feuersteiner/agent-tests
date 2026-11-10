@@ -1,0 +1,31 @@
+id: launch-promises
+title: Keep launch promises current
+description: Customer promises must use the approved December launch date.
+triggers:
+  - id: scope
+    description: Customer promises must use the approved December launch date.
+    glob: business/launch.md
+checks:
+  - id: launch-promises
+    description: Customer promises must use the approved December launch date.
+    error: Customer promises must use the approved December launch date.
+    reason: The customer promise agrees with the approved December launch date.
+evals:
+  - name: approved example
+    path: business/launch.md
+    content: |
+      Approved launch: December.
+      Customer promise: December.
+    expect: pass
+  - name: violation
+    path: business/launch.md
+    content: |
+      Approved launch: December.
+      Customer promise: November.
+    expect: fail
+  - name: outside scope
+    path: unrelated/example.txt
+    content: |
+      Approved launch: December.
+      Customer promise: November.
+    expect: skip

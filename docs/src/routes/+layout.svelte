@@ -17,14 +17,14 @@
 	};
 	let mode = $state<ThemeMode>('auto');
 
-	function cycleTheme() {
+	const cycleTheme = () => {
 		mode = modes[(modes.indexOf(mode) + 1) % modes.length];
 		try {
 			localStorage.setItem('agent-tests-theme', mode);
 		} catch {
 			// Storage is optional.
 		}
-	}
+	};
 
 	onMount(() => {
 		try {
@@ -74,7 +74,7 @@
 		<div class="content">{@render children()}</div>
 		<footer>
 			<nav aria-label="Footer">
-				<a href={`${repository}/blob/main/LICENSE`}>MIT License</a>
+				<a href="https://github.com/feuersteiner/agent-tests/blob/main/LICENSE">MIT License</a>
 				<a href={repository}>GitHub</a>
 				<a href="https://feuersteiner.github.io/bref-ui/">Built with Bref-ui</a>
 			</nav>

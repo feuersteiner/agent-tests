@@ -1,0 +1,47 @@
+id: component-structure
+title: Component folder structure
+description: Component folders must contain exactly component.svelte and types.ts.
+triggers:
+  - id: component-directories
+    description: Component directories at any depth.
+    glob: src/**/components/*-ui
+checks:
+  - id: required-children
+    description: Exactly two required children.
+    error: Keep only component.svelte and types.ts in the component folder.
+    reason: This component directory contains exactly component.svelte and types.ts.
+evals:
+  - name: complete component folder
+    path: src/components/button-ui
+    content: "Directory \"button-ui\" at \"src/components/button-ui\":
+
+      \t- \"src/components/button-ui/component.svelte\" of kind \"file\" with line count: 1.
+
+      \t- \"src/components/button-ui/types.ts\" of kind \"file\" with line count: 1."
+    expect: pass
+  - name: extra child
+    path: src/components/button-ui
+    content: "Directory \"button-ui\" at \"src/components/button-ui\":
+
+      \t- \"src/components/button-ui/component.svelte\" of kind \"file\" with line count: 1.
+
+      \t- \"src/components/button-ui/types.ts\" of kind \"file\" with line count: 1.
+
+      \t- \"src/components/button-ui/extra.ts\" of kind \"file\" with line count: 1."
+    expect: fail
+  - name: missing types
+    path: src/components/button-ui
+    content: "Directory \"button-ui\" at \"src/components/button-ui\":
+
+      \t- \"src/components/button-ui/component.svelte\" of kind \"file\" with line count: 1."
+    expect: fail
+  - name: unrelated directory
+    path: assets/icons
+    content: "Directory \"button-ui\" at \"src/components/button-ui\":
+
+      \t- \"src/components/button-ui/component.svelte\" of kind \"file\" with line count: 1.
+
+      \t- \"src/components/button-ui/types.ts\" of kind \"file\" with line count: 1.
+
+      \t- \"src/components/button-ui/extra.ts\" of kind \"file\" with line count: 1."
+    expect: skip
