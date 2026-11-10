@@ -20,17 +20,14 @@
 		"src",
 		"cli",
 		"README.md",
-		"LICENSE",
-		"!src/**/*.test.ts"
+		"LICENSE"
 	],
 	"type": "module",
 	"scripts": {
-		"check": "tsc --noEmit",
-		"test": "vitest run"
+		"check": "tsc --noEmit"
 	},
 	"devDependencies": {
-		"@types/bun": "latest",
-		"vitest": "^5.1.0"
+		"@types/bun": "latest"
 	},
 	"dependencies": {
 		"ai": "7.0.162",

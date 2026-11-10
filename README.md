@@ -62,7 +62,6 @@ tag filtering. Existing definitions can omit it.
 - **While an agent works:** on the files it just edited.
 - **Before a commit:** on uncommitted changes.
 - **In CI:** on the whole repository, like `eslint .` or `prettier --check .`.
-- **In a test suite:** through a Vitest plugin, as pass/fail tests beside your own.
 - **In your own tools:** as a library from the npm package.
 
 ## Get started (WIP)
@@ -201,7 +200,7 @@ repository.
 Design locked; implementation WIP.
 
 Checks judge each targeted file and report pass, warning, or error findings, through
-the CLI, Vitest, or the library. A check runs from `fast` to `smart` to `deep`,
+the CLI or the library. A check runs from `fast` to `smart` to `deep`,
 cheapest first, and escalates only what it cannot settle:
 
 ```yaml
