@@ -8,6 +8,19 @@ definitions, collect file and directory sources, and construct `AgentTests`.
 Directory sources expose immediate-child listings; globs scope which source paths
 each test inspects.
 
+Source discovery uses the config's top-level `ignore` glob list:
+
+```yaml
+ignore: ['**/.git', '**/.agents', '**/node_modules']
+```
+
+These are the defaults when omitted. An explicit list replaces the defaults;
+`ignore: []` disables ignoring. All other files and directories are discovered.
+Paths are relative to the repository root, and patterns can match dotfiles.
+Ignored directories are not traversed. Definition loading remains independent of
+this list.
+Selected directory listings still show their complete immediate contents.
+
 CLI code is grouped by responsibility:
 
 - `index.ts`: registers commands and runs Clinguini.
