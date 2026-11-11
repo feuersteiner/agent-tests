@@ -27,5 +27,5 @@ export interface AiSettings {
 	reasoning: AiModelConfig & { api: 'openai' | 'anthropic' };
 }
 
-/** Scores OR alternatives in [0, 1]; boolean engines return 0 or 1. */
+/** Glob returns 0 or 1, AI returns a score in [0, 1], and grep returns an occurrence count. */
 export type Engine = (input: string, criteria: Param, config?: AiConfig) => Promise<number>;
