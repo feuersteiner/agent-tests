@@ -2,7 +2,7 @@ import { TestCheck } from './check/index.ts';
 import type { Check } from './check/types.ts';
 import { validateConfig, validateTests } from './config/validate.ts';
 import { TestEval } from './evals/index.ts';
-import { AI } from './shared/ai/index.ts';
+import { AI } from './shared/deprecated-ai/index.ts';
 import type { Source } from './shared/sources/index.ts';
 import type { Result } from './shared/types.ts';
 import { TestTrigger } from './trigger/index.ts';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AiModelConfigSchema, ReasoningLevelSchema } from '../shared/ai/types.ts';
+import { AiModelConfigSchema, ReasoningLevelSchema } from '../shared/deprecated-ai/types.ts';
 import { TextSchema } from '../shared/types.ts';
 
 const ThresholdSchema = z.number().min(0).max(1);

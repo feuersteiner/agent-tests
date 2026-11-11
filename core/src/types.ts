@@ -21,7 +21,7 @@ export {
 	AiRequestSchema,
 	FailInstanceSchema,
 	ReasoningLevelSchema
-} from './shared/ai/types.ts';
+} from './shared/deprecated-ai/types.ts';
 export type {
 	AiSettings,
 	AiModelConfig,
@@ -30,7 +30,7 @@ export type {
 	AiRequest,
 	FailInstance,
 	ReasoningLevel
-} from './shared/ai/types.ts';
+} from './shared/deprecated-ai/types.ts';
 export * from './shared/sources/index.ts';
 export { ParamSchema } from './shared/types.ts';
 export type { Param, Result, ResultEntry } from './shared/types.ts';
