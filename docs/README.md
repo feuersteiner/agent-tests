@@ -1,9 +1,4 @@
-# agent-tests docs
+# Documentation
 
-The documentation site, built with Svelte 5, SvelteKit, and
-[Bref-ui](https://github.com/feuersteiner/bref-ui). It deploys to GitHub Pages
-on every push to `main`.
-
-## Pages
-
-WIP
+The documentation site is planned; see the [Roadmap](https://github.com/feuersteiner/agent-tests/issues/1).
+[usecases.md](usecases.md) is its source.

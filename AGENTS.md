@@ -3,9 +3,9 @@
 ## Layout
 
 - `core/`: the `agent-tests` npm package.
-- `docs/`: the documentation site.
-- `library/`: community tests and their binding rules.
-- `.github/workflows/`: docs deploy, npm publish, and library PR checks.
+- `docs/`: documentation plans and use cases.
+- `library/`: placeholder for the planned community library.
+- `.github/workflows/`: npm publishing.
 
 ## Ethos
 

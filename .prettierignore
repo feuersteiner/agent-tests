@@ -6,10 +6,8 @@ bun.lock
 bun.lockb
 
 # Generated and static files
-**/.svelte-kit/
 **/build/
 **/dist/
-**/static/
 
 # Generated package metadata
 core/README.md

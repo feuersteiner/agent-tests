@@ -29,15 +29,10 @@ export const sharedRules = {
 	]
 };
 
-export const svelteRules = {
-	'svelte/consistent-selector-style': ['error', { style: ['type', 'class'], checkGlobal: false }],
-	'svelte/no-unused-class-name': 'error'
-};
-
 export const filenameRules = {
 	'check-file/filename-naming-convention': [
 		'error',
-		{ '**/*.{js,ts,svelte}': 'KEBAB_CASE' },
+		{ '**/*.{js,ts}': 'KEBAB_CASE' },
 		{ ignoreMiddleExtensions: true }
 	],
 	'check-file/folder-naming-convention': ['error', { '**/src/**/': 'KEBAB_CASE' }]
