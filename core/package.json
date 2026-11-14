@@ -32,6 +32,7 @@
 		"agent-tests": "./cli/index.ts"
 	},
 	"files": [
+		"src",
 		"cli",
 		"README.md",
 		"LICENSE"
@@ -44,6 +45,8 @@
 		"@types/bun": "latest"
 	},
 	"dependencies": {
-		"clinguini": "^1.0.1"
+		"clinguini": "^1.0.1",
+		"yaml": "2.9.1",
+		"zod": "^4.6.7"
 	}
 }
