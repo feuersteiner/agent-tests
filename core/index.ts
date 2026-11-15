@@ -9,4 +9,5 @@ export {
 	validateTest
 } from './src/loader/index.ts';
 export { createEngines } from './src/engines/index.ts';
+export { Selector } from './src/selector/index.ts';
 export { DirectorySource, FileSource, InMemorySource, Source } from './src/sources/index.ts';
