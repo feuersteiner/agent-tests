@@ -1,4 +1,4 @@
-import type { AgentTestConfig } from '../../types.ts';
+import type { AgentTestConfig } from '../types.ts';
 import { parseYaml } from '../helpers/yaml.ts';
 import { validateConfig } from './validate.ts';
 

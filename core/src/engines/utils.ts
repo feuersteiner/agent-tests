@@ -1,4 +1,4 @@
-import type { AgentTestConfig } from '../types.ts';
+import type { AgentTestDecisionConfig, AgentTestReasoningConfig } from './types.ts';
 
 /**
  * Shared system instructions for scoring the passing condition: the reason engine's system role
@@ -33,7 +33,7 @@ export const RUN_SYSTEM_PROMPT = [
 ].join('\n');
 
 /** Resolves the API key from its environment variable, or throws, and the base URL; called on an engine's first use, before its first request. */
-export const providerSettings = (config: AgentTestConfig['decision' | 'reasoning']) => {
+export const providerSettings = (config: AgentTestDecisionConfig | AgentTestReasoningConfig) => {
 	const apiKey = process.env[config.apiKeyEnv];
 	if (!apiKey?.trim()) throw new Error(`Missing environment variable: ${config.apiKeyEnv}`);
 	return { apiKey, baseURL: config.url.replace(/\/$/, '') };

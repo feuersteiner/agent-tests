@@ -1,5 +1,5 @@
 import { Minimatch } from 'minimatch';
-import type { AgentTestEngine } from '../types.ts';
+import type { AgentTestEngine } from './types.ts';
 
 /** Returns 1 if any glob matches the path, otherwise 0. */
 export const createGlobEngine = (): AgentTestEngine => {

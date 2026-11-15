@@ -1,4 +1,4 @@
-import type { AgentTestConfig } from '../../types.ts';
+import type { AgentTestConfig } from '../types.ts';
 import { readFile } from '../helpers/file.ts';
 import { parseConfig } from './parse.ts';
 

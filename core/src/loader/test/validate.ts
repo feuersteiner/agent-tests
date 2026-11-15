@@ -1,5 +1,5 @@
-import { AgentTestSchema } from '../../types.ts';
-import type { AgentTest } from '../../types.ts';
+import { AgentTestSchema } from '../types.ts';
+import type { AgentTest } from '../types.ts';
 import { describeIssues } from '../helpers/issues.ts';
 import { globProblems, patterns } from '../helpers/patterns.ts';
 

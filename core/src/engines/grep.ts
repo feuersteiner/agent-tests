@@ -1,4 +1,4 @@
-import type { AgentTestEngine } from '../types.ts';
+import type { AgentTestEngine } from './types.ts';
 
 /** Returns the highest non-overlapping occurrence count among regex alternatives. */
 export const createGrepEngine = (): AgentTestEngine => {

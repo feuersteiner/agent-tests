@@ -4,3 +4,4 @@ export { validateConfig } from './config/validate.ts';
 export { loadDefinitions } from './test/load.ts';
 export { parseTest } from './test/parse.ts';
 export { LATEST_VERSION, validateTest } from './test/validate.ts';
+export type { AgentTest, AgentTestConfig, AgentTestDefinition } from './types.ts';

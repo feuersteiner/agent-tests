@@ -1,6 +1,6 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AgentTestDefinition } from '../../types.ts';
+import type { AgentTestDefinition } from '../types.ts';
 import { readFile } from '../helpers/file.ts';
 import { parseTest } from './parse.ts';
 

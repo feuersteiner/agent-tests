@@ -2,10 +2,10 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createTypeSafeAi } from '@ai-sdk/typesafe-ai';
 import { experimental_decide } from 'ai';
 import { providerSettings, RUN_SYSTEM_PROMPT } from './utils.ts';
-import type { AgentTestConfig, AgentTestEngine } from '../types.ts';
+import type { AgentTestDecisionConfig, AgentTestEngine } from './types.ts';
 
 /** Returns the highest passing probability, reusing a lazy provider and model. */
-export const createDecideEngine = (settings: AgentTestConfig['decision']): AgentTestEngine => {
+export const createDecideEngine = (settings: AgentTestDecisionConfig): AgentTestEngine => {
 	const provider = { ...settings };
 	let openai: ReturnType<typeof createOpenAI> | undefined;
 	let typesafe: ReturnType<typeof createTypeSafeAi> | undefined;

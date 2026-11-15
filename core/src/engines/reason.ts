@@ -2,11 +2,11 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText, Output } from 'ai';
 import { providerSettings, RUN_SYSTEM_PROMPT } from './utils.ts';
-import { AgentTestReasoningOutputSchema } from '../types.ts';
-import type { AgentTestConfig, AgentTestEngine } from '../types.ts';
+import { AgentTestReasoningOutputSchema } from './types.ts';
+import type { AgentTestEngine, AgentTestReasoningConfig } from './types.ts';
 
 /** Returns the highest passing confidence, reusing a lazy provider and model. */
-export const createReasonEngine = (settings: AgentTestConfig['reasoning']): AgentTestEngine => {
+export const createReasonEngine = (settings: AgentTestReasoningConfig): AgentTestEngine => {
 	const provider = { ...settings };
 	let openai: ReturnType<typeof createOpenAI> | undefined;
 	let anthropic: ReturnType<typeof createAnthropic> | undefined;
