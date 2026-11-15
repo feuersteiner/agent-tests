@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { Source } from '.';
+import { Source } from './base.ts';
 
 /** A lazily read UTF-8 file snapshot. */
 export class FileSource extends Source {
