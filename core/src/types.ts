@@ -7,16 +7,17 @@ const IdSchema = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Expected a lowerc
 const TextSchema = z.string().refine((value) => value.trim().length > 0, 'Must not be blank');
 
 /** One param or a nonempty list; each engine defines how a list combines. */
-const ParamSchema = z.union([TextSchema, z.array(TextSchema).min(1)], {
+export const AgentTestParamSchema = z.union([TextSchema, z.array(TextSchema).min(1)], {
 	error: 'Expected text or a nonempty list of text'
 });
+export type AgentTestParam = z.infer<typeof AgentTestParamSchema>;
 
 /** Filters that pick the sources a Test inspects; at least one is required. */
 const SelectSchema = z
 	.strictObject({
-		glob: ParamSchema.optional(),
-		grep: ParamSchema.optional(),
-		decide: ParamSchema.optional()
+		glob: AgentTestParamSchema.optional(),
+		grep: AgentTestParamSchema.optional(),
+		decide: AgentTestParamSchema.optional()
 	})
 	.refine(
 		(select) =>
@@ -30,9 +31,9 @@ const TestCaseSchema = z
 		id: IdSchema,
 		description: TextSchema,
 		error: TextSchema,
-		grep: ParamSchema.optional(),
-		decide: ParamSchema.optional(),
-		reason: ParamSchema.optional()
+		grep: AgentTestParamSchema.optional(),
+		decide: AgentTestParamSchema.optional(),
+		reason: AgentTestParamSchema.optional()
 	})
 	.refine(
 		(test) => test.grep !== undefined || test.decide !== undefined || test.reason !== undefined,
@@ -76,3 +77,12 @@ export const AgentTestConfigSchema = z.strictObject({
 	test: z.strictObject({ threshold: ThresholdSchema })
 });
 export type AgentTestConfig = z.infer<typeof AgentTestConfigSchema>;
+
+/** An engine score in [0, 1]. */
+export const AgentTestScoreSchema = z.number().min(0).max(1);
+
+/** The structured output the reasoning model must return. */
+export const AgentTestReasoningOutputSchema = z.strictObject({ score: AgentTestScoreSchema });
+
+/** Glob returns 0 or 1, AI returns a score in [0, 1], and grep returns an occurrence count. */
+export type AgentTestEngine = (input: string, criteria: AgentTestParam) => Promise<number>;
