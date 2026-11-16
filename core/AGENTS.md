@@ -5,7 +5,7 @@
 - `index.ts`: the package's public runtime exports; nothing inside `src/` or `cli/` imports it.
 - `types.ts`: the package's public type exports; type-only.
 - `cli/index.ts`: command dispatch and help.
-- `cli/commands/`: `validate`, and stubs for `init`, `compile`, `list`, `eval`, and `run`.
+- `cli/commands/`: `validate`, `run`, and stubs for `init`, `compile`, `list`, and `eval`.
 - `cli/helpers/error.ts`: the message of a thrown value, shared by the commands.
 - `cli/config/banner.ts`: CLI banner.
 - `src/AGENTS.md`: the rules every `src/` module follows; only the loader validates.
@@ -19,4 +19,4 @@
 - `src/assert/`: an `AssertOrchestrator` built once from the engines and the config's `assert` section, whose `run(assert, sources)` returns a finding for each source and assertion that fails, escalating grep, decide, reason and stopping at the first stage that clears the source. `index.ts` is the single import.
 - `src/eval/`: an `EvalOrchestrator` built once from the scope, select, and assert orchestrators, whose `run(test, eval)` scopes the eval folder as the root without its `eval.yaml`, runs the Test's select then assert, and returns the eval with its actual outcome (`skip` when nothing is selected, `fail` on a finding, else `pass`), `matches` (whether actual equals expected), and findings; logs ✓ for a match and ✗ otherwise. `index.ts` is the single import.
 
-Status: the `version: 1` format, the config file, `validate`, the engines, the sources, the scope, the select, assert, and eval orchestrators, and `AgentTests`, which builds and coordinates them, exist; no command calls `AgentTests` yet. Other commands print that they are not implemented yet.
+Status: the `version: 1` format, the config file, `validate`, the engines, the sources, the scope, the select, assert, and eval orchestrators, and `AgentTests`, which builds and coordinates them, exist; `run` calls `AgentTests`. Other commands print that they are not implemented yet.
