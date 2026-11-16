@@ -1,9 +1,12 @@
 export { AgentTests } from './src/index.ts';
 export {
 	CONFIG_PATH,
+	EVAL_FILE,
 	LATEST_VERSION,
 	loadConfig,
 	loadDefinitions,
+	loadEvalDefinitions,
+	loadEvalFiles,
 	loadTestFiles,
 	parseConfig,
 	parseEval,

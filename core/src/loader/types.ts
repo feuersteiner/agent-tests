@@ -4,6 +4,7 @@ import { EnginesConfigSchema } from '../engines/types.ts';
 import { SelectConfigSchema, SelectSchema } from '../select/types.ts';
 import { AssertConfigSchema, AssertSchema } from '../assert/types.ts';
 import { OutcomeSchema } from '../eval/types.ts';
+import type { AgentTestEvalDefinition } from '../eval/types.ts';
 
 /** test.yaml at `version: 1`; optional fields have no implicit defaults. */
 export const AgentTestSchema = z.strictObject({
@@ -26,6 +27,13 @@ export interface AgentTestFile {
 /** eval.yaml: the one outcome expected when the Test runs with the eval folder as the root. */
 export const AgentTestEvalSchema = z.strictObject({ expect: OutcomeSchema });
 export type AgentTestEval = z.infer<typeof AgentTestEvalSchema>;
+
+/** One eval folder's eval.yaml path, with either the loaded eval or the problems that stopped it from loading. */
+export interface AgentTestEvalFile {
+	path: string;
+	eval?: AgentTestEvalDefinition;
+	error?: string;
+}
 
 /** agent-tests.config.yaml; both models are required even for Tests using only regexes. */
 export const AgentTestConfigSchema = z.strictObject({
