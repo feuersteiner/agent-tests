@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bun --no-env-file
+#!/usr/bin/env bun
 import { clinguini } from 'clinguini';
 import { initCommand } from './commands/init.ts';
 import { listCommand } from './commands/list.ts';
