@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { lstatSync } from 'node:fs';
-import { posix } from 'node:path';
+import { join, posix } from 'node:path';
 import { Minimatch } from 'minimatch';
 import { DirectorySource, FileSource } from '../sources/index.ts';
 import type { Source } from '../sources/index.ts';
@@ -26,10 +26,15 @@ export class ScopeOrchestrator {
 	/** Every file Git lists for the scope that counts, and its ancestor directories, sorted by path. */
 	public readonly run = (scope: AgentTestScope): Source[] => {
 		console.log(`Scoping ${scope.kind} sources`);
-		const files = new Set(this.listFiles(scope).filter(this.isKept));
-		const paths = [...new Set([...files].flatMap(this.withAncestors))].sort();
-		const sources = paths.map((path) =>
-			files.has(path) ? new FileSource(path) : new DirectorySource(path)
+		return this.toSources(this.listFiles(scope), '.');
+	};
+
+	/** The kept files among `paths`, relative to `root`, and their ancestor directories, as sources sorted by path. */
+	private readonly toSources = (paths: string[], root: string): Source[] => {
+		const files = new Set(paths.filter((path) => this.isKept(path, root)));
+		const all = [...new Set([...files].flatMap(this.withAncestors))].sort();
+		const sources = all.map((path) =>
+			files.has(path) ? new FileSource(path, root) : new DirectorySource(path, root)
 		);
 		console.log(`${sources.length} source(s) in scope`);
 		return sources;
@@ -50,9 +55,10 @@ export class ScopeOrchestrator {
 			.split('\0')
 			.filter((path) => path !== '');
 
-	/** Kept when no `ignore` glob excludes it and it is a regular file on disk right now. */
-	private readonly isKept = (path: string): boolean =>
-		!this.isIgnored(path) && lstatSync(path, { throwIfNoEntry: false })?.isFile() === true;
+	/** Kept when no `ignore` glob excludes it and it is a regular file under `root` on disk right now. */
+	private readonly isKept = (path: string, root: string): boolean =>
+		!this.isIgnored(path) &&
+		lstatSync(join(root, path), { throwIfNoEntry: false })?.isFile() === true;
 
 	/** Ignored when a glob matches the file or an ancestor directory, a directory also with a trailing slash. */
 	private readonly isIgnored = (path: string): boolean =>
@@ -62,7 +68,7 @@ export class ScopeOrchestrator {
 			)
 		);
 
-	/** The path and each ancestor directory of it, without the working directory itself. */
+	/** The path and each ancestor directory of it, without the root itself. */
 	private readonly withAncestors = (path: string): string[] => {
 		const parent = posix.dirname(path);
 		return parent === '.' ? [path] : [path, ...this.withAncestors(parent)];
