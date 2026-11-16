@@ -4,7 +4,7 @@ import { clinguini } from 'clinguini';
 import { initCommand } from './commands/init.ts';
 import { listCommand } from './commands/list.ts';
 import { validateCommand } from './commands/validate.ts';
-import { compileCommand } from './commands/compile.ts';
+import { compileCommand } from './commands/compile/index.ts';
 import { evalCommand } from './commands/eval.ts';
 import { runCommand } from './commands/run.ts';
 import { banner } from './config/banner.ts';

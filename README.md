@@ -55,8 +55,9 @@ Its `eval.yaml` sets `expect: pass` (selected, no finding), `expect: fail`
 ## Commands
 
 - `agent-tests init`: write the config, `.agents/tests/`, and pre-commit hook.
-- `agent-tests compile <id>`: print the prompt an agent needs to write `test.yaml`
-  and evals from `TEST.md`, then loop on validation and evals.
+- `agent-tests compile [id]`: print the prompt an agent needs to write a Test:
+  its `TEST.md` from your request when missing (naming the Test when `id` is
+  omitted), then `test.yaml` and evals, looping on validation and evals.
 - `agent-tests list`: show installed Tests.
 - `agent-tests validate [id]`: validate one Test, or all Tests when omitted.
 - `agent-tests eval [id]`: run one Test's evals, or all Tests' evals when omitted.
