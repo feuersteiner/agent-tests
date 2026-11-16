@@ -2,6 +2,7 @@ export {
 	CONFIG_PATH,
 	LATEST_VERSION,
 	loadConfig,
+	loadDefinitions,
 	loadTestFiles,
 	parseConfig,
 	parseTest,

@@ -1,6 +1,6 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AgentTestFile } from '../types.ts';
+import type { AgentTestDefinition, AgentTestFile } from '../types.ts';
 import { readFile } from '../helpers/file.ts';
 import { parseTest } from './parse.ts';
 
@@ -25,4 +25,18 @@ export const loadTestFiles = (id?: string): AgentTestFile[] => {
 			return { path, error: error instanceof Error ? error.message : String(error) };
 		}
 	});
+};
+
+/** The definitions in the files `loadTestFiles` loads, in order, or one error listing every invalid file. */
+export const loadDefinitions = (id?: string): AgentTestDefinition[] => {
+	const files = loadTestFiles(id);
+	const invalid = files.filter((file) => file.error);
+	if (invalid.length)
+		throw new Error(
+			[
+				`${invalid.length} of ${files.length} test(s) invalid:`,
+				...invalid.map(({ path, error }) => `${path}\n  ${error!.replaceAll('\n', '\n  ')}`)
+			].join('\n')
+		);
+	return files.map((file) => file.test!);
 };
