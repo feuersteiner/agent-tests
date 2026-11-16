@@ -19,4 +19,4 @@
 
 Status: the `version: 1` format, the config file, `validate`, the engines, the sources, the scope, the select, assert, and eval orchestrators, and `AgentTests`, which builds and coordinates them, exist; no command calls `AgentTests` yet. Other commands print that they are not implemented yet.
 
-- `src/eval/`: an `EvalOrchestrator` built once from the scope, select, and assert orchestrators, whose `run(test, eval)` scopes the eval folder as the root without its `eval.yaml`, runs the Test's select then assert, and returns the eval with its actual outcome (`skip` when nothing is selected, `fail` on a finding, else `pass`), and findings. `index.ts` is the single import.
+- `src/eval/`: an `EvalOrchestrator` built once from the scope, select, and assert orchestrators, whose `run(test, eval)` scopes the eval folder as the root without its `eval.yaml`, runs the Test's select then assert, and returns the eval with its actual outcome (`skip` when nothing is selected, `fail` on a finding, else `pass`), `matches` (whether actual equals expected), and findings; logs ✓ for a match and ✗ otherwise. `index.ts` is the single import.

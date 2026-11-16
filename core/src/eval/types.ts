@@ -14,9 +14,10 @@ export interface AgentTestEvalDefinition {
 	expect: AgentTestOutcome;
 }
 
-/** One eval's outcome: the eval, its actual outcome, and findings. */
+/** One eval's outcome: the eval, its actual outcome, whether it matches the expected outcome, and findings. */
 export interface AgentTestEvalResult {
 	eval: AgentTestEvalDefinition;
 	actual: AgentTestOutcome;
+	matches: boolean;
 	findings: AgentTestFinding[];
 }

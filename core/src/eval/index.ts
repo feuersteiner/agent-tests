@@ -5,7 +5,7 @@ import type { ScopeOrchestrator } from '../scope/index.ts';
 import type { SelectOrchestrator } from '../select/index.ts';
 import type { AgentTestEvalDefinition, AgentTestEvalResult, AgentTestOutcome } from './types.ts';
 
-/** Runs a Test with an eval folder as the root and gives its actual outcome. */
+/** Runs a Test with an eval folder as the root and compares its actual and expected outcomes. */
 export class EvalOrchestrator {
 	constructor(
 		private readonly scope: ScopeOrchestrator,
@@ -13,7 +13,7 @@ export class EvalOrchestrator {
 		private readonly assert: AssertOrchestrator
 	) {}
 
-	/** The eval with its actual outcome, and findings. */
+	/** The eval with its actual outcome, whether it matches the expected outcome, and findings. */
 	public readonly run = async (
 		test: AgentTestDefinition,
 		definition: AgentTestEvalDefinition
@@ -25,7 +25,8 @@ export class EvalOrchestrator {
 		const selected = await this.select.run(test.select, sources);
 		const findings = selected.length ? await this.assert.run(test.assert, selected) : [];
 		const actual: AgentTestOutcome = !selected.length ? 'skip' : findings.length ? 'fail' : 'pass';
-		console.log(`Expected ${definition.expect}, got ${actual}`);
-		return { eval: definition, actual, findings };
+		const matches = actual === definition.expect;
+		console.log(`${matches ? '✓' : '✗'} Expected ${definition.expect}, got ${actual}`);
+		return { eval: definition, actual, matches, findings };
 	};
 }
