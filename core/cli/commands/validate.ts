@@ -1,8 +1,6 @@
 import { command, type Command } from 'clinguini';
 import { CONFIG_PATH, loadConfig, loadTestFiles } from '../../src/loader/index.ts';
-
-const message = (error: unknown): string =>
-	error instanceof Error ? error.message : String(error);
+import { message } from '../helpers/error.ts';
 
 export const validateCommand: Command = command({
 	name: 'validate',

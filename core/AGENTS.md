@@ -6,6 +6,7 @@
 - `types.ts`: the package's public type exports; type-only.
 - `cli/index.ts`: command dispatch and help.
 - `cli/commands/`: `validate`, and stubs for `init`, `compile`, `list`, `eval`, and `run`.
+- `cli/helpers/error.ts`: the message of a thrown value, shared by the commands.
 - `cli/config/banner.ts`: CLI banner.
 - `src/AGENTS.md`: the rules every `src/` module follows; only the loader validates.
 - `src/index.ts`: the `AgentTests` class, the main class and the entry for everything, built from the full config with the engines and one scope, select, assert, and eval orchestrator as private members; `run(scope, id?)` loads the Tests through the loader, scopes the sources once, runs each Test's select then assert one Test after another, and returns each Test with its findings; `eval(id?)` loads the Tests and their evals through the loader, runs each Test's evals one after another, and returns each Test with each eval's expected and actual outcome and findings; these are its only public members; not a barrel.
