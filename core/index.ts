@@ -6,8 +6,10 @@ export {
 	loadDefinitions,
 	loadTestFiles,
 	parseConfig,
+	parseEval,
 	parseTest,
 	validateConfig,
+	validateEval,
 	validateTest
 } from './src/loader/index.ts';
 export { createEngines } from './src/engines/index.ts';

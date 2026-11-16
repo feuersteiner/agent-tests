@@ -1,5 +1,10 @@
 export type { AgentTestParam } from './src/types.ts';
-export type { AgentTestConfig, AgentTestDefinition, AgentTestFile } from './src/loader/types.ts';
+export type {
+	AgentTestConfig,
+	AgentTestDefinition,
+	AgentTestEval,
+	AgentTestFile
+} from './src/loader/types.ts';
 export type {
 	AgentTestDecisionConfig,
 	AgentTestEngine,
@@ -16,3 +21,4 @@ export type {
 	AgentTestFinding,
 	AgentTestResult
 } from './src/assert/types.ts';
+export type { AgentTestOutcome } from './src/eval/types.ts';
