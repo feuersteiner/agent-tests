@@ -7,20 +7,20 @@ import type {
 	AgentTestFinding
 } from './types.ts';
 
-/** Judges the sources one Test inspects. */
+/** Judges the sources a Test inspects. */
 export class AssertOrchestrator {
 	constructor(
-		private readonly assert: AgentTestAssert,
 		private readonly engines: AgentTestEngines,
 		private readonly config: AgentTestAssertConfig
 	) {}
 
-	/** One finding for every source and assertion that fails, ordered by source, then assertion. */
-	public readonly run = async (sources: Source[]): Promise<AgentTestFinding[]> => {
-		console.log(`Asserting ${sources.length} source(s) against ${this.assert.length} assertion(s)`);
-		const pairs = sources.flatMap((source) =>
-			this.assert.map((assertion) => ({ source, assertion }))
-		);
+	/** One finding for every source and assertion of the Test's assert that fails, ordered by source, then assertion. */
+	public readonly run = async (
+		assert: AgentTestAssert,
+		sources: Source[]
+	): Promise<AgentTestFinding[]> => {
+		console.log(`Asserting ${sources.length} source(s) against ${assert.length} assertion(s)`);
+		const pairs = sources.flatMap((source) => assert.map((assertion) => ({ source, assertion })));
 		const flagged = await Promise.all(
 			pairs.map(({ source, assertion }) => this.isFlagged(source, assertion))
 		);
