@@ -2,9 +2,10 @@
 
 ## Layout
 
+- `tsconfig.build.json`: `build` compiles `index.ts`, `types.ts`, `cli/`, and `src/` with `tsc` against Node types only into `dist/`: ES modules and `.d.ts` files, `.ts` imports rewritten to `.js`; Git-ignored and removed on each build. The package ships only `dist/` and runs on Node 22 or later, without Bun.
 - `index.ts`: the package's public runtime exports; nothing inside `src/` or `cli/` imports it.
 - `types.ts`: the package's public type exports; type-only.
-- `cli/index.ts`: command dispatch and help.
+- `cli/index.ts`: the `#!/usr/bin/env node` entry; loads the working directory's `.env`, when present, without overriding variables already set, then command dispatch and help; `run` and `eval` pass `process.env` to `AgentTests`.
 - `cli/commands/`: `validate`, `run`, `eval`, `list`, and stubs for `init` and `compile`.
 - `cli/helpers/error.ts`: the message of a thrown value, shared by the commands.
 - `cli/config/banner.ts`: CLI banner.
@@ -19,4 +20,4 @@
 - `src/assert/`: an `AssertOrchestrator` built once from the engines and the config's `assert` section, whose `run(assert, sources)` returns a finding for each source and assertion that fails, escalating grep, decide, reason and stopping at the first stage that clears the source. `index.ts` is the single import.
 - `src/eval/`: an `EvalOrchestrator` built once from the scope, select, and assert orchestrators, whose `run(test, eval)` scopes the eval folder as the root without its `eval.yaml`, runs the Test's select then assert, and returns the eval with its actual outcome (`skip` when nothing is selected, `fail` on a finding, else `pass`), `matches` (whether actual equals expected), and findings; logs ✓ for a match and ✗ otherwise. `index.ts` is the single import.
 
-Status: the `version: 1` format, the config file, `validate`, the engines, the sources, the scope, the select, assert, and eval orchestrators, and `AgentTests`, which builds and coordinates them, exist; `run` and `eval` call `AgentTests`; `list` calls the loader. `init` and `compile` print that they are not implemented yet.
+Status: the `version: 1` format, the config file, `validate`, the engines, the sources, the scope, the select, assert, and eval orchestrators, and `AgentTests`, which builds and coordinates them, exist; `run` and `eval` call `AgentTests`; `list` calls the loader. The CLI loads `.env` before any command; the library never reads `process.env`. `build` emits `dist/`, which `bin` and `exports` point at. `init` and `compile` print that they are not implemented yet.

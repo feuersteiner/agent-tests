@@ -1,4 +1,5 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
+import { existsSync } from 'node:fs';
 import { clinguini } from 'clinguini';
 import { initCommand } from './commands/init.ts';
 import { listCommand } from './commands/list.ts';
@@ -7,6 +8,9 @@ import { compileCommand } from './commands/compile.ts';
 import { evalCommand } from './commands/eval.ts';
 import { runCommand } from './commands/run.ts';
 import { banner } from './config/banner.ts';
+
+/** Load the working directory's `.env`, if any; variables already set in the environment win. */
+if (existsSync('.env')) process.loadEnvFile('.env');
 
 await clinguini({
 	name: 'agent-tests',

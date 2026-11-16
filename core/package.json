@@ -29,22 +29,29 @@
 		"directory": "core"
 	},
 	"bin": {
-		"agent-tests": "./cli/index.ts"
+		"agent-tests": "./dist/cli/index.js"
 	},
 	"exports": {
-		".": "./index.ts",
-		"./types": "./types.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./types": {
+			"types": "./dist/types.d.ts",
+			"default": "./dist/types.js"
+		}
 	},
 	"files": [
-		"index.ts",
-		"types.ts",
-		"src",
-		"cli",
+		"dist",
 		"README.md",
 		"LICENSE"
 	],
 	"type": "module",
+	"engines": {
+		"node": ">=22"
+	},
 	"scripts": {
+		"build": "rm -rf dist && tsc -p tsconfig.build.json",
 		"check": "tsc --noEmit"
 	},
 	"devDependencies": {

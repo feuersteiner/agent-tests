@@ -1,0 +1,19 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		// Node only: a Bun-only API fails the build
+		"types": ["node"],
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"allowJs": false,
+
+		// Emit ES modules and declarations into dist/, rewriting `.ts` imports to `.js`
+		"noEmit": false,
+		"allowImportingTsExtensions": false,
+		"rewriteRelativeImportExtensions": true,
+		"declaration": true,
+		"rootDir": ".",
+		"outDir": "dist"
+	},
+	"include": ["index.ts", "types.ts", "cli", "src"]
+}
