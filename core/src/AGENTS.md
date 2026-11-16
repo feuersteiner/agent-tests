@@ -4,6 +4,7 @@ Validation is the loader's job and only the loader's: `src/loader/` validates te
 Outside the loader, never validate inputs, arguments, or a module's own config: no Zod `parse` or `safeParse`, no type guards, no defensive checks on arguments.
 If a value can reach a module wrong, fix the loader, not the module.
 The main components are orchestrators, each in a folder named by its verb: `scope/`, `select/`, and `assert/` now, `eval/` to follow; new stages follow this pattern.
+`src/index.ts` holds `AgentTests`, the main class and the entry for everything: built from the full config, it builds the engines and one `ScopeOrchestrator`, `SelectOrchestrator`, and `AssertOrchestrator`, keeps them as private members, and coordinates them; it loads Tests through the loader; its public members are `run(scope, id?)` now and `eval` later, nothing else; it is not a barrel.
 The folder's `index.ts` exports a `<Verb>Orchestrator` class built once from the engines and/or its config section, whose `run(...)` receives the Test's block (or the run's scope) and the sources; its `types.ts` holds `<Verb>Schema` / `AgentTest<Verb>` and `<Verb>ConfigSchema` / `AgentTest<Verb>Config` where a schema exists.
 Orchestrators keep no per-Test state and decide engine order, early stopping, and thresholds; engines only score.
 Orchestrators never walk the file system or call Git, except the scope orchestrator, the only one that calls Git (it lists the scope's files, then applies `ignore`).

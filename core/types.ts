@@ -1,4 +1,5 @@
 export type { AgentTestParam } from './src/types.ts';
+export type { AgentTestResult } from './src/index.ts';
 export type { AgentTestConfig, AgentTestDefinition, AgentTestFile } from './src/loader/types.ts';
 export type {
 	AgentTestDecisionConfig,

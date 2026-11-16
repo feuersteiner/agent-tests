@@ -1,3 +1,4 @@
+export { AgentTests } from './src/index.ts';
 export {
 	CONFIG_PATH,
 	LATEST_VERSION,
