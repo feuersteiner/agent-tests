@@ -25,5 +25,6 @@ export type {
 export type {
 	AgentTestEvalDefinition,
 	AgentTestEvalResult,
+	AgentTestEvalsResult,
 	AgentTestOutcome
 } from './src/eval/types.ts';
