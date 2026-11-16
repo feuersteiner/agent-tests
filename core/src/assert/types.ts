@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AgentTestParamSchema, IdSchema, TextSchema, ThresholdSchema } from '../types.ts';
 import type { Source } from '../sources/index.ts';
+import type { AgentTestDefinition } from '../loader/types.ts';
 
 /** One escalating assertion running grep, then decide, then reason; at least one is required. */
 const AssertionSchema = z
@@ -33,4 +34,10 @@ export type AgentTestAssertConfig = z.infer<typeof AssertConfigSchema>;
 export interface AgentTestFinding {
 	source: Source;
 	assertion: AgentTestAssertion;
+}
+
+/** One Test's outcome in a run: the Test and the findings against it. */
+export interface AgentTestResult {
+	test: AgentTestDefinition;
+	findings: AgentTestFinding[];
 }

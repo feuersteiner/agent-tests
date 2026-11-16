@@ -1,5 +1,5 @@
 import { AssertOrchestrator } from './assert/index.ts';
-import type { AgentTestFinding } from './assert/types.ts';
+import type { AgentTestResult } from './assert/types.ts';
 import { createEngines } from './engines/index.ts';
 import type { AgentTestEngines } from './engines/types.ts';
 import { loadDefinitions } from './loader/index.ts';
@@ -8,12 +8,6 @@ import { ScopeOrchestrator } from './scope/index.ts';
 import type { AgentTestScope } from './scope/types.ts';
 import { SelectOrchestrator } from './select/index.ts';
 import type { Source } from './sources/index.ts';
-
-/** One Test's outcome in a run: the Test and the findings against it. */
-export interface AgentTestResult {
-	test: AgentTestDefinition;
-	findings: AgentTestFinding[];
-}
 
 /** The main class: builds every component from the config and coordinates a run. */
 export class AgentTests {

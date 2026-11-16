@@ -9,6 +9,7 @@ The folder's `index.ts` exports a `<Verb>Orchestrator` class built once from the
 Orchestrators keep no per-Test state and decide engine order, early stopping, and thresholds; engines only score.
 Orchestrators never walk the file system or call Git, except the scope orchestrator, the only one that calls Git (it lists the scope's files, then applies `ignore`).
 `src/types.ts` holds only the shared building blocks and imports nothing from this package; each folder owns its types and schemas in its own `types.ts` and may import the shared ones.
+`assert/types.ts` owns `AgentTestResult`.
 Public re-exports live outside `src/`, in `core/index.ts` and `core/types.ts`; nothing in `src/` re-exports another folder's names.
 The whole `test.yaml` and config schemas live in `src/loader/types.ts` because only the loader validates with them.
 Never make `src/types.ts` import from a folder (a circular import that fails at load time); exported names keep the `AgentTest*` prefix.
