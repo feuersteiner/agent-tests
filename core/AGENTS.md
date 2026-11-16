@@ -10,6 +10,7 @@
 - `cli/helpers/error.ts`: the message of a thrown value, shared by the commands.
 - `cli/config/banner.ts`: CLI banner.
 - `cli/config/presets.ts`: the `init` provider presets for the config's `decision` and `reasoning` sections, their provider names, and the config built from the chosen ones.
+- `cli/config/paths.ts`: the Tests folder and a Test's folder by id, for `init` and `compile`; the loader keeps its own literal.
 - `src/AGENTS.md`: the rules every `src/` module follows; only the loader validates.
 - `src/index.ts`: the `AgentTests` class, the main class and the entry for everything, built from the full config and an environment map (`AgentTestEnv`), throwing when the decision or reasoning API key is missing or blank, with the engines and one scope, select, assert, and eval orchestrator as private members; `run(scope, id?)` loads the Tests through the loader, scopes the sources once, runs each Test's select then assert one Test after another, and returns each Test with its findings; `eval(id?)` loads the Tests and their evals through the loader, runs each Test's evals one after another, and returns each Test with each eval's expected and actual outcome and findings; these are its only public members; not a barrel.
 - `src/types.ts`: the shared building-block schemas; imports nothing from the package.

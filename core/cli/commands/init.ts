@@ -4,12 +4,10 @@ import { dirname } from 'node:path';
 import { command, type Command } from 'clinguini';
 import { stringify } from 'yaml';
 import { CONFIG_PATH } from '../../src/loader/index.ts';
+import { TESTS_FOLDER } from '../config/paths.ts';
 import { DECISION_PROVIDERS, REASONING_PROVIDERS, toConfig } from '../config/presets.ts';
 import type { InitConfig } from '../config/presets.ts';
 import { message } from '../helpers/error.ts';
-
-/** The Tests folder, relative to the current working directory; the loader reads the same path. */
-const TESTS_FOLDER = '.agents/tests';
 
 /** The command the pre-commit hook runs; the package is pure Node, so `npx`. */
 const HOOK_COMMAND = 'npx agent-tests run --staged';
