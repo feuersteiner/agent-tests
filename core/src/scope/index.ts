@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { lstatSync } from 'node:fs';
-import { join, posix } from 'node:path';
+import { lstatSync, readdirSync } from 'node:fs';
+import { join, posix, sep } from 'node:path';
 import { Minimatch } from 'minimatch';
 import { DirectorySource, FileSource } from '../sources/index.ts';
 import type { Source } from '../sources/index.ts';
@@ -27,6 +27,16 @@ export class ScopeOrchestrator {
 	public readonly run = (scope: AgentTestScope): Source[] => {
 		console.log(`Scoping ${scope.kind} sources`);
 		return this.toSources(this.listFiles(scope), '.');
+	};
+
+	/** Every file under `folder` that counts, and its ancestor directories, sorted by path, with `folder` as the repository root; needs no Git. */
+	public readonly runFolder = (folder: string): Source[] => {
+		console.log(`Scoping sources in ${folder}`);
+		const paths = readdirSync(folder, { recursive: true, encoding: 'utf8' });
+		return this.toSources(
+			paths.map((path) => path.split(sep).join(posix.sep)),
+			folder
+		);
 	};
 
 	/** The kept files among `paths`, relative to `root`, and their ancestor directories, as sources sorted by path. */

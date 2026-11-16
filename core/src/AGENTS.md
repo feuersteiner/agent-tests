@@ -7,7 +7,7 @@ The main components are orchestrators, each in a folder named by its verb: `scop
 `src/index.ts` holds `AgentTests`, the main class and the entry for everything: built from the full config, it builds the engines and one `ScopeOrchestrator`, `SelectOrchestrator`, and `AssertOrchestrator`, keeps them as private members, and coordinates them; it loads Tests through the loader; its public members are `run(scope, id?)` now and `eval` later, nothing else; it is not a barrel.
 The folder's `index.ts` exports a `<Verb>Orchestrator` class built once from the engines and/or its config section, whose `run(...)` receives the Test's block (or the run's scope) and the sources; its `types.ts` holds `<Verb>Schema` / `AgentTest<Verb>` and `<Verb>ConfigSchema` / `AgentTest<Verb>Config` where a schema exists.
 Orchestrators keep no per-Test state and decide engine order, early stopping, and thresholds; engines only score.
-Orchestrators never walk the file system or call Git, except the scope orchestrator, the only one that calls Git (it lists the scope's files, then applies `ignore`).
+Orchestrators never walk the file system or call Git, except the scope orchestrator, the only one that does (it lists the scope's files from Git, or an eval folder's files from disk, then applies `ignore`).
 `src/types.ts` holds only the shared building blocks and imports nothing from this package; each folder owns its types and schemas in its own `types.ts` and may import the shared ones.
 `assert/types.ts` owns `AgentTestResult`.
 Public re-exports live outside `src/`, in `core/index.ts` and `core/types.ts`; nothing in `src/` re-exports another folder's names.
