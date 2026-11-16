@@ -13,12 +13,12 @@ export const AgentTestSchema = z.strictObject({
 	select: SelectSchema.optional(),
 	assert: AssertSchema
 });
-export type AgentTest = z.infer<typeof AgentTestSchema>;
+export type AgentTestDefinition = z.infer<typeof AgentTestSchema>;
 
 /** One Test folder's test.yaml path, with either the loaded Test or the problems that stopped it from loading. */
-export interface AgentTestDefinition {
+export interface AgentTestFile {
 	path: string;
-	test?: AgentTest;
+	test?: AgentTestDefinition;
 	error?: string;
 }
 

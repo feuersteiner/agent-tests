@@ -1,5 +1,5 @@
 import { AgentTestSchema } from '../types.ts';
-import type { AgentTest } from '../types.ts';
+import type { AgentTestDefinition } from '../types.ts';
 import { describeIssues } from '../helpers/issues.ts';
 import { globProblems, patterns } from '../helpers/patterns.ts';
 
@@ -7,7 +7,7 @@ import { globProblems, patterns } from '../helpers/patterns.ts';
 export const LATEST_VERSION = 1;
 
 /** Validate a parsed value as the latest Test shape, or throw every schema and rule problem as `path: message` lines. */
-export const validateTest = (value: unknown): AgentTest => {
+export const validateTest = (value: unknown): AgentTestDefinition => {
 	const version =
 		typeof value === 'object' && value !== null && 'version' in value ? value.version : undefined;
 	if (typeof version !== 'number' || !Number.isInteger(version))
@@ -24,7 +24,7 @@ export const validateTest = (value: unknown): AgentTest => {
 };
 
 /** Problems the schema cannot express: duplicate assertion ids, invalid regexes, leading `!` globs. */
-const testProblems = (test: AgentTest): string[] => {
+const testProblems = (test: AgentTestDefinition): string[] => {
 	const ids = new Set<string>();
 	const greps = [
 		...patterns('select.grep', test.select?.grep),
