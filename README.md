@@ -19,7 +19,7 @@ select:
   glob: ['src/**/*.svelte', 'src/**/*.html']
   grep: '<(p|button)\b'
   decide: 'This file contains text displayed to an end user.'
-test:
+assert:
   - id: french-only
     description: User-facing text is in French.
     error: Translate the text into French.
@@ -30,8 +30,8 @@ test:
 
 `version: 1` is required. One `select` filters sources through `glob`, `grep`,
 and `decide`, in that order; every present filter must pass. Omit `select` to
-select every source. Each entry in `test` runs its configured engines in order:
-`grep`, `decide`, then `reason`, and reports its `error` on failure.
+select every source. Each assertion in `assert` runs its configured engines in
+order: `grep`, `decide`, then `reason`, and reports its `error` on failure.
 
 ## Evals
 
@@ -63,8 +63,8 @@ Its `eval.yaml` sets `expect: pass` (selected, no finding), `expect: fail`
 - `agent-tests run [id]`: run one Test, or all Tests, on the whole repository;
   narrow with `--changed`, `--staged`, or `--base <ref>`.
 
-A finding names the Test, failing test, path, and `error`. Exit codes are 0 for
-clean, 1 for findings, and 2 for setup errors.
+A finding names the Test, failing assertion, path, and `error`. Exit codes are
+0 for clean, 1 for findings, and 2 for setup errors.
 
 ## Community
 

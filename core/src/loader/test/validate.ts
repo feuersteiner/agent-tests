@@ -23,18 +23,18 @@ export const validateTest = (value: unknown): AgentTest => {
 	return result.data;
 };
 
-/** Problems the schema cannot express: duplicate test ids, invalid regexes, leading `!` globs. */
+/** Problems the schema cannot express: duplicate assertion ids, invalid regexes, leading `!` globs. */
 const testProblems = (test: AgentTest): string[] => {
 	const ids = new Set<string>();
 	const greps = [
 		...patterns('select.grep', test.select?.grep),
-		...test.test.flatMap((entry, index) => patterns(`test.${index}.grep`, entry.grep))
+		...test.assert.flatMap((entry, index) => patterns(`assert.${index}.grep`, entry.grep))
 	];
 	return [
-		...test.test.flatMap(({ id }, index) => {
+		...test.assert.flatMap(({ id }, index) => {
 			const duplicate = ids.has(id);
 			ids.add(id);
-			return duplicate ? [`test.${index}.id: Duplicate test id`] : [];
+			return duplicate ? [`assert.${index}.id: Duplicate assertion id`] : [];
 		}),
 		...greps.flatMap(([path, pattern]) =>
 			compiles(pattern) ? [] : [`${path}: Invalid regular expression`]
