@@ -4,7 +4,7 @@ import { posix } from 'node:path';
 import { Minimatch } from 'minimatch';
 import { DirectorySource, FileSource } from '../sources/index.ts';
 import type { Source } from '../sources/index.ts';
-import type { AgentTestScopeTarget } from './types.ts';
+import type { AgentTestScope } from './types.ts';
 
 /** Changed paths below the working directory and relative to it, without deletions. */
 const DIFF = ['diff', '--name-only', '-z', '--relative', '--diff-filter=d'];
@@ -16,17 +16,17 @@ const UNTRACKED = ['ls-files', '--others', '--exclude-standard', '-z'];
 const IGNORE_OPTIONS = { dot: true, platform: 'linux' } as const;
 
 /** Builds the list of sources a run looks at. */
-export class AgentTestScope {
-	constructor(
-		private readonly ignore: string[],
-		private readonly target: AgentTestScopeTarget
-	) {}
+export class ScopeOrchestrator {
+	private readonly globs: Minimatch[];
 
-	/** Every file Git lists for the target that counts, and its ancestor directories, sorted by path. */
-	public readonly run = (): Source[] => {
-		console.log(`Scoping ${this.target.kind} sources`);
-		const globs = this.ignore.map((pattern) => new Minimatch(pattern, IGNORE_OPTIONS));
-		const files = new Set(this.listFiles().filter((path) => this.isKept(path, globs)));
+	constructor(private readonly ignore: string[]) {
+		this.globs = this.ignore.map((pattern) => new Minimatch(pattern, IGNORE_OPTIONS));
+	}
+
+	/** Every file Git lists for the scope that counts, and its ancestor directories, sorted by path. */
+	public readonly run = (scope: AgentTestScope): Source[] => {
+		console.log(`Scoping ${scope.kind} sources`);
+		const files = new Set(this.listFiles(scope).filter(this.isKept));
 		const paths = [...new Set([...files].flatMap(this.withAncestors))].sort();
 		const sources = paths.map((path) =>
 			files.has(path) ? new FileSource(path) : new DirectorySource(path)
@@ -35,12 +35,12 @@ export class AgentTestScope {
 		return sources;
 	};
 
-	/** The file paths Git lists for the target. */
-	private readonly listFiles = (): string[] => {
-		if (this.target.kind === 'all') return this.git([...UNTRACKED, '--cached']);
-		if (this.target.kind === 'staged') return this.git([...DIFF, '--cached']);
-		if (this.target.kind === 'base')
-			return this.git([...DIFF, '--end-of-options', `${this.target.ref}...HEAD`, '--']);
+	/** The file paths Git lists for the scope. */
+	private readonly listFiles = (scope: AgentTestScope): string[] => {
+		if (scope.kind === 'all') return this.git([...UNTRACKED, '--cached']);
+		if (scope.kind === 'staged') return this.git([...DIFF, '--cached']);
+		if (scope.kind === 'base')
+			return this.git([...DIFF, '--end-of-options', `${scope.ref}...HEAD`, '--']);
 		return [...this.git([...DIFF, 'HEAD']), ...this.git(UNTRACKED)];
 	};
 
@@ -51,13 +51,13 @@ export class AgentTestScope {
 			.filter((path) => path !== '');
 
 	/** Kept when no `ignore` glob excludes it and it is a regular file on disk right now. */
-	private readonly isKept = (path: string, globs: Minimatch[]): boolean =>
-		!this.isIgnored(path, globs) && lstatSync(path, { throwIfNoEntry: false })?.isFile() === true;
+	private readonly isKept = (path: string): boolean =>
+		!this.isIgnored(path) && lstatSync(path, { throwIfNoEntry: false })?.isFile() === true;
 
 	/** Ignored when a glob matches the file or an ancestor directory, a directory also with a trailing slash. */
-	private readonly isIgnored = (path: string, globs: Minimatch[]): boolean =>
+	private readonly isIgnored = (path: string): boolean =>
 		this.withAncestors(path).some((candidate) =>
-			globs.some(
+			this.globs.some(
 				(glob) => glob.match(candidate) || (candidate !== path && glob.match(`${candidate}/`))
 			)
 		);

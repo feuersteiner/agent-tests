@@ -7,7 +7,7 @@ export type {
 	AgentTestEnginesConfig,
 	AgentTestReasoningConfig
 } from './src/engines/types.ts';
-export type { AgentTestScopeTarget } from './src/scope/types.ts';
+export type { AgentTestScope } from './src/scope/types.ts';
 export type { AgentTestSelect, AgentTestSelectConfig } from './src/select/types.ts';
 export type {
 	AgentTestAssert,
