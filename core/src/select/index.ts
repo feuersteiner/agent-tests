@@ -12,16 +12,24 @@ export class SelectOrchestrator {
 
 	/** The sources this Test inspects, in input order; every source when the Test has no select. */
 	public readonly run = async (sources: Source[]): Promise<Source[]> => {
-		if (!this.select) return [...sources];
-		const selected = await Promise.all(sources.map(this.isSelected));
-		return sources.filter((_, index) => selected[index]);
+		console.log(`Selecting among ${sources.length} source(s)`);
+		const flagged = this.select
+			? await Promise.all(sources.map(this.isFlagged))
+			: sources.map(() => true);
+		const selected = sources.filter((_, index) => flagged[index]);
+		console.log(`${selected.length} of ${sources.length} source(s) selected`);
+		return selected;
 	};
 
-	/** A source passes glob, then grep, then decide; the first failure stops it. */
-	private readonly isSelected = async (source: Source): Promise<boolean> =>
-		(await this.passesGlob(source)) &&
-		(await this.passesGrep(source)) &&
-		(await this.passesDecide(source));
+	/** Flagged, meaning selected for this Test, when the source passes glob, then grep, then decide; the first failure stops it. A flagged source is logged. */
+	private readonly isFlagged = async (source: Source): Promise<boolean> => {
+		const flagged =
+			(await this.passesGlob(source)) &&
+			(await this.passesGrep(source)) &&
+			(await this.passesDecide(source));
+		if (flagged) console.log(`${source.path} has been selected`);
+		return flagged;
+	};
 
 	/** Passes when the select has no glob or the source path matches it. */
 	private readonly passesGlob = async (source: Source): Promise<boolean> => {
