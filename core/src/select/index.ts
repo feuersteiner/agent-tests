@@ -3,7 +3,7 @@ import type { Source } from '../sources/index.ts';
 import type { AgentTestSelect, AgentTestSelectConfig } from './types.ts';
 
 /** Picks the sources one Test inspects. */
-export class Selector {
+export class SelectOrchestrator {
 	constructor(
 		private readonly select: AgentTestSelect | undefined,
 		private readonly engines: AgentTestEngines,

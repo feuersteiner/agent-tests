@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AgentTestParamSchema, IdSchema, TextSchema, ThresholdSchema } from '../types.ts';
 import { EnginesConfigSchema } from '../engines/types.ts';
-import { SelectConfigSchema, SelectSchema } from '../selector/types.ts';
+import { SelectConfigSchema, SelectSchema } from '../select/types.ts';
 
 /** One escalating test running grep, then decide, then reason; at least one is required. */
 const TestCaseSchema = z

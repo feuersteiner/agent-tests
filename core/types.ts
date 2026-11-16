@@ -12,4 +12,4 @@ export type {
 	AgentTestEnginesConfig,
 	AgentTestReasoningConfig
 } from './src/engines/types.ts';
-export type { AgentTestSelect, AgentTestSelectConfig } from './src/selector/types.ts';
+export type { AgentTestSelect, AgentTestSelectConfig } from './src/select/types.ts';
