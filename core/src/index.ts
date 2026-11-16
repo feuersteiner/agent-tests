@@ -1,7 +1,7 @@
 import { AssertOrchestrator } from './assert/index.ts';
 import type { AgentTestResult } from './assert/types.ts';
 import { createEngines } from './engines/index.ts';
-import type { AgentTestEngines } from './engines/types.ts';
+import type { AgentTestEngines, AgentTestEnv } from './engines/types.ts';
 import { EvalOrchestrator } from './eval/index.ts';
 import type {
 	AgentTestEvalDefinition,
@@ -15,7 +15,10 @@ import type { AgentTestScope } from './scope/types.ts';
 import { SelectOrchestrator } from './select/index.ts';
 import type { Source } from './sources/index.ts';
 
-/** The main class: builds every component from the config and coordinates a run or an eval. */
+/**
+ * The main class: builds every component from the config and the environment, and coordinates a run or an eval.
+ * Throws when the environment lacks the decision or reasoning API key.
+ */
 export class AgentTests {
 	private readonly engines: AgentTestEngines;
 	private readonly scope: ScopeOrchestrator;
@@ -23,8 +26,8 @@ export class AgentTests {
 	private readonly assert: AssertOrchestrator;
 	private readonly evaluate: EvalOrchestrator;
 
-	constructor(config: AgentTestConfig) {
-		this.engines = createEngines(config);
+	constructor(config: AgentTestConfig, env: AgentTestEnv) {
+		this.engines = createEngines(config, env);
 		this.scope = new ScopeOrchestrator(config.ignore);
 		this.select = new SelectOrchestrator(this.engines, config.select);
 		this.assert = new AssertOrchestrator(this.engines, config.assert);

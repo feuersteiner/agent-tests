@@ -11,6 +11,7 @@ export type {
 	AgentTestEngine,
 	AgentTestEngines,
 	AgentTestEnginesConfig,
+	AgentTestEnv,
 	AgentTestReasoningConfig
 } from './src/engines/types.ts';
 export type { AgentTestScope } from './src/scope/types.ts';

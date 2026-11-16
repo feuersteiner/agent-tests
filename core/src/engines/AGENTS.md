@@ -6,4 +6,4 @@ Every engine is an `AgentTestEngine` from the folder's own `types.ts`, built by 
 A list of criteria is an OR: return the best result among the alternatives (any glob matching, the highest grep count, the highest model score).
 Engines score what they are given. Engine order, early stopping, thresholds, and how many model calls to spend belong to the caller (the orchestrators).
 Return a bare number; richer metadata comes later, so do not add it yet.
-`utils.ts` holds what the model engines share: `RUN_SYSTEM_PROMPT` and `providerSettings`, which reads the API key from its environment variable on an engine's first use. `index.ts` only composes `createEngines` and is the single import for the folder; no file here imports from it.
+`utils.ts` holds what the model engines share: `RUN_SYSTEM_PROMPT` and `providerSettings`, which reads the API key from the `AgentTestEnv` map passed to `createEngines` when an engine is created, and throws when it is missing or blank; models are still created on first use. `index.ts` only composes `createEngines` and is the single import for the folder; no file here imports from it.

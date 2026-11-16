@@ -27,7 +27,7 @@ export const evalCommand: Command = command({
 	params: [{ name: 'id', optional: true, description: 'Exact test ID; omit for all.' }],
 	handler: async ({ params }): Promise<void> => {
 		try {
-			const results = await new AgentTests(loadConfig()).eval(params.id);
+			const results = await new AgentTests(loadConfig(), process.env).eval(params.id);
 			const lines = toLines(results);
 			for (const line of lines) console.log(line);
 			console.log(toCount(results));

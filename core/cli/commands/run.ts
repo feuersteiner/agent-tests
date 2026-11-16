@@ -37,7 +37,7 @@ export const runCommand: Command = command({
 	handler: async ({ params, flags }): Promise<void> => {
 		try {
 			const scope = toScope(flags);
-			const results = await new AgentTests(loadConfig()).run(scope, params.id);
+			const results = await new AgentTests(loadConfig(), process.env).run(scope, params.id);
 			const lines = toLines(results);
 			for (const line of lines) console.log(line);
 			process.exitCode = lines.length ? 1 : 0;

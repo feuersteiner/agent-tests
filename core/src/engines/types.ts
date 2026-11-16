@@ -24,6 +24,9 @@ export const EnginesConfigSchema = z.strictObject({
 });
 export type AgentTestEnginesConfig = z.infer<typeof EnginesConfigSchema>;
 
+/** Environment variables by name, such as the environment the CLI passes; the model engines read their API keys from it. */
+export type AgentTestEnv = Record<string, string | undefined>;
+
 /** An engine score in [0, 1]. */
 export const AgentTestScoreSchema = z.number().min(0).max(1);
 
