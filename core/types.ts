@@ -22,4 +22,8 @@ export type {
 	AgentTestFinding,
 	AgentTestResult
 } from './src/assert/types.ts';
-export type { AgentTestEvalDefinition, AgentTestOutcome } from './src/eval/types.ts';
+export type {
+	AgentTestEvalDefinition,
+	AgentTestEvalResult,
+	AgentTestOutcome
+} from './src/eval/types.ts';

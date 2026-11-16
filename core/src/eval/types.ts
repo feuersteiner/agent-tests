@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { AgentTestFinding } from '../assert/types.ts';
 
 /** What a Test gives on an eval folder: something selected and no finding, a finding, or nothing selected. */
 export const OutcomeSchema = z.enum(['pass', 'fail', 'skip'], {
@@ -11,4 +12,11 @@ export interface AgentTestEvalDefinition {
 	id: string;
 	root: string;
 	expect: AgentTestOutcome;
+}
+
+/** One eval's outcome: the eval, its actual outcome, and findings. */
+export interface AgentTestEvalResult {
+	eval: AgentTestEvalDefinition;
+	actual: AgentTestOutcome;
+	findings: AgentTestFinding[];
 }

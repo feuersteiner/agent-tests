@@ -19,4 +19,5 @@ export { createEngines } from './src/engines/index.ts';
 export { ScopeOrchestrator } from './src/scope/index.ts';
 export { SelectOrchestrator } from './src/select/index.ts';
 export { AssertOrchestrator } from './src/assert/index.ts';
+export { EvalOrchestrator } from './src/eval/index.ts';
 export { DirectorySource, FileSource, InMemorySource, Source } from './src/sources/index.ts';
