@@ -1,0 +1,11 @@
+version: 1
+id: decide-user-text-french
+title: User text in French
+description: All text shown to the end user in the Svelte components under src/ is in French.
+select:
+  glob: 'src/**/*.svelte'
+assert:
+  - id: french-only
+    description: User-facing text is in French.
+    error: Translate the user-facing text into French.
+    decide: 'All text shown to an end user in this component, including labels, placeholders, and titles, is written in French.'

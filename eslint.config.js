@@ -12,7 +12,7 @@ const sourceFiles = ['**/*.{js,mjs,cjs,ts,mts,cts}'];
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
-	globalIgnores(['**/build/**', '**/dist/**']),
+	globalIgnores(['**/build/**', '**/dist/**', 'core/tests/models/.agents/']),
 	js.configs.recommended,
 	ts.configs.recommended,
 	prettier,

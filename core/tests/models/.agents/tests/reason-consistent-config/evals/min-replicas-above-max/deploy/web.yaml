@@ -1,0 +1,14 @@
+service: web
+image: registry.example.com/web:7.0.4
+port: 3000
+autoscaling:
+  minReplicas: 6
+  maxReplicas: 3
+  targetCpuPercent: 60
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

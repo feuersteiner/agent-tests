@@ -1,0 +1,11 @@
+version: 1
+id: reason-consistent-config
+title: Deploy settings agree
+description: No two settings in a YAML deploy config under deploy/ contradict each other.
+select:
+  glob: 'deploy/*.{yaml,yml}'
+assert:
+  - id: no-contradiction
+    description: Every pair of settings can hold at the same time.
+    error: Change one of the two contradicting settings so that both can hold.
+    reason: 'No two settings in this config contradict each other: every pair of values can hold at the same time, so no minimum is above its maximum, no resource request is above its limit, and nothing is both enabled and disabled. Equal values do not contradict.'

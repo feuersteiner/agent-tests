@@ -1,0 +1,12 @@
+version: 1
+id: decide-no-hardcoded-secrets
+title: No hard-coded secrets
+description: Source code under src/ never contains a hard-coded API key, token, or password.
+select:
+  glob: 'src/**/*.{ts,js}'
+assert:
+  - id: no-literal-secret
+    description: API keys, tokens, and passwords are read from the environment, never written as literal values.
+    error: Move the secret out of the code and read it from the environment.
+    grep: '[Kk]ey|KEY|[Tt]oken|TOKEN|[Ss]ecret|SECRET|[Pp]assword|PASSWORD'
+    decide: 'The code contains no hard-coded secret value, such as a literal API key, token, or password.'

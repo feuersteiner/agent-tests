@@ -1,0 +1,12 @@
+service: worker
+image: registry.example.com/worker:2.3.1
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 3
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 500m
+    memory: 1Gi

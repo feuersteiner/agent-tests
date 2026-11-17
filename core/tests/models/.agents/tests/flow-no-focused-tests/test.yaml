@@ -1,0 +1,13 @@
+version: 1
+id: flow-no-focused-tests
+title: No focused tests
+description: Test files never focus tests with describe.only, it.only, or test.only.
+select:
+  glob: '**/*.{ts,tsx,js}'
+  grep: '\.only\('
+  decide: 'This file is an automated test file that defines test cases for a test runner.'
+assert:
+  - id: no-only
+    description: No test or suite is focused with .only.
+    error: Remove the .only so the whole suite runs.
+    grep: '\b(describe|it|test)\.only\('

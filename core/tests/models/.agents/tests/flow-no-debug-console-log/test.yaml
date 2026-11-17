@@ -1,0 +1,12 @@
+version: 1
+id: flow-no-debug-console-log
+title: No stray console.log
+description: Application code never calls console.log; only the logger implementation writes to the console.
+select:
+  glob: 'src/**/*.{ts,tsx}'
+assert:
+  - id: no-console-log
+    description: console.log is called only inside the logger implementation.
+    error: Replace the console.log with a call to the logger, or remove the debug print.
+    grep: 'console\.log\('
+    decide: 'Every console.log call in this file is part of implementing a logger, code whose job is to write log records; none is a debug print in application logic.'

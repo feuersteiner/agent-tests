@@ -12,6 +12,7 @@
 		"build": "cp README.md LICENSE core/ && bun run --cwd core build",
 		"check": "bun run --workspaces check",
 		"test": "bun run --workspaces test",
+		"test:models": "bun run build && cd core/tests/models && node --env-file-if-exists=../../../.env ../../dist/cli/index.js eval",
 		"lint": "bun run format:check && eslint .",
 		"pack": "bun run build && cd core && npm pack",
 		"format": "prettier --write .",

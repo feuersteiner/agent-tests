@@ -1,0 +1,17 @@
+service: api
+image: registry.example.com/api:4.12.0
+port: 8080
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 6
+  targetCpuPercent: 70
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: '1'
+    memory: 512Mi
+features:
+  enabled: [search, exports]
+  disabled: [beta-dashboard]

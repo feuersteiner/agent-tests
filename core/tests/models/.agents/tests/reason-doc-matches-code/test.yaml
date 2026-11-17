@@ -1,0 +1,12 @@
+version: 1
+id: reason-doc-matches-code
+title: Doc comments match the code
+description: Every documented function in the TypeScript files under src/ does what its doc comment says.
+select:
+  glob: 'src/**/*.ts'
+  grep: '/\*\*'
+assert:
+  - id: doc-matches-code
+    description: Each documented function behaves as its doc comment states.
+    error: Make the function do what its doc comment says, or correct the comment to describe what the function does.
+    reason: 'Every function with a /** */ doc comment does what that comment states: the return values, thrown errors, parameter defaults, and bounds the comment claims all match the implementation.'

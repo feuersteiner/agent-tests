@@ -1,0 +1,12 @@
+version: 1
+id: reason-unit-comments-match
+title: Unit comments match the value
+description: A comment stating a constant's value in another unit, such as minutes or megabytes, agrees with the constant's actual value.
+select:
+  glob: 'src/**/*.ts'
+  grep: '//.*\b(seconds?|minutes?|hours?|days?|weeks?|KB|MB|GB)\b'
+assert:
+  - id: unit-comment-matches
+    description: Each unit comment agrees with the value of its constant.
+    error: Correct the constant or its comment so that both state the same amount.
+    reason: 'Every comment that states a constant''s value in a unit, such as seconds, minutes, hours, days, weeks, or megabytes, agrees with the actual value of that constant once its own unit is converted.'

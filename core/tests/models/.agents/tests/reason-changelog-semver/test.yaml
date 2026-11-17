@@ -1,0 +1,12 @@
+version: 1
+id: reason-changelog-semver
+title: Changelog versions follow semver
+description: Each release in a CHANGELOG.md bumps its version as Semantic Versioning requires for the changes it lists.
+select:
+  glob: '**/CHANGELOG.md'
+assert:
+  - id: semver-bump
+    description: Every release is bumped at least as far as its listed changes require.
+    error: Give the release the version Semantic Versioning requires for its changes, a new major version for a breaking change and at least a new minor version for a new feature, or move the change to a release that has it.
+    grep: '(^|\n)## \[?v?\d+\.\d+\.\d+[\s\S]*\n## \[?v?\d+\.\d+\.\d+'
+    reason: 'Every released version in this changelog is bumped from the release listed directly below it as Semantic Versioning requires for the changes it lists: a new major version when it lists a breaking change, and at least a new minor version when it adds a feature. The Unreleased section is not a release.'

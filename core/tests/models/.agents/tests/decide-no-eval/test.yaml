@@ -1,0 +1,12 @@
+version: 1
+id: decide-no-eval
+title: No eval
+description: Code under src/ never calls eval and never builds a function from a string with the Function constructor.
+select:
+  glob: 'src/**/*.{ts,js}'
+assert:
+  - id: no-string-as-code
+    description: The code never runs a string as code.
+    error: Replace eval or the Function constructor with code that does not run strings, such as JSON.parse or a lookup table.
+    grep: '\beval\b|\bFunction\b'
+    decide: 'The code never calls eval and never creates a function from a string with the Function constructor.'
