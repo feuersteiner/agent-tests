@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { StubAgentTests } from '../helpers/agent-tests.ts';
+import { StubAgentests } from '../helpers/agentests.ts';
 import { stubEngines } from '../helpers/engines.ts';
 import { testFolder, toYaml, validConfig, validTest } from '../helpers/fixtures.ts';
 import { git, inTempRepo } from '../helpers/git.ts';
@@ -29,10 +29,10 @@ const twoTests = {
 	'src/fixme.ts': '// FIXME'
 };
 
-describe('AgentTests.run', () => {
+describe('Agentests.run', () => {
 	test('returns one result per Test, sorted by Test folder name, with its findings', async () => {
 		await inTempRepo(twoTests, async () => {
-			const results = await new StubAgentTests(validConfig()).run({ kind: 'all' });
+			const results = await new StubAgentests(validConfig()).run({ kind: 'all' });
 			expect(results.map(({ test }) => test)).toEqual([noFixme, noTodo]);
 			expect(summarize(results)).toEqual([
 				{ id: 'no-fixme', paths: ['src/fixme.ts'] },
@@ -43,14 +43,14 @@ describe('AgentTests.run', () => {
 
 	test('runs only the Test named by id', async () => {
 		await inTempRepo(twoTests, async () => {
-			const results = await new StubAgentTests(validConfig()).run({ kind: 'all' }, 'no-fixme');
+			const results = await new StubAgentests(validConfig()).run({ kind: 'all' }, 'no-fixme');
 			expect(summarize(results)).toEqual([{ id: 'no-fixme', paths: ['src/fixme.ts'] }]);
 		});
 	});
 
 	test('throws on an unknown id', async () => {
 		await inTempRepo(twoTests, async () => {
-			const run = new StubAgentTests(validConfig()).run({ kind: 'all' }, 'missing');
+			const run = new StubAgentests(validConfig()).run({ kind: 'all' }, 'missing');
 			await expect(run).rejects.toThrow('Unknown test: missing');
 		});
 	});
@@ -62,7 +62,7 @@ describe('AgentTests.run', () => {
 			'.agents/tests/mismatch/test.yaml': toYaml(validTest({ id: 'other' }))
 		};
 		await inTempRepo(files, async () => {
-			const run = new StubAgentTests(validConfig()).run({ kind: 'all' });
+			const run = new StubAgentests(validConfig()).run({ kind: 'all' });
 			await expect(run).rejects.toThrow('2 of 3 test(s) invalid:');
 			const error = await run.catch((caught: Error) => caught.message);
 			expect(error).toContain('.agents/tests/broken/test.yaml');
@@ -89,7 +89,7 @@ describe('AgentTests.run', () => {
 			'c.ts': 'skip'
 		};
 		await inTempRepo(files, async () => {
-			const results = await new StubAgentTests(validConfig(), { decide: engines.decide }).run({
+			const results = await new StubAgentests(validConfig(), { decide: engines.decide }).run({
 				kind: 'all'
 			});
 			expect(summarize(results)).toEqual([{ id: 'no-todo', paths: ['a.ts'] }]);
@@ -111,7 +111,7 @@ describe('AgentTests.run', () => {
 			await inTempRepo(files, async (dir) => {
 				writeFiles(dir, { 'src/staged.ts': '// TODO' });
 				git(dir, 'add', 'src/staged.ts');
-				const results = await new StubAgentTests(validConfig()).run(scope);
+				const results = await new StubAgentests(validConfig()).run(scope);
 				expect(summarize(results)).toEqual([{ id: 'no-todo', paths }]);
 			});
 		}
@@ -128,7 +128,7 @@ describe('AgentTests.run', () => {
 			'src/a.ts': '// TODO'
 		};
 		await inTempRepo(files, async () => {
-			const results = await new StubAgentTests(config).run({ kind: 'all' });
+			const results = await new StubAgentests(config).run({ kind: 'all' });
 			expect(summarize(results)).toEqual([{ id: 'no-todo', paths }]);
 		});
 	});

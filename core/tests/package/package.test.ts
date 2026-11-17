@@ -27,7 +27,7 @@ const distFiles = (): string[] =>
 describe('public exports', () => {
 	test('index.ts exports exactly the expected runtime names', () => {
 		expect(Object.keys(pkg).sort()).toEqual([
-			'AgentTests',
+			'Agentests',
 			'AssertOrchestrator',
 			'CONFIG_PATH',
 			'DirectorySource',

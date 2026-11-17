@@ -19,7 +19,7 @@ import type { Source } from './sources/index.ts';
  * The main class: builds every component from the config and the environment, and coordinates a run or an eval.
  * Throws when the environment lacks the decision or reasoning API key.
  */
-export class AgentTests {
+export class Agentests {
 	protected readonly engines: AgentTestEngines;
 	private readonly scope: ScopeOrchestrator;
 	private readonly select: SelectOrchestrator;

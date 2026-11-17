@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, test } from 'bun:test';
-import { StubAgentTests } from '../helpers/agent-tests.ts';
+import { StubAgentests } from '../helpers/agentests.ts';
 import { testFolder, validConfig, validTest } from '../helpers/fixtures.ts';
 import { inTempDir } from '../helpers/temp.ts';
 import type { AgentTestEvalResult, AgentTestOutcome } from '../../src/eval/types.ts';
@@ -43,7 +43,7 @@ const decideTest = validTest({
 	]
 });
 
-describe('AgentTests.eval', () => {
+describe('Agentests.eval', () => {
 	test('gives one result per Test with one entry per eval folder carrying the eval, actual, matches, and findings', async () => {
 		const files = {
 			...testFolder(validTest(), {
@@ -54,7 +54,7 @@ describe('AgentTests.eval', () => {
 			...testFolder(noFixme, { empty: { expect: 'skip', files: { 'docs/a.md': 'FIXME' } } })
 		};
 		await inTempDir(files, async () => {
-			const results = await new StubAgentTests(validConfig()).eval();
+			const results = await new StubAgentests(validConfig()).eval();
 			const byTest = Object.fromEntries(results.map((result) => [result.test.id, result]));
 			expect(results).toHaveLength(2);
 			expect(byTest['no-todo']!.test).toEqual(validTest());
@@ -93,7 +93,7 @@ describe('AgentTests.eval', () => {
 
 	test('gives an empty list of evals for a Test without an evals folder', async () => {
 		await inTempDir(testFolder(validTest()), async () => {
-			const results = await new StubAgentTests(validConfig()).eval();
+			const results = await new StubAgentests(validConfig()).eval();
 			expect(results).toEqual([{ test: validTest(), evals: [] }]);
 		});
 	});
@@ -104,7 +104,7 @@ describe('AgentTests.eval', () => {
 			...testFolder(noFixme, { clean: { expect: 'pass', files: { 'src/a.ts': 'ok' } } })
 		};
 		await inTempDir(files, async () => {
-			const results = await new StubAgentTests(validConfig()).eval('no-fixme');
+			const results = await new StubAgentests(validConfig()).eval('no-fixme');
 			expect(results.map((result) => result.test.id)).toEqual(['no-fixme']);
 			expect(results[0]!.evals.map((result) => result.eval.id)).toEqual(['clean']);
 		});
@@ -112,7 +112,7 @@ describe('AgentTests.eval', () => {
 
 	test('throws on an unknown id', async () => {
 		await inTempDir(testFolder(validTest()), async () => {
-			await expect(new StubAgentTests(validConfig()).eval('missing')).rejects.toThrow(
+			await expect(new StubAgentests(validConfig()).eval('missing')).rejects.toThrow(
 				'Unknown test: missing'
 			);
 		});
@@ -127,7 +127,7 @@ describe('AgentTests.eval', () => {
 			'.agents/tests/no-todo/evals/broken/eval.yaml': 'expect: maybe\n'
 		};
 		await inTempDir(files, async () => {
-			const error = await new StubAgentTests(validConfig()).eval().catch((thrown: Error) => thrown);
+			const error = await new StubAgentests(validConfig()).eval().catch((thrown: Error) => thrown);
 			expect(error).toBeInstanceOf(Error);
 			const message = (error as Error).message;
 			expect(message).toStartWith('1 of 2 eval(s) invalid:');
@@ -142,7 +142,7 @@ describe('AgentTests.eval', () => {
 		});
 		await inTempDir(files, async (dir) => {
 			expect(existsSync(join(dir, '.git'))).toBe(false);
-			const [result] = await new StubAgentTests(validConfig()).eval();
+			const [result] = await new StubAgentests(validConfig()).eval();
 			expect(result!.evals.map(summarize)[0]!.actual).toBe('fail');
 		});
 	});
@@ -160,7 +160,7 @@ describe('AgentTests.eval', () => {
 			await inTempDir(files, async () => {
 				const decide = async (_input: string, criteria: unknown) =>
 					criteria === SELECT_QUESTION ? select : assert;
-				const [result] = await new StubAgentTests(validConfig(), { decide }).eval();
+				const [result] = await new StubAgentests(validConfig(), { decide }).eval();
 				const [evalResult] = result!.evals;
 				expect(evalResult!.actual).toBe(outcome);
 				expect(evalResult!.matches).toBe(true);

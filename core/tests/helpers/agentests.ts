@@ -1,4 +1,4 @@
-import { AgentTests } from '../../src/index.ts';
+import { Agentests } from '../../src/index.ts';
 import { ENV } from './fixtures.ts';
 import type { AgentTestEngine, AgentTestEngines } from '../../src/engines/types.ts';
 import type { AgentTestConfig } from '../../src/loader/types.ts';
@@ -7,11 +7,11 @@ import type { AgentTestConfig } from '../../src/loader/types.ts';
 const unreachable =
 	(engine: 'decide' | 'reason'): AgentTestEngine =>
 	async () => {
-		throw new Error(`StubAgentTests: ${engine} is not stubbed and never reaches a model`);
+		throw new Error(`StubAgentests: ${engine} is not stubbed and never reaches a model`);
 	};
 
-/** The real `AgentTests` built with `ENV`, with the given engines stubbed; decide and reason that are not given reject, glob and grep stay real unless given. */
-export class StubAgentTests extends AgentTests {
+/** The real `Agentests` built with `ENV`, with the given engines stubbed; decide and reason that are not given reject, glob and grep stay real unless given. */
+export class StubAgentests extends Agentests {
 	constructor(config: AgentTestConfig, stubs: Partial<AgentTestEngines> = {}) {
 		super(config, ENV);
 		Object.assign(

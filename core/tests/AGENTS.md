@@ -2,13 +2,13 @@
 
 ## Layout
 
-- One folder per `src/` folder (`loader/`, `engines/`, `sources/`, `scope/`, `select/`, `assert/`, `eval/`), plus `cli/` for the commands, `agent-tests/` for `AgentTests`, `package/` for the public exports and the Node-only rule, and `helpers/` for the shared helpers below.
+- One folder per `src/` folder (`loader/`, `engines/`, `sources/`, `scope/`, `select/`, `assert/`, `eval/`), plus `cli/` for the commands, `agentests/` for `Agentests`, `package/` for the public exports and the Node-only rule, and `helpers/` for the shared helpers below.
 - `models/`: a fixture repository of real Tests for the owner's paid model runs, not a suite; see its `AGENTS.md`.
 - Test files are kebab-case `*.test.ts`; no snapshot files.
 
 ## Rules
 
-- Never reach a model or any network: stub `decide` and `reason` with `stubEngines` or `StubAgentTests`.
+- Never reach a model or any network: stub `decide` and `reason` with `stubEngines` or `StubAgentests`.
 - Never read `process.env` or the root `.env`; pass explicit environment maps such as `ENV`.
 - Temporary files and repositories live under the OS temp directory, never in the repository; clean up even on failure, through `inTempDir` and `inTempRepo`.
 - Always restore the working directory after changing it.
@@ -81,12 +81,12 @@ const { engines, calls } = stubEngines({ grep: () => 2 });
 await expect(engines.decide('text', 'Is it fine?')).rejects.toThrow('no implementation');
 ```
 
-`agent-tests.ts`
+`agentests.ts`
 
-- `class StubAgentTests extends AgentTests`, `constructor(config: AgentTestConfig, stubs: Partial<AgentTestEngines> = {})`: the real `AgentTests` built with `ENV`, so `config` must name `DECISION_KEY` and `REASONING_KEY`; the given engines replace the real ones, `decide` and `reason` not given reject, `glob` and `grep` stay real unless given.
+- `class StubAgentests extends Agentests`, `constructor(config: AgentTestConfig, stubs: Partial<AgentTestEngines> = {})`: the real `Agentests` built with `ENV`, so `config` must name `DECISION_KEY` and `REASONING_KEY`; the given engines replace the real ones, `decide` and `reason` not given reject, `glob` and `grep` stay real unless given.
 
 ```ts
-const tests = new StubAgentTests(validConfig(), { decide: async () => 0 });
+const tests = new StubAgentests(validConfig(), { decide: async () => 0 });
 await expect(tests.run({ kind: 'all' })).rejects.toThrow('reason is not stubbed');
 ```
 

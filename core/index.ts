@@ -1,4 +1,4 @@
-export { AgentTests } from './src/index.ts';
+export { Agentests } from './src/index.ts';
 export {
 	CONFIG_PATH,
 	EVAL_FILE,

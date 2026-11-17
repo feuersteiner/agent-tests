@@ -1,5 +1,5 @@
 import { command, type Command, type Handler } from 'clinguini';
-import { AgentTests } from '../../src/index.ts';
+import { Agentests } from '../../src/index.ts';
 import type { AgentTestResult } from '../../src/assert/types.ts';
 import { loadConfig } from '../../src/loader/index.ts';
 import type { AgentTestScope } from '../../src/scope/types.ts';
@@ -37,7 +37,7 @@ export const runCommand: Command = command({
 	handler: async ({ params, flags }): Promise<void> => {
 		try {
 			const scope = toScope(flags);
-			const results = await new AgentTests(loadConfig(), process.env).run(scope, params.id);
+			const results = await new Agentests(loadConfig(), process.env).run(scope, params.id);
 			const lines = toLines(results);
 			for (const line of lines) console.log(line);
 			process.exitCode = lines.length ? 1 : 0;

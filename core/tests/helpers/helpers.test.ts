@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadConfig, loadDefinitions, loadEvalDefinitions } from '../../src/loader/index.ts';
-import { StubAgentTests } from './agent-tests.ts';
+import { StubAgentests } from './agentests.ts';
 import { runCli } from './cli.ts';
 import { stubEngines } from './engines.ts';
 import { configFile, ENV, testFolder, toYaml, validConfig, validTest } from './fixtures.ts';
@@ -92,7 +92,7 @@ describe('stubEngines', () => {
 	});
 });
 
-describe('StubAgentTests', () => {
+describe('StubAgentests', () => {
 	const files = { ...configFile(), 'src/a.ts': 'export const a = 1;\n' };
 	const modelTest = validTest({
 		assert: [
@@ -102,17 +102,17 @@ describe('StubAgentTests', () => {
 
 	test('rejects instead of reaching a decide or reason that is not stubbed', async () => {
 		await inTempRepo({ ...files, ...testFolder(modelTest) }, async () => {
-			await expect(new StubAgentTests(validConfig()).run({ kind: 'all' })).rejects.toThrow(
+			await expect(new StubAgentests(validConfig()).run({ kind: 'all' })).rejects.toThrow(
 				'decide is not stubbed'
 			);
-			const tests = new StubAgentTests(validConfig(), { decide: async () => 0 });
+			const tests = new StubAgentests(validConfig(), { decide: async () => 0 });
 			await expect(tests.run({ kind: 'all' })).rejects.toThrow('reason is not stubbed');
 		});
 	});
 
 	test('uses the stubs given', async () => {
 		await inTempRepo({ ...files, ...testFolder(modelTest) }, async () => {
-			const tests = new StubAgentTests(validConfig(), {
+			const tests = new StubAgentests(validConfig(), {
 				decide: async () => 0,
 				reason: async () => 1
 			});
