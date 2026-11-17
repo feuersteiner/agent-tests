@@ -20,7 +20,7 @@ import type { Source } from './sources/index.ts';
  * Throws when the environment lacks the decision or reasoning API key.
  */
 export class AgentTests {
-	private readonly engines: AgentTestEngines;
+	protected readonly engines: AgentTestEngines;
 	private readonly scope: ScopeOrchestrator;
 	private readonly select: SelectOrchestrator;
 	private readonly assert: AssertOrchestrator;

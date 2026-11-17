@@ -11,6 +11,7 @@
 		"prepare": "lefthook install",
 		"build": "cp README.md LICENSE core/ && bun run --cwd core build",
 		"check": "bun run --workspaces check",
+		"test": "bun run --workspaces test",
 		"lint": "bun run format:check && eslint .",
 		"pack": "bun run build && cd core && npm pack",
 		"format": "prettier --write .",

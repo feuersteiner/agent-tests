@@ -52,7 +52,8 @@
 	},
 	"scripts": {
 		"build": "rm -rf dist && tsc -p tsconfig.build.json",
-		"check": "tsc --noEmit"
+		"check": "tsc --noEmit",
+		"test": "bun run build && bun test ./tests"
 	},
 	"devDependencies": {
 		"@types/bun": "latest"
