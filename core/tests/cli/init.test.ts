@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { devNull } from 'node:os';
 import { dirname, join } from 'node:path';
 import { parseConfig } from '../../src/loader/index.ts';
-import { toConfig } from '../../cli/config/presets.ts';
+import { toConfig } from '../../cli/commands/init/presets.ts';
 import { runCli } from '../helpers/cli.ts';
 import { toYaml } from '../helpers/fixtures.ts';
 import { git, inTempRepo } from '../helpers/git.ts';
@@ -121,7 +121,7 @@ describe('agent-tests init', () => {
 			const result = init(dir, ['--decision', 'jev', '--reasoning', 'anthropic']);
 			expect(result.exitCode).toBe(0);
 			expect(readFileSync(join(dir, 'agent-tests.config.yaml'), 'utf8')).toBe('custom: true\n');
-			expect(result.output).toContain(
+			expect(result.stdout).toContain(
 				'agent-tests.config.yaml exists; left it alone. Add what you need from:\n' +
 					toYaml(toConfig('jev', 'anthropic'))
 			);
@@ -190,7 +190,7 @@ describe('agent-tests init', () => {
 		await inTempRepo({ 'agent-tests.config.yaml': 'custom: true\n' }, (dir) => {
 			const result = init(dir);
 			expect(result.exitCode).toBe(0);
-			expect(result.output).not.toContain('in .env or the environment.');
+			expect(result.stdout).not.toContain('in .env or the environment.');
 		});
 	});
 });

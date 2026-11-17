@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync } from 'node:fs';
 import { clinguini } from 'clinguini';
-import { initCommand } from './commands/init.ts';
+import { initCommand } from './commands/init/index.ts';
 import { listCommand } from './commands/list.ts';
 import { validateCommand } from './commands/validate.ts';
 import { compileCommand } from './commands/compile/index.ts';

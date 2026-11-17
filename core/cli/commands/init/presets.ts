@@ -1,5 +1,8 @@
-import type { AgentTestDecisionConfig, AgentTestReasoningConfig } from '../../src/engines/types.ts';
-import type { AgentTestConfig } from '../../src/loader/types.ts';
+import type {
+	AgentTestDecisionConfig,
+	AgentTestReasoningConfig
+} from '../../../src/engines/types.ts';
+import type { AgentTestConfig } from '../../../src/loader/types.ts';
 
 /** A provider the config's `decision` section accepts. */
 type DecisionProvider = AgentTestDecisionConfig['api'];
