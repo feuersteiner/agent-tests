@@ -35,8 +35,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bun run test
-      - name: Copy package documentation
-        run: cp README.md LICENSE core/
+      - run: bun run build
       - name: Publish
         working-directory: core
         run: npm publish --ignore-scripts --access public --provenance
