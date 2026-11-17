@@ -21,7 +21,7 @@
     },
     "core": {
       "name": "agentests",
-      "version": "0.8.0",
+      "version": "1.0.0",
       "bin": {
         "agentests": "./dist/cli/index.js",
       },
