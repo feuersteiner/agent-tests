@@ -20,6 +20,7 @@
 - `bun test` runs every file in one process, one file after another, and each file's tests in order; globals, `process.env`, and the working directory carry over between files, so leave them as you found them.
 - `bun test` skips dot-folders, so nothing under `models/.agents/` runs.
 - `bun run check` type-checks the tests; `tsconfig.build.json` leaves them out of `dist/` and the package.
+- The pre-push hook runs the suite without `GIT_DIR`, `GIT_WORK_TREE`, and `GIT_INDEX_FILE`: Git exports them to hooks, and the scope orchestrator's Git calls would follow them to this repository instead of the temp one.
 
 ## Helpers
 
