@@ -3,7 +3,7 @@ import type { AgentTestConfig } from '../types.ts';
 import { describeIssues } from '../helpers/issues.ts';
 import { globProblems } from '../helpers/patterns.ts';
 
-/** Validate a parsed value as a config, or throw every schema and rule problem as `path: message` lines. */
+/** Validate a parsed value as a config, or throw `path: message` lines: every schema problem; else, once the schema passes, every rule problem. */
 export const validateConfig = (value: unknown): AgentTestConfig => {
 	const result = AgentTestConfigSchema.safeParse(value);
 	if (!result.success) throw new Error(describeIssues(result.error.issues).join('\n'));

@@ -6,7 +6,7 @@ import { globProblems, patterns } from '../helpers/patterns.ts';
 /** The newest test.yaml format version this package validates. */
 export const LATEST_VERSION = 1;
 
-/** Validate a parsed value as the latest Test shape, or throw every schema and rule problem as `path: message` lines. */
+/** Validate a parsed value as the latest Test shape, or throw `path: message` lines: the version problem alone; else every schema problem; else, once the schema passes, every rule problem. */
 export const validateTest = (value: unknown): AgentTestDefinition => {
 	const version =
 		typeof value === 'object' && value !== null && 'version' in value ? value.version : undefined;
