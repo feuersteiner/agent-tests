@@ -29,7 +29,7 @@ export class ScopeOrchestrator {
 		return this.toSources(this.listFiles(scope), '.');
 	};
 
-	/** Every file under `folder` that counts, and its ancestor directories, sorted by path, with `folder` as the repository root; needs no Git. */
+	/** Every file under `folder` that counts, and its ancestor directories, sorted by path, with `folder` as the repository root; needs no Git; nothing behind a directory symlink counts. */
 	public readonly runFolder = (folder: string): Source[] => {
 		console.log(`Scoping sources in ${folder}`);
 		const paths = readdirSync(folder, { recursive: true, encoding: 'utf8' });
@@ -65,10 +65,13 @@ export class ScopeOrchestrator {
 			.split('\0')
 			.filter((path) => path !== '');
 
-	/** Kept when no `ignore` glob excludes it and it is a regular file under `root` on disk right now. */
+	/** Kept when no `ignore` glob excludes it, it is a regular file under `root` on disk right now, and no ancestor directory of it under `root` is a symlink. */
 	private readonly isKept = (path: string, root: string): boolean =>
 		!this.isIgnored(path) &&
-		lstatSync(join(root, path), { throwIfNoEntry: false })?.isFile() === true;
+		lstatSync(join(root, path), { throwIfNoEntry: false })?.isFile() === true &&
+		!this.withAncestors(path)
+			.slice(1)
+			.some((directory) => lstatSync(join(root, directory)).isSymbolicLink());
 
 	/** Ignored when a glob matches the file or an ancestor directory, a directory also with a trailing slash. */
 	private readonly isIgnored = (path: string): boolean =>
