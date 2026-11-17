@@ -100,5 +100,14 @@ The product's name, command, config file name, tagline and repository live only 
 
 ## Delivery
 
-The rendered MP4 is uploaded to GitHub and its URL pasted on its own line in the root README's "See
-it in 60 seconds" section. The MP4 itself is never committed.
+The root README embeds the film through the URL GitHub returns when the rendered MP4 is dragged
+into a comment box, pasted on its own line in "See it in 60 seconds". After a re-render, repeat
+that upload and replace the URL.
+
+The MP4 and a poster frame, one frame at 13.5 seconds, are also kept as assets of the pre-release
+tagged `demo-video`, uploaded with the GitHub CLI. Neither file is committed.
+
+```sh
+ffmpeg -ss 13.5 -i output/demo.mp4 -frames:v 1 output/poster.png
+gh release upload demo-video output/demo.mp4 output/poster.png --clobber
+```

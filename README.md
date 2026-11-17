@@ -17,7 +17,7 @@ comes next.
 
 ## See it in 60 seconds
 
-<!-- Video: paste the uploaded video URL on its own line here. -->
+https://github.com/user-attachments/assets/b7f71b93-9cb0-4d5e-9825-edc523b0ebdb
 
 One brand decision, from the meeting to a blocked commit: written down once, compiled into three
 clear questions, proved on six evals. The film's [SvelteKit app](demo-video) is in this repository.
@@ -83,7 +83,7 @@ assert:
     description: Never blame the reader.
     error: Say what happened and what to do next.
     grep: '[Yy]ou (entered|failed|forgot)|[Yy]our (mistake|error|fault)'
-    decide: 'The text does not blame the reader for a problem.'
+    decide: 'The text does not say the reader made a mistake.'
 ```
 
 Your agent also writes evals: tiny repositories, each with files at their real paths and the
@@ -171,6 +171,17 @@ itself. It also sets the `select` and `assert` thresholds and `ignore` globs. Pr
 both (`OPENAI_API_KEY`), Jev by typesafe.ai for decisions (`TYPESAFE_AI_API_KEY`), Anthropic for
 reasoning (`ANTHROPIC_API_KEY`). The CLI loads `.env` without overriding variables already set;
 `run` and `eval` need the keys the config names, even for a Test that uses only `glob` and `grep`.
+
+### Library
+
+```ts
+import { Agentests, loadConfig } from 'agentests';
+
+const results = await new Agentests(loadConfig(), process.env).run({ kind: 'staged' });
+```
+
+Each result is a Test with its findings, and the types are under `agentests/types`. The library
+never reads `.env` or `process.env` itself: pass the environment in.
 
 ## Repository structure
 

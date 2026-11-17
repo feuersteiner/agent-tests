@@ -75,7 +75,7 @@
 		{
 			id: 'no-blame',
 			grep: '[Yy]ou (entered|failed|…',
-			decide: 'The text does not blame the reader for a problem.'
+			decide: 'The text does not say the reader made a mistake.'
 		}
 	];
 	const cardAt = (index: number) => 4.4 + index * 1.2;
