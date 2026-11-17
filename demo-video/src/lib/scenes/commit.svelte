@@ -14,133 +14,126 @@
 	const duration = scenes.find((scene) => scene.id === 'commit')!.duration;
 
 	// Scene moments, in seconds on this scene's clock.
-	const blocked = 2.6;
-	const fixed = 4;
-	const cleared = 5.2;
-	const committed = 7.2;
+	const blocked = 3;
+	const fixing = 6;
+	const erased = 6.3;
+	const rewritten = 6.9;
+	const retried = 7;
+	// The committed state lands by 8.2 and holds completely still until the exit at 10.7.
+	const committed = 8;
+	const landing = 0.2;
 
-	// The route as the agent wrote it, and the two lines that replace its leak.
-	const head = [
-		"router.get('/:id', async (req, res) => {",
-		'  try {',
-		'    res.json(await findUser(req.params.id));',
-		'  } catch (err) {'
-	];
-	const tail = ['  }', '});'];
-	const indent = '    ';
-	const leak = 'res.status(500).send(err.stack);';
-	const logged = 'console.error(err.stack);';
-	const answer = "res.status(500).send('Error');";
+	// The launch email as the agent wrote it. Line 4 breaks the decision; the fix replaces only it.
+	const before = ['# One-click checkout is live', '', 'Your customers can now pay in one step.'];
+	const after = ['', 'Turn it on in Settings, under Checkout.'];
+	const promise = 'Guaranteed to double your conversions in 30 days.';
+	const typical = 'Most teams see results within a month.';
+	const flagged = before.length + 1;
+	const length = before.length + 1 + after.length;
 
-	// The fix: the leak is erased, then the logging line and the generic reply are typed in.
-	const erased = 4.2;
+	// The fix: the promise is erased, then the typical result is typed in its place.
 	const code = $derived(
-		time < erased
-			? [...head, indent + typeChars(leak, 1 - progress(time, fixed, erased)), ...tail].join('\n')
-			: [
-					...head,
-					indent + typeChars(logged, progress(time, 4.25, 4.65)),
-					...(time >= 4.7 ? [indent + typeChars(answer, progress(time, 4.7, 5.1))] : []),
-					...tail
-				].join('\n')
+		[
+			...before,
+			time < erased
+				? typeChars(promise, 1 - progress(time, fixing, erased))
+				: typeChars(typical, progress(time, erased + 0.05, rewritten)),
+			...after
+		].join('\n')
 	);
 	const marks: EditorMark[] = $derived(
 		time < erased
-			? [{ line: 5, at: blocked, kind: 'remove' }]
-			: [
-					{ line: 5, at: 4.25, kind: 'add' },
-					{ line: 6, at: 4.7, kind: 'add' }
-				]
+			? [{ line: flagged, at: blocked, kind: 'remove' }]
+			: [{ line: flagged, at: erased + 0.05, kind: 'add' }]
 	);
 
-	const commit = 'git commit -m "Handle user errors"';
+	const commit = 'git commit -m "Add the launch email"';
 	const hook = `pre-commit: ${product.command} run --staged`;
 	const first: TerminalLine[] = [
-		{ at: 0.5, text: commit, kind: 'command', typed: 1 },
-		{ at: 1.65, text: hook, kind: 'muted' },
-		{ at: 1.85, text: 'Scoping staged sources' },
-		{ at: 2.05, text: 'src/routes/user.ts has been selected' },
-		{ at: 2.25, text: 'src/routes/user.ts has failed no-stack-trace' },
+		{ at: 0.8, text: commit, kind: 'command', typed: 1 },
+		{ at: 2, text: hook, kind: 'muted' },
+		{ at: 2.25, text: 'Test brand-voice' },
+		{ at: 2.5, text: 'emails/launch.md has been selected' },
 		{
-			at: 2.45,
-			text: 'src/routes/user.ts  errors-hide-internals/no-stack-trace  Log the stack trace instead.',
+			at: 2.75,
+			text: 'emails/launch.md  brand-voice/no-guarantees  Describe the typical result, or link the terms.',
 			kind: 'fail'
 		}
 	];
 	// The terminal starts clean for the second attempt, so the first run never crowds it.
 	const second: TerminalLine[] = [
-		{ at: 5.3, text: commit, kind: 'command', typed: 0.9 },
-		{ at: 6.3, text: hook, kind: 'muted' },
-		{ at: 6.5, text: 'src/routes/user.ts has been selected' },
-		{ at: 6.75, text: '0 of 1 source(s) failed', kind: 'pass' },
-		{ at: 6.95, text: '[main 4c1d2e7] Handle user errors' },
-		{ at: 7.05, text: ' 1 file changed, 2 insertions(+), 1 deletion(-)' }
+		{ at: retried, text: commit, kind: 'command', typed: 0.6 },
+		{ at: 7.65, text: hook, kind: 'muted' },
+		{ at: 7.8, text: '0 of 1 source(s) failed', kind: 'pass' },
+		{ at: 7.95, text: '[main 8f3b1c2] Add the launch email' },
+		{ at: 8.05, text: ` 1 file changed, ${length} insertions(+)` }
 	];
-	const lines = $derived(time < cleared ? first : second);
+	const lines = $derived(time < retried ? first : second);
 
 	const entered = $derived(fade(time, 0, 0.4));
-	const shown = $derived(entered * (1 - fade(time, duration - 0.3, duration)));
+	const exit = $derived(1 - fade(time, duration - 0.3, duration));
 	const alarm = $derived(
-		fade(time, blocked, blocked + 0.25) * (1 - fade(time, fixed, fixed + 0.25))
+		fade(time, blocked, blocked + 0.25) * (1 - fade(time, fixing, fixing + 0.25))
 	);
-	const passed = $derived(fade(time, committed, committed + 0.25));
+	const passed = $derived(fade(time, committed, committed + landing));
 	// The idle label steps aside before a colored state arrives and returns once it has gone.
 	const idle = $derived(
 		1 -
 			fade(time, blocked - 0.2, blocked) +
-			fade(time, fixed + 0.25, fixed + 0.45) -
+			fade(time, fixing + 0.25, fixing + 0.45) -
 			fade(time, committed - 0.2, committed)
 	);
 </script>
 
-<div class="caption" style:opacity={1 - fade(time, duration - 0.3, duration)}>
-	<Caption step={4} text="Run it on every commit" {time} />
-</div>
+<div class="scene" style:opacity={exit}>
+	<Caption step={4} text="Now it reaches the work" {time} />
 
-<div class="content" style:opacity={shown} style:translate={`0 ${(1 - entered) * 24}px`}>
-	<div class="editor">
-		<Editor file="src/routes/user.ts" {code} {marks} {time} />
-	</div>
+	<div class="content" style:opacity={entered} style:translate={`0 ${(1 - entered) * 24}px`}>
+		<div class="editor">
+			<Editor file="emails/launch.md" {code} {marks} {time} />
+			<!-- Sits in the editor's tab bar, where an editor names who changed a file. -->
+			<span class="author">
+				<Icon name="smart_toy" filled />
+				<span class="byline">written by your coding agent</span>
+			</span>
+		</div>
 
-	<!-- The commit's state, big enough to read from across a room. -->
-	<div class="status">
-		<div class="state idle" style:opacity={idle}>
-			<Icon name="commit" />
-			<strong>Pre-commit hook</strong>
+		<!-- The commit's state, big enough to read from across a room. -->
+		<div class="status">
+			<div class="state idle" style:opacity={idle}>
+				<Icon name="commit" />
+				<strong>Pre-commit hook</strong>
+			</div>
+			<div
+				class="state alarm"
+				style:opacity={alarm}
+				style:scale={0.94 + 0.06 * fade(time, blocked, blocked + 0.3)}
+			>
+				<Icon name="block" filled />
+				<strong>Commit blocked</strong>
+				<code>exit 1</code>
+			</div>
+			<div
+				class="state passed"
+				style:opacity={passed}
+				style:scale={0.94 + 0.06 * fade(time, committed, committed + landing)}
+			>
+				<Icon name="check_circle" filled />
+				<strong>Committed</strong>
+				<code>exit 0</code>
+			</div>
 		</div>
-		<div
-			class="state alarm"
-			style:opacity={alarm}
-			style:scale={0.94 + 0.06 * fade(time, blocked, blocked + 0.3)}
-		>
-			<Icon name="block" filled />
-			<strong>Commit blocked</strong>
-			<code>exit 1</code>
-		</div>
-		<div
-			class="state passed"
-			style:opacity={passed}
-			style:scale={0.94 + 0.06 * fade(time, committed, committed + 0.3)}
-		>
-			<Icon name="check_circle" filled />
-			<strong>Committed</strong>
-			<code>exit 0</code>
-		</div>
-	</div>
 
-	<div class="terminal">
-		<div class="ring alarm" style:opacity={alarm}></div>
-		<div class="ring passed" style:opacity={passed}></div>
-		<Terminal {lines} {time} />
+		<div class="terminal">
+			<div class="ring alarm" style:opacity={alarm}></div>
+			<div class="ring passed" style:opacity={passed}></div>
+			<Terminal {lines} {time} />
+		</div>
 	</div>
 </div>
 
 <style>
-	.caption {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-	}
+	.scene,
 	.content {
 		position: absolute;
 		inset: 0;
@@ -149,16 +142,35 @@
 		position: absolute;
 		top: 200px;
 		left: 96px;
-		width: 1060px;
-		height: 418px;
-		--code-size: 24px;
+		width: 1088px;
+		height: 440px;
+		--code-size: 32px;
+	}
+	/* Centered on the file tab's row, so the two read as one line of the tab bar. */
+	.author {
+		position: absolute;
+		top: 40px;
+		right: 0;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		height: 48px;
+		padding-right: 28px;
+		color: #9cdcfe;
+		font-size: 34px;
+	}
+	.byline {
+		font:
+			500 24px / 1 var(--font-text),
+			sans-serif;
+		letter-spacing: -0.01em;
 	}
 	.status {
 		position: absolute;
 		top: 200px;
-		left: 1180px;
-		width: 644px;
-		height: 418px;
+		left: 1208px;
+		width: 616px;
+		height: 440px;
 		border-radius: 1rem;
 		background: color-mix(in srgb, var(--color-foreground) 5%, var(--color-background));
 		box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-foreground) 10%, transparent);
@@ -201,10 +213,10 @@
 	}
 	.terminal {
 		position: absolute;
-		top: 634px;
+		top: 664px;
 		left: 96px;
 		width: 1728px;
-		height: 374px;
+		height: 344px;
 		isolation: isolate;
 		--code-size: 28px;
 	}

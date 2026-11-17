@@ -1,12 +1,12 @@
 // Every scene has an explicit duration; any frame is a pure function of the film's time.
 export const scenes = [
-	{ id: 'hook', label: 'The same mistake, again', duration: 3.5 },
-	{ id: 'rule', label: 'Write the rule', duration: 5 },
-	{ id: 'compile', label: 'Your agent compiles it', duration: 7 },
-	{ id: 'eval', label: 'Prove it on evals', duration: 6 },
-	{ id: 'commit', label: 'Run it on every commit', duration: 8.5 },
-	{ id: 'funnel', label: 'Cheap first', duration: 5 },
-	{ id: 'cta', label: 'Your turn', duration: 5 }
+	{ id: 'decision', label: 'The decision', duration: 7 },
+	{ id: 'drift', label: 'The work never heard', duration: 8 },
+	{ id: 'rule', label: 'Write it down once', duration: 8 },
+	{ id: 'compile', label: 'Your agent compiles it', duration: 11 },
+	{ id: 'eval', label: 'Prove it on your evals', duration: 9 },
+	{ id: 'commit', label: 'Now it reaches the work', duration: 11 },
+	{ id: 'cta', label: 'Your turn', duration: 6 }
 ] as const;
 export type Scene = (typeof scenes)[number];
 export type SceneId = Scene['id'];

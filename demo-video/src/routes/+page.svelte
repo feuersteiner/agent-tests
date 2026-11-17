@@ -37,6 +37,7 @@
 		if (rendering)
 			window.__film = {
 				duration,
+				scenes,
 				seek: async (seconds) => {
 					film.seek(seconds);
 					await tick();

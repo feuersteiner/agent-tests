@@ -9,45 +9,42 @@
 
 	const duration = scenes.find((scene) => scene.id === 'rule')!.duration;
 
-	// The film's one rule, exactly as its TEST.md is written.
+	// The decision from the meeting, written down exactly as its TEST.md is written.
 	const rule = [
-		'# Error responses hide internals',
+		'# Brand voice',
 		'',
-		'Error responses from routes under `src/routes/` reveal no stack trace, SQL, file path, or internal host.',
+		'Customer-facing copy under `content/` and `emails/` says what the product does in plain words.',
+		'It promises no result and never blames the reader for a problem.',
 		'',
-		'Exceptions: details that are only logged.'
+		'Exceptions: refund and legal terms.'
 	].join('\n');
-	const folder = '.agents/tests/errors-hide-internals/';
-	const notes = ['Plain language.', 'No regex.', 'No prompts.'];
+	const folder = '.agents/tests/brand-voice/';
 
 	// Scene moments, in seconds on this scene's clock.
-	const typeFrom = 0.45;
-	const typeTo = 3;
-	const noted = 3.1;
+	const typeFrom = 0.6;
+	const typeTo = 4;
+	const closing = 4.4;
 
 	const entered = $derived(fade(time, 0, 0.4));
 	const shown = $derived(1 - fade(time, duration - 0.3, duration));
-	const noteShown = (index: number) => fade(time, noted + index * 0.12, noted + index * 0.12 + 0.3);
+	const closed = $derived(fade(time, closing, closing + 0.45));
 </script>
 
 <div class="scene" style:opacity={shown}>
-	<Caption step={1} text="Write the rule" {time} />
+	<Caption step={1} text="Write it down once" {time} />
 	<div class="content" style:opacity={entered} style:translate={`0 ${(1 - entered) * 24}px`}>
-		<p>
+		<p class="path">
 			<Icon name="folder_open" />
-			<span>{folder}</span>
+			<code>{folder}</code>
 		</p>
 		<div class="panel">
 			<Editor file="TEST.md" code={rule} {time} {typeFrom} {typeTo} />
 		</div>
 	</div>
-	<ul style:--bar={fade(time, noted, noted + 0.5)}>
-		{#each notes as note, index (note)}
-			<li style:opacity={noteShown(index)} style:translate={`0 ${(1 - noteShown(index)) * 24}px`}>
-				{note}
-			</li>
-		{/each}
-	</ul>
+	<p class="closing" style:opacity={closed} style:translate={`0 ${(1 - closed) * 24}px`}>
+		<strong>Plain language.</strong>
+		<span>Nothing else.</span>
+	</p>
 </div>
 
 <style>
@@ -55,46 +52,50 @@
 		position: absolute;
 		inset: 0;
 	}
-	/* The path and the panel, centered in the content area below the caption (top 200, 808 tall). */
+	/* The path and the panel, left-aligned under the caption; the closing line sits below them. */
 	.content {
 		position: absolute;
-		top: 248px;
+		top: 200px;
 		left: 96px;
-		width: 1280px;
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 18px;
 	}
-	p {
+	.path {
 		display: flex;
 		align-items: center;
 		gap: 14px;
 		margin: 0;
 		color: var(--color-muted);
 		font:
-			500 30px / 1.3 var(--font-mono),
+			500 32px / 1.3 var(--font-mono),
 			monospace;
-		letter-spacing: 0;
 	}
-	span {
+	code {
+		font: inherit;
+		letter-spacing: 0;
 		white-space: nowrap;
 	}
+	/*
+	 * Sized to the file. A 40px character of the editor's JetBrains Mono is 23.68px wide, so a
+	 * 1530px text column (1662 less the gutter, padding and border) holds 64 characters and the
+	 * caret but not 65: the second sentence stays whole and the first wraps once, after "says
+	 * what". Just tall enough for its seven rows, with even padding above and below.
+	 */
 	.panel {
-		--code-size: 44px;
+		--code-size: 40px;
 		--gutter: calc(var(--code-size) * 2.75);
-		/* Just tall enough for the whole file, so no empty editor sits under it. */
-		height: 648px;
+		width: 1662px;
+		height: 588px;
 	}
 	/* The tab bar keeps the size it has in every other scene; only the code is larger here. */
 	.panel :global(header) {
 		font-size: 26px;
 	}
 	/*
-	 * The shared editor never wraps, and the rule's long sentence would run off the panel at this
-	 * size. These overrides soft-wrap each line like an editor with word wrap on: the line number
-	 * hangs in the gutter, wrapped text lines up under the first line's text, and the caret stays
-	 * at the end of the typed text. The panel fits 43 characters a line, so the sentence breaks
-	 * into three short lines and the last line of the file stays whole.
+	 * The shared editor never wraps. These overrides soft-wrap each line like an editor with word
+	 * wrap on: the line number hangs in the gutter, wrapped text lines up under the first line's
+	 * text, inline code never breaks inside, and the caret stays at the end of the typed text.
 	 */
 	.panel :global(.code) {
 		padding-right: calc(var(--code-size) * 0.5);
@@ -131,37 +132,22 @@
 		vertical-align: calc(var(--code-size) * -0.25);
 		text-indent: 0;
 	}
-	ul {
+	/* The scene's one closing line, baseline near y = 960, on the caption's left edge. */
+	.closing {
 		position: absolute;
-		top: 564px;
-		left: 1440px;
+		top: 908px;
+		left: 96px;
 		display: flex;
-		flex-direction: column;
-		gap: 10px;
+		gap: 0.26em;
 		margin: 0;
-		padding: 4px 0 4px 32px;
-		list-style: none;
-	}
-	/* The note's accent bar draws downward as its lines rise in. */
-	ul::before {
-		content: '';
-		position: absolute;
-		inset: 0 auto 0 0;
-		width: 4px;
-		border-radius: 2px;
-		background: var(--color-primary);
-		opacity: var(--bar);
-		scale: 1 var(--bar);
-		transform-origin: top;
-	}
-	li {
 		font:
-			650 48px / 1.2 var(--font-text),
+			650 56px / 1.1 var(--font-text),
 			sans-serif;
 		letter-spacing: -0.03em;
 		white-space: nowrap;
 	}
-	li:not(:first-child) {
-		color: var(--color-muted);
+	strong {
+		font-weight: inherit;
+		color: var(--color-primary);
 	}
 </style>

@@ -3,6 +3,6 @@ export const product = {
 	name: 'agentests',
 	command: 'npx agentests',
 	config: 'agentests.config.yaml',
-	tagline: 'Turn repository rules into tests an agent can compile, prove on evals, and run.',
+	tagline: 'Linting for intelligence.',
 	repository: 'github.com/feuersteiner/agentests'
 } as const;

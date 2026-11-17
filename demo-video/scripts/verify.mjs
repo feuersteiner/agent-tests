@@ -5,8 +5,6 @@ import { join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { filmDuration, openFilm, root, seek, serveFilm } from './browser.mjs';
 
-/** The finished film's length in seconds and its number of scenes. */
-const expected = { duration: 40, scenes: 7 };
 /** Film seconds between the samples that find the scenes; every scene is longer. */
 const step = 0.5;
 /** Where frames that differ between two seeks are saved for inspection. */
@@ -69,14 +67,20 @@ const inkShare = async (browser, png) => {
 const verify = async (film) => {
 	const { page } = film;
 	const screenshot = () => page.screenshot({ animations: 'disabled' });
+	// The expected length and scenes are the film's own timeline, as the player exposes it.
 	const duration = await filmDuration(page);
-	await check('duration', async () => ({
-		passed: duration === expected.duration,
-		detail:
-			duration === expected.duration
-				? `${duration} s`
-				: `the film reports ${duration} s; expected ${expected.duration} s`
-	}));
+	const timeline = (await page.evaluate(() => window.__film.scenes)) ?? [];
+	const total = timeline.reduce((sum, scene) => sum + scene.duration, 0);
+	await check('duration', async () => {
+		if (!timeline.length)
+			return { passed: false, detail: 'the page exposes no scenes in window.__film.scenes' };
+		return duration > 0 && duration === total
+			? { passed: true, detail: `${duration} s, the sum of ${timeline.length} scene durations` }
+			: {
+					passed: false,
+					detail: `the film reports ${duration} s; its ${timeline.length} scenes add up to ${total} s`
+				};
+	});
 
 	// Sample the stage every `step` seconds and group the samples into runs of one scene each.
 	const times = Array.from({ length: Math.floor(duration / step) + 1 }, (_, index) => index * step);
@@ -104,10 +108,11 @@ const verify = async (film) => {
 		}
 		const missing = runs.filter((run) => run.placeholder).map((run) => run.scene);
 		const ids = runs.map((run) => run.scene).join(', ');
-		if (runs.length !== expected.scenes)
+		const expected = timeline.map((scene) => scene.id).join(', ');
+		if (ids !== expected)
 			return {
 				passed: false,
-				detail: `expected ${expected.scenes} scenes, found ${runs.length}: ${ids}`
+				detail: `expected ${timeline.length} scenes in order, ${expected}; found ${runs.length}: ${ids}`
 			};
 		if (missing.length)
 			return {

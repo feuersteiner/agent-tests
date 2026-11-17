@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { Icon, Pill, Surface } from 'bref-ui';
+	import { Surface as CodeSurface, Theme } from 'bref-ui-themes/vscode';
 	import Caption from '../components/caption.svelte';
 	import Terminal from '../components/terminal.svelte';
 	import type { TerminalLine } from '../components/terminal.svelte';
-	import { fade, progress } from '../motion.js';
+	import { fade } from '../motion.js';
 	import { product } from '../product.js';
 	import { scenes } from '../timeline.js';
 
@@ -11,154 +12,191 @@
 
 	const duration = scenes.find((scene) => scene.id === 'compile')!.duration;
 
-	// The command types out, then the first real lines of the prompt print one after another.
+	// Beat A, 0.4 to 3.4: alone on stage, the command types, the first real lines of its prompt
+	// print, then the tag; from 1.8 nothing moves, so the tag can be read.
+	const command = `${product.command} compile brand-voice`;
 	const lines: TerminalLine[] = [
-		{
-			at: 0.4,
-			text: `${product.command} compile errors-hide-internals`,
-			kind: 'command',
-			typed: 1.1
-		},
-		...[
-			`# Compile the ${product.name} Test \`errors-hide-internals\``,
-			'## The rule',
-			'## Steps',
-			'## test.yaml',
-			'## How a Test runs',
-			'## One thing per criterion',
-			'## Example'
-		].map((text, index) => ({ at: 1.6 + index * 0.12, text }))
+		{ at: 0.4, text: command, kind: 'command', typed: 0.7 },
+		...[`# Compile the ${product.name} Test \`brand-voice\``, '## The rule', '## Steps'].map(
+			(text) => ({ at: 1.25, text })
+		)
 	];
 
-	// The four assertions of test.yaml; long patterns are cut after a meaningful prefix.
-	const assertions = [
-		{ id: 'no-stack-trace', grep: '[Ss]tack', decide: 'No response includes a stack trace.' },
-		{
-			id: 'no-sql',
-			grep: 'SQL|[Ss]ql|[Qq]uery|SELECT|…',
-			decide: 'No response includes an SQL query.'
-		},
-		{
-			id: 'no-file-path',
-			grep: '__dirname|__filename|[Pp]ath|…',
-			decide: 'No response includes a server file path.'
-		},
-		{
-			id: 'no-internal-host',
-			grep: '[Hh]ost|\\.internal|…',
-			decide: 'No response names an internal host or address.'
-		}
-	].map((assertion, index) => ({ ...assertion, at: 3 + index * 0.55 }));
+	// Beat B, 3.4 to 4.4: the terminal shrinks into a dim chip under the caption, and the hand-off
+	// leads from it to the coding agent, then branches down to where the three cards will land.
+	// Both boxes match their rules in the style block.
+	const terminal = { left: 360, top: 320, width: 1200, height: 436 };
+	const chip = { left: 96, top: 208, width: 542, height: 64 };
+	const shrinkTo = chip.width / terminal.width;
+	const shiftX = chip.left + chip.width / 2 - (terminal.left + terminal.width / 2);
+	const shiftY = chip.top + chip.height / 2 - (terminal.top + terminal.height / 2);
 
-	const exit = $derived(1 - fade(time, duration - 0.3, duration));
+	/** The hand-off row's center line, and the agent's node on the stage's center column. */
+	const row = chip.top + chip.height / 2;
+	const node = { x: 960, radius: 36 };
+	const wireFrom = chip.left + chip.width + 16;
+	const wireTo = node.x - node.radius - 12;
+	const gap = 32;
+	const cardWidth = (1920 - 2 * 96 - 2 * gap) / 3;
+	const cardsTop = 344;
+	const bar = 300;
+	const corner = 16;
+	const tip = cardsTop - 14;
+	/** The center of each card, where its branch ends. */
+	const centers = [0, 1, 2].map((index) => 96 + cardWidth / 2 + index * (cardWidth + gap));
+	const branches = centers.map((x, index) => {
+		if (index === 1) return `M ${node.x} ${row + node.radius} V ${tip}`;
+		const side = Math.sign(x - node.x);
+		return [
+			`M ${node.x} ${row + node.radius}`,
+			`V ${bar - corner}`,
+			`Q ${node.x} ${bar} ${node.x + side * corner} ${bar}`,
+			`H ${x - side * corner}`,
+			`Q ${x} ${bar} ${x} ${bar + corner}`,
+			`V ${tip}`
+		].join(' ');
+	});
+	const chevron = (x: number, y: number, dx: number, dy: number) =>
+		`${x - dx - dy},${y - dy + dx} ${x},${y} ${x - dx + dy},${y - dy - dx}`;
+
+	// Beat C, 4.4 to 8.0: one card per assertion of brand-voice/test.yaml, 1.2 s apart.
+	// Long patterns are cut with a trailing … after a meaningful prefix; the questions are exact.
+	const assertions = [
+		{
+			id: 'no-hype',
+			grep: '[Rr]evolutionary|…',
+			decide: 'The text makes no superlative claim about the product.'
+		},
+		{
+			id: 'no-guarantees',
+			grep: '[Gg]uarantee|100%|…',
+			decide: 'The text makes no promise of a result.'
+		},
+		{
+			id: 'no-blame',
+			grep: '[Yy]ou (entered|failed|…',
+			decide: 'The text does not blame the reader for a problem.'
+		}
+	];
+	const cardAt = (index: number) => 4.4 + index * 1.2;
+
 	const enter = $derived(fade(time, 0, 0.4));
-	// Once every card is in, the prompt side steps back so the result and the summary lead.
-	const dim = $derived(1 - 0.3 * fade(time, 5.1, 5.5));
-	const note = $derived(fade(time, 1.9, 2.3));
-	const wireIn = $derived(progress(time, 2.5, 2.65));
-	const node = $derived(fade(time, 2.58, 2.8));
-	const wireOut = $derived(progress(time, 2.72, 2.9));
-	const head = $derived(fade(time, 2.85, 2.95));
-	const file = $derived(fade(time, 2.85, 3.15));
-	const broad = $derived(fade(time, 5.25, 5.55));
-	const narrow = $derived(fade(time, 5.35, 5.65));
-	const rise = (shown: number) => `0 ${(1 - shown) * 24}px`;
+	const exit = $derived(1 - fade(time, duration - 0.3, duration));
+	const tagIn = $derived(fade(time, 1.5, 1.8));
+	const tag = $derived(tagIn * (1 - fade(time, 3.4, 3.55)));
+	// Each step of the hand-off starts as the one before it settles: shrink, chip, wire, agent, branches.
+	const shrink = $derived(fade(time, 3.4, 3.75));
+	const shown = $derived(enter * (1 - fade(time, 3.5, 3.75)));
+	const landed = $derived(fade(time, 3.58, 3.78));
+	const wire = $derived(fade(time, 3.74, 3.92));
+	const agent = $derived(fade(time, 3.9, 4.08));
+	const tree = $derived(fade(time, 4.06, 4.32));
+	const tips = $derived(fade(time, 4.28, 4.38));
+	// Beat D: settled by 8.2 and completely still until the exit at 10.7.
+	const closing = $derived(fade(time, 7.9, 8.2));
+	const rise = (amount: number) => `0 ${(1 - amount) * 24}px`;
 </script>
 
 <div class="scene" style:opacity={exit}>
 	<Caption step={2} text="Your agent compiles it" {time} />
 
-	<!-- Dimmed as one layer, so the label on the terminal keeps covering it while both fade. -->
-	<div class="prompt" style:opacity={dim}>
-		<div class="terminal" style:opacity={enter} style:translate={rise(enter)}>
-			<Terminal --code-size="21px" {lines} {time} />
-		</div>
+	<svg viewBox="0 0 1920 1080" aria-hidden="true">
+		{#if wire > 0}
+			<path
+				d={`M ${wireFrom} ${row} H ${wireTo}`}
+				pathLength="1"
+				stroke-dasharray="1"
+				stroke-dashoffset={1 - wire}
+			/>
+			<polyline points={chevron(wireTo, row, 11, 0)} style:opacity={fade(time, 3.86, 3.92)} />
+		{/if}
+		{#if tree > 0}
+			{#each branches as branch (branch)}
+				<path d={branch} pathLength="1" stroke-dasharray="1" stroke-dashoffset={1 - tree} />
+			{/each}
+			{#each centers as x (x)}
+				<polyline points={chevron(x, tip, 0, 11)} style:opacity={tips} />
+			{/each}
+		{/if}
+	</svg>
 
-		<div class="note" style:opacity={note} style:translate={rise(note)}>
-			<span class="tag">
-				<Pill label="prints a prompt · calls no model" color="primary" variant="filled" />
-			</span>
-		</div>
-
-		<div class="handoff">
-			<svg viewBox="0 0 188 72" aria-hidden="true">
-				<path d="M 10 36 H 56" stroke-dasharray="46" stroke-dashoffset={46 * (1 - wireIn)} />
-				<path d="M 132 36 H 174" stroke-dasharray="42" stroke-dashoffset={42 * (1 - wireOut)} />
-				<polyline points="164,26 175,36 164,46" style:opacity={head} />
-			</svg>
-			<div class="node" style:opacity={node} style:scale={0.6 + 0.4 * node}>
-				<Icon name="smart_toy" filled />
-			</div>
-			<span class="agent" style:opacity={node}>your coding agent</span>
-		</div>
+	<div
+		class="terminal"
+		style:opacity={shown}
+		style:translate={`${shiftX * shrink}px ${shiftY * shrink + (1 - enter) * 24}px`}
+		style:scale={1 - (1 - shrinkTo) * shrink}
+	>
+		<Terminal --code-size="44px" {lines} {time} />
 	</div>
 
-	<header style:opacity={file} style:translate={rise(file)}>
-		<strong>test.yaml</strong>
-		<code class="glob">glob: 'src/routes/**/*.ts'</code>
-	</header>
+	<div class="note" style:opacity={tag} style:translate={rise(tagIn)}>
+		<span class="tag">
+			<Pill label="prints a prompt · calls no model" color="primary" variant="filled" />
+		</span>
+	</div>
+
+	<div class="chip" style:opacity={0.55 * landed}>
+		<Theme>
+			<CodeSurface
+				orientation="horizontal"
+				height="fill"
+				radius="1rem"
+				shadow="medium"
+				color="background"
+				variant="filled"
+			>
+				<span class="dollar">$</span>
+				<code class="command">{command}</code>
+			</CodeSurface>
+		</Theme>
+	</div>
+
+	<div class="node" style:opacity={agent} style:scale={0.6 + 0.4 * agent}>
+		<Icon name="smart_toy" filled />
+	</div>
+	<span class="agent" style:opacity={agent} style:translate={`${(1 - agent) * -16}px 0`}>
+		your coding agent
+	</span>
 
 	<div class="cards">
-		{#each assertions as assertion (assertion.id)}
-			{@const shown = fade(time, assertion.at, assertion.at + 0.3)}
-			<div class="card" style:opacity={shown} style:translate={rise(shown)}>
+		{#each assertions as assertion, index (assertion.id)}
+			{@const arrived = fade(time, cardAt(index), cardAt(index) + 0.3)}
+			<div class="card" style:opacity={arrived} style:translate={rise(arrived)}>
 				<Surface color="background" variant="filled" shadow="medium" radius="1.5rem" height="fill">
 					<h3>{assertion.id}</h3>
 					<div class="check">
 						<span class="tag">
-							<Pill label="grep · local" color="muted" variant="soft" />
+							<Pill label="text check · local · free" color="success" variant="soft" />
 						</span>
 						<code class="pattern">{assertion.grep}</code>
 					</div>
 					<div class="check">
 						<span class="tag">
-							<Pill label="decide · one yes/no question" color="primary" variant="soft" />
+							<Pill label="if it matches: one yes-or-no question" color="primary" variant="soft" />
 						</span>
-						<p class="decide">{assertion.decide}</p>
+						<p class="question">{assertion.decide}</p>
 					</div>
 				</Surface>
 			</div>
 		{/each}
 	</div>
 
-	<p class="summary">
-		<span class="broad" style:opacity={broad} style:translate={rise(broad)}>One broad rule.</span>
-		<span class="narrow" style:opacity={narrow} style:translate={rise(narrow)}>
-			Four narrow checks.
-		</span>
+	<p class="closing" style:opacity={closing} style:translate={rise(closing)}>
+		<span>One fuzzy rule.</span>
+		<span class="accent">Three clear questions.</span>
 	</p>
 </div>
 
 <style>
-	.scene,
-	.prompt {
+	.scene {
 		position: absolute;
 		inset: 0;
 	}
-	.terminal {
-		position: absolute;
-		top: 200px;
-		left: 96px;
-		width: 620px;
-		height: 420px;
-	}
-	.note {
-		position: absolute;
-		/* Straddles the terminal's bottom edge, so it reads as a label on the terminal. */
-		top: 596px;
-		left: 124px;
-		--tag-zoom: 1.5;
-	}
-	.handoff {
-		position: absolute;
-		top: 374px;
-		left: 716px;
-		width: 188px;
-	}
 	svg {
-		display: block;
-		width: 188px;
-		height: 72px;
+		position: absolute;
+		inset: 0;
+		width: 1920px;
+		height: 1080px;
 		overflow: visible;
 	}
 	path,
@@ -169,74 +207,108 @@
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
+	.terminal {
+		position: absolute;
+		top: 320px;
+		left: 360px;
+		width: 1200px;
+		height: 436px;
+	}
+	.note {
+		position: absolute;
+		top: 800px;
+		left: 0;
+		display: flex;
+		justify-content: center;
+		width: 1920px;
+		--tag-zoom: 2;
+	}
+	/* Pills are sized in rem; zoom scales the whole pill so it reads at film size. */
+	.tag {
+		display: flex;
+		zoom: var(--tag-zoom, 1.5);
+		font-size: 18px;
+		font-weight: 600;
+	}
+	.chip {
+		position: absolute;
+		top: 208px;
+		left: 96px;
+		width: 542px;
+		height: 64px;
+	}
+	.chip > :global([data-bref-theme]) {
+		height: 100%;
+		min-height: 0;
+		background: transparent;
+		font:
+			400 24px / 1.5 var(--font-mono),
+			monospace;
+	}
+	.chip :global([data-surface]) {
+		gap: 0.6em;
+		padding: 0 1em;
+	}
+	.dollar {
+		color: var(--color-success);
+	}
+	.command {
+		font: inherit;
+		color: #e4e4e4;
+		white-space: pre;
+	}
 	.node {
 		position: absolute;
-		top: 2px;
-		left: 60px;
+		top: 204px;
+		left: 924px;
 		display: grid;
 		place-items: center;
-		width: 68px;
-		height: 68px;
+		width: 72px;
+		height: 72px;
 		border-radius: 50%;
 		background: var(--color-primary);
 		color: var(--color-background);
-		font-size: 40px;
+		font-size: 44px;
 	}
 	.agent {
-		display: block;
-		margin: 14px auto 0;
-		width: 150px;
+		position: absolute;
+		top: 219px;
+		left: 1016px;
 		color: var(--color-primary);
 		font:
-			600 22px / 1.2 var(--font-text),
+			600 34px / 1.2 var(--font-text),
 			sans-serif;
-		text-align: center;
-	}
-	header {
-		position: absolute;
-		top: 200px;
-		left: 904px;
-		display: flex;
-		align-items: baseline;
-		gap: 24px;
-		height: 48px;
-	}
-	strong {
-		font:
-			700 32px / 1.4 var(--font-mono),
-			monospace;
 		letter-spacing: -0.02em;
-	}
-	.glob {
-		color: var(--color-muted);
-		font:
-			400 24px / 1.4 var(--font-mono),
-			monospace;
+		white-space: nowrap;
 	}
 	.cards {
 		position: absolute;
-		top: 268px;
-		left: 904px;
+		top: 344px;
+		left: 96px;
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		grid-template-rows: repeat(2, 1fr);
-		gap: 24px;
-		width: 920px;
-		height: 740px;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 32px;
+		width: 1728px;
+		/* 26px tag text: the longest tag fits the card's width on one line. */
+		--tag-zoom: 1.44;
 	}
 	.card {
 		min-width: 0;
-		min-height: 0;
+	}
+	/* The card tags take less side padding and never wrap, so the longer second tag stays on one line. */
+	.card .tag :global([data-variant]) {
+		--pill-padding: 0.5rem;
+		white-space: nowrap;
 	}
 	.card :global([data-surface]) {
 		--surface-fill: color-mix(in srgb, white 72%, var(--color-background));
-		gap: 22px;
-		padding: 26px 26px 28px;
+		gap: 26px;
+		padding: 34px 36px 40px;
 	}
 	h3 {
 		margin: 0;
 		font:
-			700 30px / 1.2 var(--font-mono),
+			700 36px / 1.2 var(--font-mono),
 			monospace;
 		letter-spacing: -0.02em;
 	}
@@ -244,45 +316,37 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 10px;
-	}
-	/* Pills are sized in rem; zoom scales the whole pill so it reads at film size. */
-	.tag {
-		display: flex;
-		zoom: var(--tag-zoom, 1.2);
-		font-size: 17px;
-		font-weight: 600;
+		gap: 12px;
 	}
 	.pattern {
 		white-space: nowrap;
-		color: color-mix(in srgb, var(--color-foreground) 78%, var(--color-background));
+		color: color-mix(in srgb, var(--color-foreground) 75%, var(--color-background));
 		font:
-			500 22px / 1.4 var(--font-mono),
+			500 30px / 1.35 var(--font-mono),
 			monospace;
 	}
-	.decide {
+	.question {
 		margin: 0;
 		font:
-			560 32px / 1.25 var(--font-text),
+			600 48px / 1.14 var(--font-text),
 			sans-serif;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.025em;
+		text-wrap: pretty;
 	}
-	.summary {
+	.closing {
 		position: absolute;
-		bottom: 72px;
+		top: 896px;
 		left: 96px;
-		width: 620px;
+		display: flex;
+		gap: 0.26em;
 		margin: 0;
 		font:
-			650 56px / 1.12 var(--font-text),
+			650 64px / 1.1 var(--font-text),
 			sans-serif;
 		letter-spacing: -0.035em;
+		white-space: nowrap;
 	}
-	.broad,
-	.narrow {
-		display: block;
-	}
-	.narrow {
+	.accent {
 		color: var(--color-primary);
 	}
 </style>
