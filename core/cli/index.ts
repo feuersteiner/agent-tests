@@ -14,7 +14,8 @@ if (existsSync('.env')) process.loadEnvFile('.env');
 
 await clinguini({
 	name: 'agentests',
-	description: 'Reusable repository checks for lessons learned during agent sessions.',
+	description:
+		'Linting for intelligence: plain-language rules compiled into engineered checks and proved on your own evals.',
 	commands: [initCommand, compileCommand, listCommand, validateCommand, evalCommand, runCommand],
 	utils: {
 		help: true,

@@ -1,7 +1,7 @@
 {
 	"name": "agentests",
 	"version": "0.8.0",
-	"description": "Reusable repository checks for lessons learned during agent sessions.",
+	"description": "Linting for intelligence: plain-language rules compiled into engineered checks and proved on your own evals.",
 	"keywords": [
 		"ai-native",
 		"ai-native-business",
