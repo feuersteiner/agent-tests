@@ -5,3 +5,5 @@ pre-commit:
       stage_fixed: true
     - name: check
       run: bun run lint && bun run check
+    - name: test
+      run: bun run test
