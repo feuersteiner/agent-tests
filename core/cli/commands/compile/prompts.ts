@@ -19,13 +19,11 @@ export const toCompilePrompt = (id: string, rule: string): string =>
 			step.REPORT
 		]),
 		section.LIMITS,
-		section.TEST_YAML,
+		section.FIELDS,
 		section.RUN,
-		section.GLOB,
-		section.GREP,
-		section.MODELS,
-		section.EVALS,
-		section.EXAMPLE
+		section.CRITERIA,
+		section.EXAMPLE,
+		section.EVALS
 	].join('\n\n');
 
 /** For a named Test whose `TEST.md` is missing or blank: write it, then compile. */
