@@ -123,13 +123,12 @@ describe('StubAgentTests', () => {
 });
 
 describe('runCli', () => {
-	test('strips the banner', async () => {
+	test('returns the exit code, stdout, and its non-empty lines', async () => {
 		await inTempDir({ ...configFile(), ...testFolder(validTest()) }, (dir) => {
 			const result = runCli(['list'], { cwd: dir });
-			expect(result.stdout).toContain('─');
-			expect(result.output).not.toContain('─');
-			expect(result.lines).toEqual(['no-todo  No TODO']);
 			expect(result.exitCode).toBe(0);
+			expect(result.stdout).toBe('no-todo  No TODO\n');
+			expect(result.lines).toEqual(['no-todo  No TODO']);
 		});
 	});
 

@@ -18,6 +18,6 @@ await clinguini({
 	commands: [initCommand, compileCommand, listCommand, validateCommand, evalCommand, runCommand],
 	utils: {
 		help: true,
-		header: banner()
+		header: process.stdout.isTTY ? banner() : undefined
 	}
 });

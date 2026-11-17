@@ -23,34 +23,34 @@ describe('compile command', () => {
 		await inTempDir(testFolder(validTest(), {}, RULE), (dir) => {
 			const result = runCli(['compile', 'no-todo'], { cwd: dir });
 			expect(result.exitCode).toBe(0);
-			expect(result.output).toBe(`${toCompilePrompt('no-todo', RULE)}\n`);
+			expect(result.stdout).toBe(`${toCompilePrompt('no-todo', RULE)}\n`);
 		});
 	});
 
 	test('the compile prompt holds the rule verbatim and names the id', async () => {
 		await inTempDir(testFolder(validTest(), {}, RULE), (dir) => {
-			const { output } = runCli(['compile', 'no-todo'], { cwd: dir });
-			expect(output).toContain(RULE);
-			expect(output).toContain('# Compile the agent-tests Test `no-todo`');
-			expect(output).toContain('`.agents/tests/no-todo/test.yaml`');
+			const { stdout } = runCli(['compile', 'no-todo'], { cwd: dir });
+			expect(stdout).toContain(RULE);
+			expect(stdout).toContain('# Compile the agent-tests Test `no-todo`');
+			expect(stdout).toContain('`.agents/tests/no-todo/test.yaml`');
 		});
 	});
 
 	test('the compile prompt names the validate and eval commands with npx, never bunx or bun run', async () => {
 		await inTempDir(testFolder(validTest(), {}, RULE), (dir) => {
-			const { output } = runCli(['compile', 'no-todo'], { cwd: dir });
-			expect(output).toContain('`npx agent-tests validate no-todo`');
-			expect(output).toContain('`npx agent-tests eval no-todo`');
-			expect(output).not.toContain('bunx');
-			expect(output).not.toContain('bun run');
+			const { stdout } = runCli(['compile', 'no-todo'], { cwd: dir });
+			expect(stdout).toContain('`npx agent-tests validate no-todo`');
+			expect(stdout).toContain('`npx agent-tests eval no-todo`');
+			expect(stdout).not.toContain('bunx');
+			expect(stdout).not.toContain('bun run');
 		});
 	});
 
 	test('a rule holding a code fence is quoted in a longer fence', async () => {
 		const rule = '# No TODO\n\n```ts\n// TODO\n```\n';
 		await inTempDir(testFolder(validTest(), {}, rule), (dir) => {
-			const { output } = runCli(['compile', 'no-todo'], { cwd: dir });
-			expect(output).toContain(`\`\`\`\`markdown\n${rule}\`\`\`\`\n`);
+			const { stdout } = runCli(['compile', 'no-todo'], { cwd: dir });
+			expect(stdout).toContain(`\`\`\`\`markdown\n${rule}\`\`\`\`\n`);
 		});
 	});
 
@@ -59,7 +59,6 @@ describe('compile command', () => {
 			const first = runCli(['compile', 'no-todo'], { cwd: dir });
 			const second = runCli(['compile', 'no-todo'], { cwd: dir });
 			expect(second.stdout).toBe(first.stdout);
-			expect(second.output).toBe(first.output);
 		});
 	});
 
@@ -67,7 +66,7 @@ describe('compile command', () => {
 		await inTempDir(EMPTY_TESTS, (dir) => {
 			const result = runCli(['compile'], { cwd: dir });
 			expect(result.exitCode).toBe(0);
-			expect(result.output).toBe(`${NEW_TEST_PROMPT}\n`);
+			expect(result.stdout).toBe(`${NEW_TEST_PROMPT}\n`);
 		});
 	});
 
@@ -84,8 +83,8 @@ describe('compile command', () => {
 			await inTempDir(files, (dir) => {
 				const result = runCli(['compile', 'no-todo'], { cwd: dir });
 				expect(result.exitCode).toBe(0);
-				expect(result.output).toBe(`${toRulePrompt('no-todo')}\n`);
-				expect(result.output).toContain('`.agents/tests/no-todo/TEST.md`');
+				expect(result.stdout).toBe(`${toRulePrompt('no-todo')}\n`);
+				expect(result.stdout).toContain('`.agents/tests/no-todo/TEST.md`');
 			});
 		}
 	);
@@ -98,7 +97,7 @@ describe('compile command', () => {
 			const result = runCli(['compile', id], { cwd: dir });
 			expect(result.exitCode).toBe(2);
 			expect(result.stderr).toContain('Invalid test id');
-			expect(result.output).not.toContain(RULE);
+			expect(result.stdout).not.toContain(RULE);
 		});
 	});
 
@@ -109,7 +108,7 @@ describe('compile command', () => {
 			const result = runCli(['compile', ...args], { cwd: dir });
 			expect(result.exitCode).toBe(2);
 			expect(result.stderr).toContain('No .agents/tests/ folder');
-			expect(result.output.trim()).toBe('');
+			expect(result.stdout.trim()).toBe('');
 		});
 	});
 
@@ -118,7 +117,7 @@ describe('compile command', () => {
 			const result = runCli(['compile', 'no-todo'], { cwd: dir, env: {} });
 			expect(result.exitCode).toBe(0);
 			expect(result.stderr).toBe('');
-			expect(result.output).toContain(RULE);
+			expect(result.stdout).toContain(RULE);
 		});
 	});
 });

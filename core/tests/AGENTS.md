@@ -91,7 +91,7 @@ await expect(tests.run({ kind: 'all' })).rejects.toThrow('reason is not stubbed'
 
 `cli.ts`
 
-- `runCli = (args: string[], options: { cwd: string; env?: Record<string, string> }): { exitCode: number; stdout: string; stderr: string; output: string; lines: string[] }`: runs the built `dist/cli/index.js` on Node in `cwd`, which is required; the child gets only `PATH`, `HOME`, and `env`, plus the `.env` of `cwd` the CLI loads itself; `output` is stdout without the banner, `lines` its non-empty lines. Throws when `dist/` is missing or `cwd` is the repository or inside it (compared on real paths), where a real `.env` could be loaded; a temp directory with its own placeholder `.env` is allowed.
+- `runCli = (args: string[], options: { cwd: string; env?: Record<string, string> }): { exitCode: number; stdout: string; stderr: string; lines: string[] }`: runs the built `dist/cli/index.js` on Node in `cwd`, which is required; the child gets only `PATH`, `HOME`, and `env`, plus the `.env` of `cwd` the CLI loads itself; its stdout is a pipe, so it holds no banner; `lines` is the non-empty lines of `stdout`. Throws when `dist/` is missing or `cwd` is the repository or inside it (compared on real paths), where a real `.env` could be loaded; a temp directory with its own placeholder `.env` is allowed.
 
 ```ts
 const result = runCli(['list'], { cwd: dir });

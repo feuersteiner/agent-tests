@@ -26,7 +26,15 @@ describe('agent-tests entry', () => {
 			const result = runCli(['--help'], { cwd: dir });
 			expect(result.exitCode).toBe(0);
 			for (const name of ['init', 'compile', 'list', 'validate', 'eval', 'run'])
-				expect(result.output).toContain(`Usage: agent-tests ${name} `);
+				expect(result.stdout).toContain(`Usage: agent-tests ${name} `);
+		});
+	});
+
+	test('prints no banner when stdout is not a terminal', async () => {
+		await inTempDir({ ...configFile(), ...testFolder(validTest()) }, (dir) => {
+			const result = runCli(['list'], { cwd: dir });
+			expect(result.exitCode).toBe(0);
+			expect(result.stdout).toBe('no-todo  No TODO\n');
 		});
 	});
 

@@ -15,32 +15,17 @@ const isInRepo = (dir: string): boolean => {
 	return !isAbsolute(path) && path !== '..' && !path.startsWith(`..${sep}`);
 };
 
-/** A banner rule: a full line of box-drawing dashes, as wide as the terminal or 80 when piped. */
-const RULE = /^─+$/;
-
-/** One CLI run: exit code, raw streams, stdout without the banner, and its non-empty lines. */
+/** One CLI run: exit code, raw streams, and the non-empty lines of stdout. */
 interface CliResult {
 	exitCode: number;
 	stdout: string;
 	stderr: string;
-	output: string;
 	lines: string[];
 }
 
 /**
- * Stdout without the banner block clinguini prints first: `console.log(banner())`, where the banner is
- * `\n<rule>\n<art>\n<rule>\n`, so a blank line, a rule, the art, a rule, and one more blank line.
- */
-const stripBanner = (stdout: string): string => {
-	const lines = stdout.split('\n');
-	if (lines[0] !== '' || !RULE.test(lines[1] ?? '')) return stdout;
-	const end = lines.findIndex((line, index) => index > 1 && RULE.test(line));
-	if (end === -1) return stdout;
-	return lines.slice(lines[end + 1] === '' ? end + 2 : end + 1).join('\n');
-};
-
-/**
  * Runs the built CLI on Node in `cwd`, which is required; the child sees only PATH, HOME, `env`, and the `.env` of `cwd`.
+ * Its stdout is a pipe, never a terminal, so it holds no banner.
  * Throws when `dist/` is not built or `cwd` is inside the repository, where the CLI could load a real `.env`.
  */
 export const runCli = (
@@ -59,12 +44,10 @@ export const runCli = (
 		env: { PATH: process.env.PATH ?? '', HOME: process.env.HOME ?? '', ...env }
 	});
 	if (result.error) throw result.error;
-	const output = stripBanner(result.stdout);
 	return {
 		exitCode: result.status ?? 1,
 		stdout: result.stdout,
 		stderr: result.stderr,
-		output,
-		lines: output.split('\n').filter((line) => line.trim() !== '')
+		lines: result.stdout.split('\n').filter((line) => line.trim() !== '')
 	};
 };
