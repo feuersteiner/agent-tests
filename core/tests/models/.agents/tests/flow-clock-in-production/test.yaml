@@ -1,0 +1,12 @@
+version: 1
+id: flow-clock-in-production
+title: Production code reads the time from the clock
+description: Production code reads the current time through clock.now(), never Date.now() or new Date().
+select:
+  glob: 'src/**/*.ts'
+  decide: 'This file is production application code, not an automated test.'
+assert:
+  - id: clock-now
+    description: Production code never reads the current time with Date.now() or new Date().
+    error: Read the current time with clock.now() from lib/clock.ts.
+    grep: 'Date\.now\(\)|new Date\(\)'

@@ -1,0 +1,11 @@
+version: 1
+id: decide-fr-locale-no-english
+title: No English in the French locale
+description: The French translation file locales/fr.json contains no English text among its translated strings.
+select:
+  glob: 'locales/fr.json'
+assert:
+  - id: no-english-value
+    description: No translated string in the French locale is in English.
+    error: Translate the English strings into French.
+    decide: 'No translated string value in this JSON is written in English; the keys are identifiers, not translations, and do not count.'

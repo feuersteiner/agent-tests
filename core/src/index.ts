@@ -1,79 +1,78 @@
-import { TestCheck } from './check/index.ts';
-import type { Check } from './check/types.ts';
-import { validateConfig, validateTests } from './config/validate.ts';
-import { TestEval } from './evals/index.ts';
-import { AI } from './shared/deprecated-ai/index.ts';
-import type { Source } from './shared/sources/index.ts';
-import type { Result } from './shared/types.ts';
-import { TestTrigger } from './trigger/index.ts';
-import type { AgentTest, AgentTestConfig, AgentTestEvalResult, AgentTestResult } from './types.ts';
+import { AssertOrchestrator } from './assert/index.ts';
+import type { AgentTestResult } from './assert/types.ts';
+import { createEngines } from './engines/index.ts';
+import type { AgentTestEngines, AgentTestEnv } from './engines/types.ts';
+import { EvalOrchestrator } from './eval/index.ts';
+import type {
+	AgentTestEvalDefinition,
+	AgentTestEvalResult,
+	AgentTestEvalsResult
+} from './eval/types.ts';
+import { loadDefinitions, loadEvalDefinitions } from './loader/index.ts';
+import type { AgentTestConfig, AgentTestDefinition } from './loader/types.ts';
+import { ScopeOrchestrator } from './scope/index.ts';
+import type { AgentTestScope } from './scope/types.ts';
+import { SelectOrchestrator } from './select/index.ts';
+import type { Source } from './sources/index.ts';
 
-/** Run each validated test's triggers and checks independently over shared sources. */
-export class AgentTests {
-	public readonly tests: AgentTest[];
-	private readonly config: AgentTestConfig;
-	private ai?: AI;
+/**
+ * The main class: builds every component from the config and the environment, and coordinates a run or an eval.
+ * Throws when the environment lacks the decision or reasoning API key.
+ */
+export class Agentests {
+	protected readonly engines: AgentTestEngines;
+	private readonly scope: ScopeOrchestrator;
+	private readonly select: SelectOrchestrator;
+	private readonly assert: AssertOrchestrator;
+	private readonly evaluate: EvalOrchestrator;
 
-	/**
-	 * @param sources - Shared base sources supplied by the caller; each test selects its own targets.
-	 * @param definitions - Parsed test definitions; text parsing belongs to src/config.
-	 * @param config - Shared provider models and stage settings, validated here.
-	 * @throws If any definition or config is invalid, including duplicate test IDs.
-	 */
-	constructor(
-		public readonly sources: Source[],
-		definitions: unknown,
-		config: unknown
-	) {
-		this.tests = validateTests(definitions);
-		this.config = validateConfig(config);
+	constructor(config: AgentTestConfig, env: AgentTestEnv) {
+		this.engines = createEngines(config, env);
+		this.scope = new ScopeOrchestrator(config.ignore);
+		this.select = new SelectOrchestrator(this.engines, config.select);
+		this.assert = new AssertOrchestrator(this.engines, config.assert);
+		this.evaluate = new EvalOrchestrator(this.scope, this.select, this.assert);
 	}
 
-	/** Run each test over the shared base; return groups in definition order. */
-	public readonly run = async (verbose = false): Promise<(AgentTestResult & { id: string })[]> => {
-		return Promise.all(
-			this.tests.map(async (test) => {
-				const ai = (this.ai ??= new AI(this.config));
-				const trigger = new TestTrigger(test.triggers ?? [], { ...this.config.trigger, ai });
-				const check = new TestCheck(test.checks, { ...this.config.check, ai });
-				console.log(`Agent test "${test.title}" (${test.id}) running...`);
-				const triggered = await trigger.run(this.sources, verbose);
-				const selected = trigger.selected(this.sources, triggered);
-				const checked = await check.run(selected, verbose);
-				if (verbose) this.log(test.id, selected, checked);
-				return { id: test.id, trigger: triggered, check: checked };
-			})
-		);
+	/** Runs every Test, or only the one named `id`, over the sources in scope; one result per Test. */
+	public readonly run = async (scope: AgentTestScope, id?: string): Promise<AgentTestResult[]> => {
+		const tests = loadDefinitions(id);
+		const sources = this.scope.run(scope);
+		const results: AgentTestResult[] = [];
+		for (const test of tests) results.push(await this.runTest(test, sources));
+		return results;
 	};
 
-	/** Run each test's labeled examples using fresh stages and the shared AI. */
-	public readonly eval = async (verbose = false): Promise<AgentTestEvalResult[]> => {
-		return Promise.all(
-			this.tests.map(async (test) => {
-				const ai = (this.ai ??= new AI(this.config));
-				const trigger = new TestTrigger(test.triggers ?? [], { ...this.config.trigger, ai });
-				const check = new TestCheck(test.checks, { ...this.config.check, ai });
-				const evals = new TestEval(test.evals);
-				const { id } = test;
-				if (verbose) console.log(`Agent test ${id} evaluating...`);
-				const result = await evals.run(trigger, check, verbose);
-				if (verbose)
-					console.log(
-						`Summary ${id}: evals: ${result.flagged.length} flagged, ${result.cleared.length} cleared`
-					);
-				return { id, result };
-			})
-		);
+	/** Runs every Test, or only the one named `id`, on each of its eval folders; one result per Test. */
+	public readonly eval = async (id?: string): Promise<AgentTestEvalsResult[]> => {
+		const tests = loadDefinitions(id).map((test) => ({
+			test,
+			evals: loadEvalDefinitions(test.id)
+		}));
+		const results: AgentTestEvalsResult[] = [];
+		for (const { test, evals } of tests) results.push(await this.evalTest(test, evals));
+		return results;
 	};
 
-	private readonly log = (
-		id: string,
-		selected: Source[],
-		{ flagged, cleared }: Result<Check>
-	): void => {
-		console.log(
-			`Summary ${id}: ${selected.length} of ${this.sources.length} sources selected; ` +
-				`checks: ${flagged.length} flagged, ${cleared.length} cleared`
-		);
+	/** Selects the sources one Test inspects, then asserts on them. */
+	private readonly runTest = async (
+		test: AgentTestDefinition,
+		sources: Source[]
+	): Promise<AgentTestResult> => {
+		console.log(`Test ${test.id}`);
+		const selected = await this.select.run(test.select, sources);
+		const findings = await this.assert.run(test.assert, selected);
+		return { test, findings };
+	};
+
+	/** Runs one Test on each of its eval folders, one after another. */
+	private readonly evalTest = async (
+		test: AgentTestDefinition,
+		evals: AgentTestEvalDefinition[]
+	): Promise<AgentTestEvalsResult> => {
+		console.log(`Test ${test.id}`);
+		const results: AgentTestEvalResult[] = [];
+		for (const definition of evals) results.push(await this.evaluate.run(test, definition));
+		return { test, evals: results };
 	};
 }

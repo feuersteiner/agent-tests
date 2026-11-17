@@ -1,0 +1,11 @@
+version: 1
+id: decide-mit-license-header
+title: MIT license header
+description: Every TypeScript file under src/ begins with a comment stating that the code is licensed under the MIT License.
+select:
+  glob: 'src/**/*.ts'
+assert:
+  - id: mit-header
+    description: The file begins with a comment stating the MIT License.
+    error: Add a comment at the top of the file stating that the code is licensed under the MIT License.
+    decide: 'The content begins with a comment stating that the code is licensed under the MIT License.'

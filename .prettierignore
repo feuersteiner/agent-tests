@@ -9,8 +9,10 @@ bun.lockb
 **/.svelte-kit/
 **/build/
 **/dist/
-**/static/
 
 # Generated package metadata
 core/README.md
 core/LICENSE
+
+# Model accuracy fixture samples, with deliberate violations
+core/tests/models/.agents/

@@ -1,0 +1,17 @@
+{
+	"login.title": "Connexion",
+	"login.password": "Mot de passe",
+	"login.forgot": "Forgot your password?",
+	"login.submit": "Se connecter",
+	"signup.title": "Créer un compte",
+	"signup.terms": "J'accepte les conditions d'utilisation",
+	"cart.title": "Votre panier",
+	"cart.empty": "Votre panier est vide.",
+	"cart.checkout": "Passer la commande",
+	"cart.remove": "Retirer l'article",
+	"orders.title": "Mes commandes",
+	"orders.none": "Vous n'avez encore rien commandé.",
+	"settings.title": "Paramètres",
+	"settings.language": "Langue de l'interface",
+	"settings.logout": "Se déconnecter"
+}

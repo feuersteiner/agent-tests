@@ -1,71 +1,20 @@
 import { z } from 'zod';
-import { CheckSchema } from './check/types.ts';
-import type { Check } from './check/types.ts';
-import { EvalSchema } from './evals/types.ts';
-import type { Eval } from './evals/types.ts';
-import { IdSchema, TextSchema } from './shared/types.ts';
-import type { Result } from './shared/types.ts';
-import { TriggersSchema } from './trigger/types.ts';
-import type { Trigger } from './trigger/types.ts';
 
-export { CheckSchema } from './check/types.ts';
-export type { Check, CheckConfig } from './check/types.ts';
-export { AgentTestConfigSchema } from './config/types.ts';
-export type { AgentTestConfig } from './config/types.ts';
-export { EvalSchema, TestOutcomeSchema } from './evals/types.ts';
-export type { Eval, TestOutcome } from './evals/types.ts';
-export {
-	AiModelConfigSchema,
-	AiConfigSchema,
-	AiExplanationSchema,
-	AiRequestSchema,
-	FailInstanceSchema,
-	ReasoningLevelSchema
-} from './shared/deprecated-ai/types.ts';
-export type {
-	AiSettings,
-	AiModelConfig,
-	AiConfig,
-	AiExplanation,
-	AiRequest,
-	FailInstance,
-	ReasoningLevel
-} from './shared/deprecated-ai/types.ts';
-export * from './shared/sources/index.ts';
-export { ParamSchema } from './shared/types.ts';
-export type { Param, Result, ResultEntry } from './shared/types.ts';
-export { FilterSchema, TriggerSchema, TriggersSchema } from './trigger/types.ts';
-export type { FilterConfig, Trigger } from './trigger/types.ts';
+/** Lowercase kebab-case identifier. */
+export const IdSchema = z
+	.string()
+	.regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Expected a lowercase kebab-case id');
 
-/** What each stage of a run produced. */
-export interface AgentTestResult {
-	trigger: Result<Trigger>;
-	check: Result<Check>;
-}
+/** Text with at least one non-whitespace character. */
+export const TextSchema = z
+	.string()
+	.refine((value) => value.trim().length > 0, 'Must not be blank');
 
-/** A test's labeled-example results within a suite. */
-export interface AgentTestEvalResult {
-	id: string;
-	result: Result<Eval>;
-}
-
-/** Test identity, description, optional tags, and optional source digest. */
-export const MetadataSchema = z.strictObject({
-	id: IdSchema,
-	title: TextSchema,
-	description: TextSchema,
-	tags: z.array(z.string()).optional(),
-	source: z
-		.string()
-		.regex(/^sha256:[a-fA-F\d]{64}$/, 'Expected sha256: followed by 64 hexadecimal digits')
-		.optional()
+/** One param or a nonempty list; each engine defines how a list combines. */
+export const AgentTestParamSchema = z.union([TextSchema, z.array(TextSchema).min(1)], {
+	error: 'Expected text or a nonempty list of text'
 });
-export type Metadata = z.infer<typeof MetadataSchema>;
+export type AgentTestParam = z.infer<typeof AgentTestParamSchema>;
 
-/** test.yaml structure; optional fields have no implicit defaults. */
-export const AgentTestSchema = MetadataSchema.extend({
-	triggers: TriggersSchema.optional(),
-	checks: z.array(CheckSchema).min(1),
-	evals: z.array(EvalSchema)
-});
-export type AgentTest = z.infer<typeof AgentTestSchema>;
+/** A score threshold in [0, 1]. */
+export const ThresholdSchema = z.number().min(0).max(1);

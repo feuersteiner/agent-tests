@@ -1,0 +1,12 @@
+version: 1
+id: decide-no-skipped-tests
+title: No skipped tests
+description: Test files never skip, disable, or focus a test.
+select:
+  glob: '**/*.test.ts'
+assert:
+  - id: every-test-runs
+    description: No test is skipped, disabled, or focused.
+    error: Remove the .skip, .only, xit, xdescribe, or xtest so that every test runs.
+    grep: '\.(skip|only)\b|\bx(it|describe|test)\b'
+    decide: 'Every test and test group in this file runs: none is skipped, disabled, or focused with a modifier such as .skip, .only, xit, xdescribe, or xtest.'

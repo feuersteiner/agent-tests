@@ -1,7 +1,7 @@
 {
-	"name": "agent-tests",
-	"version": "0.8.0",
-	"description": "Reusable repository checks for lessons learned during agent sessions.",
+	"name": "agentests",
+	"version": "1.0.0",
+	"description": "Linting for intelligence: plain-language rules compiled into engineered checks and proved on your own evals.",
 	"keywords": [
 		"ai-native",
 		"ai-native-business",
@@ -25,39 +25,47 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/feuersteiner/agent-tests.git",
+		"url": "git+https://github.com/feuersteiner/agentests.git",
 		"directory": "core"
 	},
 	"bin": {
-		"agent-tests": "./cli/index.ts"
+		"agentests": "./dist/cli/index.js"
 	},
 	"exports": {
-		".": "./index.ts",
-		"./types": "./src/types.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./types": {
+			"types": "./dist/types.d.ts",
+			"default": "./dist/types.js"
+		}
 	},
 	"files": [
-		"index.ts",
-		"src",
-		"cli",
+		"dist",
 		"README.md",
 		"LICENSE"
 	],
 	"type": "module",
+	"engines": {
+		"node": ">=22"
+	},
 	"scripts": {
-		"check": "tsc --noEmit"
+		"build": "rm -rf dist && tsc -p tsconfig.build.json",
+		"check": "tsc --noEmit",
+		"test": "bun run build && bun test ./tests"
 	},
 	"devDependencies": {
 		"@types/bun": "latest"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "4.0.96",
+		"@ai-sdk/openai": "4.0.108",
+		"@ai-sdk/typesafe-ai": "3.0.33",
 		"ai": "7.0.162",
 		"clinguini": "^1.0.1",
 		"minimatch": "11.0.4",
 		"yaml": "2.9.1",
-		"@ai-sdk/openai": "4.0.108",
-		"@ai-sdk/typesafe-ai": "3.0.33",
-		"@ai-sdk/anthropic": "4.0.96",
 		"zod": "^4.6.7"
-	},
-	"module": "./index.ts"
+	}
 }

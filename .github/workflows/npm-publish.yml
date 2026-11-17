@@ -1,4 +1,4 @@
-name: Publish agent-tests
+name: Publish agentests
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: publish-agent-tests
+  group: publish-agentests
   cancel-in-progress: false
 
 jobs:
@@ -34,6 +34,7 @@ jobs:
           bun-version: '1.3.4'
       - run: bun install --frozen-lockfile
       - run: bun run check
+      - run: bun run test
       - run: bun run build
       - name: Publish
         working-directory: core
@@ -43,7 +44,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          RELEASE_TAG="agent-tests@$(npm pkg get version --workspaces=false | tr -d '"')"
+          RELEASE_TAG="agentests@$(npm pkg get version --workspaces=false | tr -d '"')"
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "$RELEASE_TAG" --generate-notes
           fi

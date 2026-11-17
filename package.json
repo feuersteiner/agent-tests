@@ -6,19 +6,18 @@
 	"packageManager": "bun@1.3.4",
 	"workspaces": [
 		"core",
-		"docs"
+		"demo-video"
 	],
 	"scripts": {
 		"prepare": "lefthook install",
-		"dev": "bun run --cwd docs dev",
-		"build": "cp README.md LICENSE core/ && bun run --cwd docs build",
-		"preview": "bun run --cwd docs preview",
-		"check": "bun run --workspaces check",
+		"build": "cp README.md LICENSE core/ && bun run --cwd core build",
+		"check": "bun run --workspaces --if-present check",
+		"test": "bun run --workspaces --if-present test",
+		"test:models": "bun run build && cd core/tests/models && node --env-file-if-exists=../../../.env ../../dist/cli/index.js eval",
 		"lint": "bun run format:check && eslint .",
 		"pack": "bun run build && cd core && npm pack",
 		"format": "prettier --write .",
-		"format:check": "prettier --check .",
-		"demo": "bun core/fixtures/run.ts"
+		"format:check": "prettier --check ."
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

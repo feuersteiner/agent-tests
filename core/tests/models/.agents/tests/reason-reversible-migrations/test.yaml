@@ -1,0 +1,11 @@
+version: 1
+id: reason-reversible-migrations
+title: Migrations are reversible
+description: Every Knex migration in a migrations/ folder has a down that undoes everything its up does.
+select:
+  glob: '**/migrations/*.{ts,js}'
+assert:
+  - id: down-reverses-up
+    description: The down function undoes every change of the up function.
+    error: Write a down that reverses each change of up, in reverse order, so a rollback restores the previous schema.
+    reason: 'This migration defines a down function that reverses every change its up function makes, returning the database schema to exactly the state it had before up ran.'

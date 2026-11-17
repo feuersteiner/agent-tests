@@ -5,3 +5,8 @@ pre-commit:
       stage_fixed: true
     - name: check
       run: bun run lint && bun run check
+
+pre-push:
+  jobs:
+    - name: test
+      run: env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE bun run test

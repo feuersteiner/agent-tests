@@ -1,9 +1,23 @@
-export { AgentTests } from './src/index.ts';
-export { TestCheck } from './src/check/index.ts';
-export { TestEval } from './src/evals/index.ts';
-export { AI } from './src/shared/deprecated-ai/index.ts';
-export { AIEngine } from './src/shared/deprecated-ai/engines/index.ts';
-export * from './src/shared/sources/index.ts';
-export { TestTrigger } from './src/trigger/index.ts';
-export { validate, validateConfig, validateTest, validateTests } from './src/config/validate.ts';
-export { loadConfig } from './src/config/index.ts';
+export { Agentests } from './src/index.ts';
+export {
+	CONFIG_PATH,
+	EVAL_FILE,
+	LATEST_VERSION,
+	loadConfig,
+	loadDefinitions,
+	loadEvalDefinitions,
+	loadEvalFiles,
+	loadTestFiles,
+	parseConfig,
+	parseEval,
+	parseTest,
+	validateConfig,
+	validateEval,
+	validateTest
+} from './src/loader/index.ts';
+export { createEngines } from './src/engines/index.ts';
+export { ScopeOrchestrator } from './src/scope/index.ts';
+export { SelectOrchestrator } from './src/select/index.ts';
+export { AssertOrchestrator } from './src/assert/index.ts';
+export { EvalOrchestrator } from './src/eval/index.ts';
+export { DirectorySource, FileSource, InMemorySource, Source } from './src/sources/index.ts';

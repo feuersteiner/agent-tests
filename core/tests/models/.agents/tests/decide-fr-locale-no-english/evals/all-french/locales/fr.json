@@ -1,0 +1,10 @@
+{
+	"login.title": "Connexion",
+	"login.password": "Mot de passe",
+	"login.forgot": "Mot de passe oublié ?",
+	"login.submit": "Se connecter",
+	"cart.title": "Votre panier",
+	"cart.empty": "Votre panier est vide.",
+	"cart.checkout": "Passer la commande",
+	"settings.language": "Langue de l'interface"
+}

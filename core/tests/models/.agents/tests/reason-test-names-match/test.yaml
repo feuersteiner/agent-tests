@@ -1,0 +1,12 @@
+version: 1
+id: reason-test-names-match
+title: Test names match their assertions
+description: Every test case in a *.test.ts file asserts the behavior its title describes.
+select:
+  glob: '**/*.test.ts'
+  grep: '\b(it|test)\('
+assert:
+  - id: title-matches-assertions
+    description: Each test's assertions verify the behavior its title describes.
+    error: Make the assertions check the behavior the test title describes, or rename the test to describe what it checks.
+    reason: 'Every test case in this file asserts the behavior its title describes: the expected values and outcomes in its assertions agree with what the title says should happen, not a different or opposite outcome.'

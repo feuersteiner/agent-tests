@@ -1,5 +1,29 @@
-import { command, type Command } from 'clinguini';
-import { loadRunner } from '../config/index.ts';
+import { command, type Command, type Handler } from 'clinguini';
+import { Agentests } from '../../src/index.ts';
+import type { AgentTestResult } from '../../src/assert/types.ts';
+import { loadConfig } from '../../src/loader/index.ts';
+import type { AgentTestScope } from '../../src/scope/types.ts';
+import { message } from '../helpers/error.ts';
+
+type Flags = Parameters<Handler>[0]['flags'];
+
+/** The scope the flags name: all sources without one; more than one is an error. */
+const toScope = ({ changed, staged, base }: Flags): AgentTestScope => {
+	const given = [changed === true, staged === true, typeof base === 'string'].filter(Boolean);
+	if (given.length > 1) throw new Error('Use only one of --changed, --staged, and --base');
+	if (changed === true) return { kind: 'changed' };
+	if (staged === true) return { kind: 'staged' };
+	if (typeof base === 'string') return { kind: 'base', ref: base };
+	return { kind: 'all' };
+};
+
+/** One `<path>  <test>/<assertion>  <error>` line per finding, in result order. */
+const toLines = (results: AgentTestResult[]): string[] =>
+	results.flatMap(({ test, findings }) =>
+		findings.map(
+			({ source, assertion }) => `${source.path}  ${test.id}/${assertion.id}  ${assertion.error}`
+		)
+	);
 
 export const runCommand: Command = command({
 	name: 'run',
@@ -11,13 +35,15 @@ export const runCommand: Command = command({
 		{ name: 'base', type: 'string', description: 'Select changes against a base ref.' }
 	],
 	handler: async ({ params, flags }): Promise<void> => {
-		const runner = loadRunner(params.id);
-		console.log(`Loaded config and ${runner.tests.length} agent test(s).`);
-		if (flags.changed || flags.staged || flags.base)
-			console.log('Git scope selection is pending; running all repository sources.');
-		const results = await runner.run();
-		const failures = results.reduce((count, result) => count + result.check.flagged.length, 0);
-		console.log(`Run complete: ${failures} finding(s).`);
-		if (failures) process.exitCode = 1;
+		try {
+			const scope = toScope(flags);
+			const results = await new Agentests(loadConfig(), process.env).run(scope, params.id);
+			const lines = toLines(results);
+			for (const line of lines) console.log(line);
+			process.exitCode = lines.length ? 1 : 0;
+		} catch (error) {
+			console.error(`Error: ${message(error)}`);
+			process.exitCode = 2;
+		}
 	}
 });

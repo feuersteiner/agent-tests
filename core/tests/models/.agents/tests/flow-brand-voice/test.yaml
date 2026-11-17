@@ -1,0 +1,22 @@
+version: 1
+id: flow-brand-voice
+title: Brand voice
+description: Customer-facing copy has no hype, promises no result, and never blames the reader.
+select:
+  glob: ['content/**/*.md', 'emails/**/*.md']
+assert:
+  - id: no-hype
+    description: No hype.
+    error: Say what it does in plain words.
+    grep: '[Rr]evolutionary|[Ww]orld-class|[Gg]ame-chang|[Cc]utting-edge|[Bb]est-in-class'
+    decide: 'The text makes no superlative claim about the product.'
+  - id: no-guarantees
+    description: No promise of a result.
+    error: Describe the typical result, or link the terms.
+    grep: '[Gg]uarantee|100%|[Rr]isk-free'
+    decide: 'The text makes no promise of a result.'
+  - id: no-blame
+    description: Never blame the reader.
+    error: Say what happened and what to do next.
+    grep: '[Yy]ou (entered|failed|forgot)|[Yy]our (mistake|error|fault)'
+    decide: 'The text does not say the reader made a mistake.'

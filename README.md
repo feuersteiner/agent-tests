@@ -1,293 +1,224 @@
-# agent-tests
+# agentests
 
-Linting for intelligence: turn fuzzy business and code rules into tests.
+Linting for intelligence.
 
+Decisions travel slowly. Agents write fast. The work ships before the decision reaches it, and a
+linter cannot read tone, meaning, or intent.
+
+[![npm](https://img.shields.io/npm/v/agentests?logo=npm)](https://www.npmjs.com/package/agentests)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/kESK4bgEPW)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-An agent test is a rule your codebase must follow, packaged so a person, an agent,
-or CI can check it. Triggers pick the files the rule applies to; checks judge them.
-Both use globs and regex where a pattern is enough, and a decision model where the
-rule needs judgment. Tests report findings and never modify your code.
+agentests shows where a decision has not reached the work. Write it once, in plain language. Your
+coding agent compiles it into narrow yes-or-no questions and proves them on your own evals. A
+pre-commit hook then checks every commit and names each file that breaks it. The MVP is
+feature-complete; the [roadmap](https://github.com/feuersteiner/agentests/issues/1) lists what
+comes next.
 
-**Status:** WIP 🚧
+## See it in 60 seconds
 
-## Example
+https://github.com/user-attachments/assets/b7f71b93-9cb0-4d5e-9825-edc523b0ebdb
 
-Your app's interface must be in French, but agents keep adding English strings.
-A test is two files in the repository-root `.agents/tests/user-text-french/`. `TEST.md` states the rule
-in plain prose:
+One brand decision, from the meeting to a blocked commit: written down once, compiled into three
+clear questions, proved on six evals. The film's [SvelteKit app](demo-video) is in this repository.
 
-```md
-All user-facing text is written in French. Examples, exceptions, and how to fix a
-violation...
-```
+## Get started
 
-`test.yaml`, written by an agent from `TEST.md`, holds everything that runs:
+### 1. Install
 
-```yaml
-id: user-text-french
-title: User text in French
-description: User-facing text is written in French.
-tags: ['ui', 'language'] # optional metadata
-triggers:
-  - id: user-facing-text
-    description: Svelte and HTML files with text shown to end users.
-    glob: ['src/**/*.svelte', 'src/**/*.html']
-    ask: 'This file contains text displayed to an end user.'
-checks:
-  - id: french-only
-    message: User-facing text is not in French.
-    fix: Translate the text into French.
-    smart:
-      ask: 'Quote each piece of user-facing text that is not in French.'
-evals:
-  - name: English button label
-    path: src/lib/Save.svelte
-    content: <button>Save</button>
-    expect: fail
-```
-
-Only Svelte and HTML files that a decision model judges to contain user-facing text
-are inspected. Paths outside those globs are skipped without a model call.
-
-Tests live only in the repository-root `.agents/tests/<id>/`, following the
-project `.agents/skills/` convention. IDs are unique within `.agents/tests/`.
-Use triggers and globs to scope tests to files or subdirectories.
-Optional `tags` accepts an array of strings, including `[]`, with no default or
-tag filtering. Existing definitions can omit it.
-
-## Where it runs
-
-- **While an agent works:** on the files it just edited.
-- **Before a commit:** on uncommitted changes.
-- **In CI:** on the whole repository, like `eslint .` or `prettier --check .`.
-- **In your own tools:** as a library from the npm package.
-
-## Get started (WIP)
-
-Not published yet.
-
-The package ships TypeScript source. Library imports require Bun or tooling that
-compiles TypeScript dependencies; plain Node does not execute TypeScript inside
-`node_modules`. The TypeScript CLI requires Bun on `PATH`.
-
-All documented commands have scaffolded help and dispatch. Functionality is pending:
-each stub prints its command name, ID when supplied, and parsed values with runtime
-types, then exits 0. Undefined values are omitted; Clinguini supplies `false` for
-omitted boolean flags. Invalid arguments exit 2. Stubs do not load test/config/env
-files, run Git, or make model calls.
-`validate [id]`, `run [id]`, and `eval [id]` accept an optional exact test ID;
-omission will select all tests when implemented, without `--all`.
+In a Git repository, with Node 22 or later:
 
 ```sh
-npm install -D agent-tests
-npx agent-tests init                          # config, .agents/tests/, pre-commit hook
-npx agent-tests add user-text-french          # install a community test at the root
-npx agent-tests list                          # installed tests
-npx agent-tests validate user-text-french     # check one local test
-npx agent-tests validate                      # check all local tests
-npx agent-tests targets user-text-french      # files that test would inspect
-npx agent-tests compile user-text-french      # compile TEST.md into test.yaml
-npx agent-tests eval user-text-french         # run its labeled examples
-npx agent-tests eval                          # run all tests' labeled examples
-npx agent-tests run user-text-french          # run one test
-npx agent-tests run                           # run all tests on the whole repository
-npx agent-tests run --changed                 # uncommitted files
-npx agent-tests run --staged                  # pre-commit
-npx agent-tests run --base main               # pull requests
-npx agent-tests docs                          # skills that teach agents to write and run tests
-npx agent-tests vote user-text-french         # toggle your vote for a library test
+npm install --save-dev agentests
+npx agentests init
 ```
 
-Run the standalone fixture repository:
+`init` writes `agentests.config.yaml`, the `.agents/tests/` folder and a pre-commit hook. It never
+overwrites: when a file exists, it prints what to add. Set the API key it names, `OPENAI_API_KEY`
+by default, in the environment or in `.env`, and keep `.env` out of Git.
 
-```sh
-bun run demo
+### 2. Write the rule
+
+Marketing decided: **No hype. No guarantees. Never blame the customer.** Write it down once as a
+**Test**, a folder in `.agents/tests/` whose `TEST.md` states the rule in plain language, here
+`.agents/tests/brand-voice/TEST.md`:
+
+```markdown
+# Brand voice
+
+Customer-facing copy under `content/` and `emails/` says what the product does in plain words.
+It promises no result and never blames the reader for a problem.
+
+Exceptions: refund and legal terms.
 ```
 
-This executes every CLI command from [`core/fixtures/repository`](core/fixtures/README.md).
-Config and definitions are loaded and validated before constructing the runner.
-`list`, `validate`, `run`, and `eval` work; unfinished actions are labelled as scaffolds.
+Prefer to say it in chat? `npx agentests compile` without an id prints the prompt for your agent to
+name the Test and write this file.
 
-Choose the decision model (Jev or OpenAI) in `agent-tests.config.yaml`
-and keep its credentials in `.env`.
-Clef support is deferred pending standardized APIs for system-one models.
+### 3. Compile it and prove it
 
-For library use, pass parsed definitions as an array and parsed shared config:
-
-```ts
-import { AgentTests, FileSource } from 'agent-tests';
-
-const sources = [new FileSource('src/app.ts')];
-const suite = new AgentTests(sources, definitions, config);
-const results = await suite.run(); // [{ id, trigger, check }]
-const evals = await suite.eval(); // [{ id, result }]
-```
-
-Each test filters the same source base independently. Construction validates every
-definition and config; AI and provider keys are required only when execution starts.
-Use `[definition]` for one test. Results follow definition order.
-
-Sources read their paths synchronously through Node filesystem APIs. `FileSource.open()` caches UTF-8 file content;
-`DirectorySource.open()` caches a text listing with a directory header and
-immediate child paths, kinds, and file line counts, without opening child directories.
-Both return strings directly, cache successful results, and allow retries after I/O failures. Both expose `path`
-and `kind`, and extend the abstract `Source<Content = string>` class. Runners and
-results accept `Source`, including independent subclasses returning strings. Glob filters match any
-source path without opening it. Current grep, ask, and reason functions require
-`open()` to return a string, so they work with both file text and directory listings.
-
-## Triggers
-
-Design locked; implementation WIP.
-
-Triggers decide whether a test inspects a file. `triggers` is optional;
-omitting it or setting `triggers: []` selects every file.
-Otherwise, it is a list of triggers, each with a lowercase kebab-case `id` and a `description`.
-Each trigger requires at least one filter:
-
-- `glob`: POSIX glob patterns on the path, including dotfiles.
-- `grep`: case-sensitive JavaScript regex patterns on the content, without flags.
-- `ask`: a decision model judging the content against a passing condition.
-
-Filters within one ID use **AND**: every configured filter must pass.
-Triggers use **OR**: trigger A or trigger B can qualify a file.
-Within each trigger, filters always run as `glob`, then `grep`, then `ask`, so a
-model is only called once the cheap filters pass. Omitted filters are skipped; the
-first failure stops that trigger. A file is excluded only if every trigger fails.
-
-`glob`, `grep`, and `ask` each accept a string or a nonempty list of alternatives (**OR**).
-For `glob` and `grep`, any matching pattern passes that filter.
-For `ask`, each string is a nonblank passing condition; prompts run in list order
-until one passes. If none passes, the filter fails.
+Ask your coding agent to run `npx agentests compile brand-voice` and follow the prompt. `compile`
+calls no model: it prints a prompt, and your agent does the work. One fuzzy rule becomes three
+clear questions in `test.yaml`, the part that runs, each behind a local text check:
 
 ```yaml
-# .agents/tests/brand-messaging/test.yaml: customer-facing copy follows Acme's brand voice.
-triggers:
-  # Marketing pages are always brand copy: a glob is enough.
-  - id: marketing
-    description: Marketing pages.
-    glob: ['content/**/*.md', 'src/routes/(marketing)/**/*.svelte']
-  # Elsewhere, cheap filters first and models last.
-  - id: customer-copy
-    description: Product and marketing copy shown to customers.
-    glob: ['src/**/*.svelte', 'emails/**/*.html']
-    grep: '[Aa]cme'
-    ask:
-      - 'This file contains product copy shown to customers.'
-      - 'This file contains marketing copy shown to customers.'
+version: 1
+id: brand-voice
+title: Brand voice
+description: Customer-facing copy has no hype, promises no result, and never blames the reader.
+select:
+  glob: ['content/**/*.md', 'emails/**/*.md']
+assert:
+  - id: no-hype
+    description: No hype.
+    error: Say what it does in plain words.
+    grep: '[Rr]evolutionary|[Ww]orld-class|[Gg]ame-chang|[Cc]utting-edge|[Bb]est-in-class'
+    decide: 'The text makes no superlative claim about the product.'
+  - id: no-guarantees
+    description: No promise of a result.
+    error: Describe the typical result, or link the terms.
+    grep: '[Gg]uarantee|100%|[Rr]isk-free'
+    decide: 'The text makes no promise of a result.'
+  - id: no-blame
+    description: Never blame the reader.
+    error: Say what happened and what to do next.
+    grep: '[Yy]ou (entered|failed|forgot)|[Yy]our (mistake|error|fault)'
+    decide: 'The text does not say the reader made a mistake.'
 ```
 
-For debugging, trace outcomes by trigger ID and filter (`glob`, `grep`, or `ask`),
-with a pass, failure, or skipped status and reason. Later filters are skipped
-after one fails. Trace output remains WIP.
-
-## Compilation
-
-Design locked; implementation WIP.
-
-Your agent turns `TEST.md` into `test.yaml`. `agent-tests compile <id>` hands it the
-rule, a test-generator skill, and your repository layout; the agent writes the
-triggers, checks, and evals, then loops on `agent-tests validate` and
-`agent-tests eval` until they pass. Edit `test.yaml` by hand whenever you like.
-When `TEST.md` changes, `validate` flags `test.yaml` as stale until it is recompiled.
-Library tests ship already compiled; after `add`, your agent adapts them to your
-repository.
-
-## Checks
-
-Design locked; implementation WIP.
-
-Checks judge each targeted file and report pass, warning, or error findings, through
-the CLI or the library. A check runs from `fast` to `smart` to `deep`,
-cheapest first, and escalates only what it cannot settle:
-
-```yaml
-# .agents/tests/brand-messaging/test.yaml
-checks:
-  - id: no-familiar-language
-    message: Copy uses familiar language.
-    fix: Rewrite in Acme's formal voice; see TEST.md.
-    human-tiebreak: true # if deep stays unsure, a person decides
-    fast: # patterns, no model
-      match: # any match fails
-        - '\b(gonna|wanna|gotta)\b'
-      maybe: # weak signal: a match escalates, with the hits as hints
-        - '\b(hey|awesome|folks|no worries)\b'
-    smart: # classifier such as Jev or OpenAI
-      ask: 'Quote each phrase in this copy that uses familiar or casual language.'
-      bounds: [0.3, 0.8] # below: pass, between: unsure, above: likely violation
-    deep: # structured LLM call, the final word
-      ask: 'Judge each quoted phrase against the brand voice in TEST.md.'
-      reasoning: medium # low, medium, or high
-```
-
-- **`fast`** fails on a `match`. A `maybe` hit escalates, and so does no hit when
-  `smart` or `deep` exists. The agent writes the patterns; `agent-tests validate`
-  checks them against the evals and flags risky ones. Patterns are regex today,
-  with room for other pattern types later.
-- **`smart`** passes, escalates, or flags violations by confidence bounds,
-  quoting each instance it finds.
-- **`deep`** confirms every violation a model flagged, with the `reasoning` effort
-  the check sets. If it stays unsure, the CLI shows a warning, or a person
-  reviews it with `human-tiebreak: true`.
-- A check uses only the levels it needs, and `maybe`, `bounds`, and `reasoning`
-  are optional.
-
-Every finding names its test, check, level, file, and line, with the fix:
+Your agent also writes evals: tiny repositories, each with files at their real paths and the
+outcome it expects, `fail` for a finding, `pass` for no finding, `skip` when nothing is selected.
+The near misses carry the proof:
 
 ```text
-src/routes/+page.svelte:12:5  error  "Hey folks!" uses familiar language
-  brand-messaging/no-familiar-language (deep): Rewrite in Acme's formal voice.
+.agents/tests/brand-voice/evals/
+  guaranteed-result/
+    eval.yaml            expect: fail
+    content/pricing.md   Guaranteed to double your conversions in 30 days.
+  refund-terms/
+    eval.yaml            expect: pass
+    content/pricing.md   30-day money-back guarantee. See the terms.
 ```
 
-## Evals
+Both say "guarantee". Only one promises a result. `hype-headline` and `plain-headline` split the
+same way, `blames-reader` must fail, and `changelog-is-not-copy` must be skipped: a changelog is
+not customer copy. The agent runs `validate` and `eval` until every eval matches, then reports what
+`test.yaml` cannot express. Review the Test like code, then run `npx agentests eval brand-voice`
+yourself. Among its progress lines, it prints one result per eval and a total:
 
-Design locked; implementation WIP.
-
-Benchmarks that show whether a newer model or a regenerated test still makes the
-approved decisions before you upgrade. Each test keeps labeled examples under
-`evals` in its `test.yaml`:
-
-```yaml
-evals:
-  - name: casual greeting on the homepage
-    path: src/routes/+page.svelte
-    content: <h1>Hey folks! Welcome to Acme.</h1>
-    expect: fail
-  - name: formal copy
-    path: src/routes/about/+page.svelte
-    content: <p>Acme provides enterprise-grade testing.</p>
-    expect: pass
-  - name: billing code is not copy
-    path: src/billing/charge.ts
-    content: 'export const charge = (cents: number) => cents;'
-    expect: skip # the triggers should not select it
+```text
+Eval blames-reader
+✓ Expected fail, got fail
+Eval changelog-is-not-copy
+✓ Expected skip, got skip
+Eval guaranteed-result
+✓ Expected fail, got fail
+Eval hype-headline
+✓ Expected fail, got fail
+Eval plain-headline
+✓ Expected pass, got pass
+Eval refund-terms
+✓ Expected pass, got pass
+6 of 6 eval(s) match.
 ```
 
-`expect` is `pass`, `fail`, `unsure`, or `skip`. The planned `agent-tests eval [id]`
-will run the real triggers and checks on every example and report disagreements.
-An ID selects one test; omission selects all tests.
+### 4. Commit
 
-## Community library
+An agent drafts a launch email, `emails/launch.md`, with the line `Guaranteed to double your
+conversions in 30 days.` On commit, the hook runs `npx agentests run --staged`, prints the finding,
+and exits 1. The commit stops:
 
-The [`library/`](library/README.md) directory is a shared catalog of tests. Anyone can contribute one with a pull request containing its `TEST.md`, credited to the author's GitHub profile, and its compiled `test.yaml`. Every PR is screened for malware and prompt injection, and accounts that attempt either are banned. Every test merged into `main` is available to `npx agent-tests add [test-id]`.
+```text
+emails/launch.md  brand-voice/no-guarantees  Describe the typical result, or link the terms.
+```
 
-Vote for a test with `npx agent-tests vote <test-id>` (WIP): it uses your GitHub CLI login to open a pull request that adds or removes your handle in the test's `score.csv`, and the PR merges automatically once its check passes. Only you can add yourself, one vote per pull request. Scores show interest and never gate availability.
+Replace the line with `Most teams see results within a month.` and the commit goes through. The
+decision now reaches every commit. `npx agentests run` checks the whole repository.
+
+## Why?
+
+- **Engineered, not vibes.** "Is this on brand?" cannot be grepped and is too broad to ask a model
+  reliably. agentests has your agent split it into narrow yes-or-no questions, with local text
+  checks first. The text checks, the order of stages and the exit codes are deterministic.
+- **Fewer tokens, faster runs.** `glob` and `grep` run locally and cost nothing, so a model sees
+  only the files they could not clear, one small question per call.
+- **Proved on your own evals.** A compiled Test comes with its own cases and the outcome each must
+  get. `eval` shows whether it holds before it blocks a single commit, and again when you change
+  models.
+- **You own it.** Rules and evals are plain files in your repository, reviewed like code and
+  compiled by any coding agent that runs shell commands. Change the model or provider in the
+  config, then re-prove with one command.
+
+## Documentation
+
+Until the documentation site ships, `npx agentests --help` and the compile prompt carry the detail.
+Run each command as `npx agentests <command>`; an `[id]` names one Test, without it every Test.
+
+- `init`: writes the config, `.agents/tests/` and the hook, never overwriting. Pick providers with
+  `--decision openai|jev` and `--reasoning openai|anthropic`.
+- `compile [id]`: prints the prompt for your agent to write `TEST.md`, `test.yaml` and the evals.
+- `validate [id]`: checks the config, each `test.yaml` and each `eval.yaml`. Needs no key.
+- `list`: prints each Test's id and title.
+- `eval [id]`: runs each eval folder as its own repository and reports whether it matches.
+- `run [id]`: checks the whole repository, or only `--changed`, `--staged`, or `--base <ref>` files.
+
+A finding prints as `<path>  <test>/<assertion>  <error>`. Exit codes: `0` clean, `1` findings or
+an eval mismatch, `2` a setup error such as a missing key, no Tests, or an invalid file.
+
+`agentests.config.yaml` names the `decision` model, for `decide`, and the `reasoning` model, for
+`reason`, by `api`, `url`, `model` and `apiKeyEnv`, the variable that holds the key, never the key
+itself. It also sets the `select` and `assert` thresholds and `ignore` globs. Providers: OpenAI for
+both (`OPENAI_API_KEY`), Jev by typesafe.ai for decisions (`TYPESAFE_AI_API_KEY`), Anthropic for
+reasoning (`ANTHROPIC_API_KEY`). The CLI loads `.env` without overriding variables already set;
+`run` and `eval` need the keys the config names, even for a Test that uses only `glob` and `grep`.
+
+### Library
+
+```ts
+import { Agentests, loadConfig } from 'agentests';
+
+const results = await new Agentests(loadConfig(), process.env).run({ kind: 'staged' });
+```
+
+Each result is a Test with its findings, and the types are under `agentests/types`. The library
+never reads `.env` or `process.env` itself: pass the environment in.
 
 ## Repository structure
 
-- [`core`](core): the `agent-tests` npm package.
-- [`docs`](docs): the documentation site, built with [Bref-ui](https://github.com/feuersteiner/bref-ui).
-- [`library`](library): community tests.
-- [`docs/usecases.md`](docs/usecases.md): proposed use cases.
+- [`core`](core): the npm package, with the [CLI](core/cli) and the library in [`src`](core/src).
+- [`docs`](docs): use cases, the source of the planned documentation site.
+- [`library`](library): placeholder for the planned community library of shared Tests.
+- [`demo-video`](demo-video): the SvelteKit app that renders the demo film.
+- [`.github/workflows`](.github/workflows): publishing to npm.
+
+## Roadmap
+
+**Shipped.** The MVP: the `version: 1` Test format, evals, the commands `init`, `compile`, `list`,
+`validate`, `eval` and `run`, and the `--changed`, `--staged` and `--base` scopes.
+
+**Planned.**
+
+- Selectors: several per Test, typed selection of files or folders, selecting a folder by its
+  children and counting them, and `!` glob exclusions.
+- Findings and reporting: line, quote, reason and fix; JSON reports; GitHub annotations.
+- Evals and benchmarks: the same evals across models, compared for accuracy, consistency, speed and
+  cost, and a warning when `test.yaml` is older than its `TEST.md`.
+- CLI: `targets <id>` to list what a Test inspects, and `docs` to ship the agent skills.
+- Integrations: a GitHub Action, and plugins for Vitest, Bun, Playwright Test and Jest.
+- Community library: shared Tests installed with `add <id>`, screened for malware and prompt
+  injection.
+- Documentation site.
+
+Track it in [Roadmap #1](https://github.com/feuersteiner/agentests/issues/1), where items become
+linked sub-issues as work starts, and in [open issues](https://github.com/feuersteiner/agentests/issues).
 
 ## Community and contributing
 
-For questions and ideas, join [Discord](https://discord.gg/kESK4bgEPW). Report bugs
-and suggest features through [GitHub Issues](https://github.com/feuersteiner/agent-tests/issues).
-Contributors and their agents start with [`AGENTS.md`](AGENTS.md).
+Bring questions and ideas to [Discord](https://discord.gg/kESK4bgEPW), and bugs and feature
+requests to [GitHub Issues](https://github.com/feuersteiner/agentests/issues). To contribute, start
+with [AGENTS.md](AGENTS.md); [core/AGENTS.md](core/AGENTS.md) maps the package, which needs only
+Node, while the repository uses Bun for development. Pick a roadmap item or an open issue and say
+so there or on Discord before you start.
 
 ## License
 

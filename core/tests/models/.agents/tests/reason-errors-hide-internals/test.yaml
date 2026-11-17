@@ -1,0 +1,12 @@
+version: 1
+id: reason-errors-hide-internals
+title: Error responses hide internals
+description: The error responses Express routes under src/routes/ send to clients contain no stack trace, SQL query, server file path, internal hostname, or credential.
+select:
+  glob: 'src/routes/**/*.ts'
+assert:
+  - id: no-internal-details
+    description: No error response sent to a client reveals an internal detail.
+    error: Send the client a generic message and log the internal detail on the server instead.
+    grep: '\.status\(\s*[45]\d\d\s*\)'
+    reason: 'No response this handler sends to the client contains an internal detail such as a stack trace, an SQL query, a file path on the server, an internal hostname, or a credential; details written only to a server-side log do not count.'

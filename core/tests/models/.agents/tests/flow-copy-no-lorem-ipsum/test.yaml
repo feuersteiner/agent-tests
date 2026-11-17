@@ -1,0 +1,12 @@
+version: 1
+id: flow-copy-no-lorem-ipsum
+title: No Lorem ipsum in user-facing copy
+description: Text that the app shows to its users never contains Lorem ipsum placeholder text.
+select:
+  glob: 'src/**/*.{ts,tsx}'
+  decide: 'This file holds text that the app itself displays to its end users, such as page copy, labels, button text, or translated messages.'
+assert:
+  - id: no-lorem-ipsum
+    description: User-facing copy contains no Lorem ipsum placeholder text.
+    error: Replace the Lorem ipsum placeholder with the real copy.
+    grep: '[Ll]orem ipsum'

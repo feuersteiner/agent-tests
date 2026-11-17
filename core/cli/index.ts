@@ -1,34 +1,24 @@
-#!/usr/bin/env -S bun --no-env-file
+#!/usr/bin/env node
+import { existsSync } from 'node:fs';
 import { clinguini } from 'clinguini';
-import { initCommand } from './commands/init.ts';
-import { addCommand } from './commands/add.ts';
+import { initCommand } from './commands/init/index.ts';
 import { listCommand } from './commands/list.ts';
 import { validateCommand } from './commands/validate.ts';
-import { targetsCommand } from './commands/targets.ts';
-import { compileCommand } from './commands/compile.ts';
+import { compileCommand } from './commands/compile/index.ts';
 import { evalCommand } from './commands/eval.ts';
 import { runCommand } from './commands/run.ts';
-import { docsCommand } from './commands/docs.ts';
-import { voteCommand } from './commands/vote.ts';
 import { banner } from './config/banner.ts';
 
+/** Load the working directory's `.env`, if any; variables already set in the environment win. */
+if (existsSync('.env')) process.loadEnvFile('.env');
+
 await clinguini({
-	name: 'agent-tests',
-	description: 'Reusable repository checks for lessons learned during agent sessions.',
-	commands: [
-		initCommand,
-		addCommand,
-		listCommand,
-		validateCommand,
-		targetsCommand,
-		compileCommand,
-		evalCommand,
-		runCommand,
-		docsCommand,
-		voteCommand
-	],
+	name: 'agentests',
+	description:
+		'Linting for intelligence: plain-language rules compiled into engineered checks and proved on your own evals.',
+	commands: [initCommand, compileCommand, listCommand, validateCommand, evalCommand, runCommand],
 	utils: {
 		help: true,
-		header: banner()
+		header: process.stdout.isTTY ? banner() : undefined
 	}
 });

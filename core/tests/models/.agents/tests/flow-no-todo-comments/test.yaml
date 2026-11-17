@@ -1,0 +1,12 @@
+version: 1
+id: flow-no-todo-comments
+title: No TODO comments
+description: Code comments never hold a TODO; the word TODO in strings and values the app uses is allowed.
+select:
+  glob: 'src/**/*.{ts,tsx}'
+assert:
+  - id: no-todo-comment
+    description: No code comment contains TODO.
+    error: Remove the TODO comment and track the work in the issue tracker.
+    grep: 'TODO'
+    decide: 'No code comment in this file contains the word TODO; TODO inside a string, a type, or text the app displays does not count.'

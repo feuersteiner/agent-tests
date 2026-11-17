@@ -1,0 +1,12 @@
+version: 1
+id: decide-fetch-timeout
+title: Fetch with a timeout
+description: Every fetch call in the TypeScript files under src/ passes a signal created with AbortSignal.timeout.
+select:
+  glob: 'src/**/*.ts'
+  grep: '\bfetch\('
+assert:
+  - id: fetch-has-timeout
+    description: Every fetch call passes a signal created with AbortSignal.timeout.
+    error: 'Pass `signal: AbortSignal.timeout(ms)` in the options of every fetch call.'
+    decide: 'Every fetch call in this code passes a signal option created with AbortSignal.timeout.'
