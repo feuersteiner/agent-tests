@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, posix } from 'node:path';
 import { Source } from './base.ts';
 
-/** A lazy text listing of immediate children. */
+/** A lazy text listing of immediate children, sorted by name. */
 export class DirectorySource extends Source {
 	public readonly kind = 'directory';
 	private content?: string;
@@ -18,7 +18,7 @@ export class DirectorySource extends Source {
 	public readonly open = (): string => {
 		return (this.content ??= [
 			this.formatHeader(),
-			...readdirSync(join(this.root, this.path)).map(this.formatLine)
+			...readdirSync(join(this.root, this.path)).sort().map(this.formatLine)
 		].join('\n'));
 	};
 
