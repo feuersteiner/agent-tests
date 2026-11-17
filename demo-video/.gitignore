@@ -1,0 +1,5 @@
+node_modules/
+.svelte-kit/
+build/
+output/
+vite.config.ts.timestamp-*
