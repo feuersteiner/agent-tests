@@ -85,13 +85,13 @@ describe('validate', () => {
 
 	test.each([
 		['invalid', badConfig, 'decision.url: Expected HTTPS or HTTP localhost'],
-		['missing', {}, 'Missing agent-tests.config.yaml; run `agent-tests init`']
+		['missing', {}, 'Missing agentests.config.yaml; run `agentests init`']
 	])('reports an %s config together with the invalid Tests', async (_, config, problem) => {
 		await inTempDir({ ...config, ...twoTests, ...broken }, (dir) => {
 			const { exitCode, stderr } = runCli(['validate'], { cwd: dir });
 			expect(exitCode).toBe(2);
 			expect(stderr).toStartWith(
-				`Error: config and 1 of 3 test(s) invalid:\nagent-tests.config.yaml\n  ${problem}`
+				`Error: config and 1 of 3 test(s) invalid:\nagentests.config.yaml\n  ${problem}`
 			);
 			expect(stderr).toContain('.agents/tests/broken/test.yaml\n');
 		});
@@ -102,7 +102,7 @@ describe('validate', () => {
 			const { exitCode, stderr } = runCli(['validate'], { cwd: dir });
 			expect(exitCode).toBe(2);
 			expect(stderr).toBe(
-				'Error: config invalid:\nagent-tests.config.yaml\n' +
+				'Error: config invalid:\nagentests.config.yaml\n' +
 					'  decision.url: Expected HTTPS or HTTP localhost without credentials, query, or fragment\n'
 			);
 		});

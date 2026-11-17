@@ -8,7 +8,7 @@ import { message } from '../helpers/error.ts';
 const toLine = ({ path, test }: AgentTestFile): string => {
 	if (test) return `${test.id}  ${test.title}`;
 	const folder = basename(dirname(path));
-	return `${folder}  invalid; run \`agent-tests validate ${folder}\``;
+	return `${folder}  invalid; run \`agentests validate ${folder}\``;
 };
 
 export const listCommand: Command = command({

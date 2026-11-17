@@ -37,9 +37,9 @@ describe('validateTest', () => {
 		]);
 	});
 
-	test('a version newer than supported says to upgrade agent-tests', () => {
+	test('a version newer than supported says to upgrade agentests', () => {
 		expect(problemsOf({ ...validTest(), version: LATEST_VERSION + 1 })).toEqual([
-			`version: ${LATEST_VERSION + 1} is newer than this package supports (${LATEST_VERSION}); upgrade agent-tests`
+			`version: ${LATEST_VERSION + 1} is newer than this package supports (${LATEST_VERSION}); upgrade agentests`
 		]);
 	});
 

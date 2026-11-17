@@ -64,10 +64,8 @@ describe('parseTest', () => {
 		expect(() => parseTest(text)).toThrow();
 	});
 
-	test('a version newer than supported in the text says to upgrade agent-tests', () => {
-		expect(() => parseTest(FULL.replace('version: 1', 'version: 2'))).toThrow(
-			'upgrade agent-tests'
-		);
+	test('a version newer than supported in the text says to upgrade agentests', () => {
+		expect(() => parseTest(FULL.replace('version: 1', 'version: 2'))).toThrow('upgrade agentests');
 	});
 
 	test('problems in the text are all reported, one per line, as path: message', () => {

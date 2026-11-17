@@ -1,5 +1,5 @@
 {
-	"name": "agent-tests",
+	"name": "agentests",
 	"version": "0.8.0",
 	"description": "Reusable repository checks for lessons learned during agent sessions.",
 	"keywords": [
@@ -29,7 +29,7 @@
 		"directory": "core"
 	},
 	"bin": {
-		"agent-tests": "./dist/cli/index.js"
+		"agentests": "./dist/cli/index.js"
 	},
 	"exports": {
 		".": {

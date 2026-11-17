@@ -93,7 +93,7 @@ describe('loadTestFiles', () => {
 	test('returns an error pointing to compile when a folder has no test.yaml', async () => {
 		await inTempDir({ '.agents/tests/draft/TEST.md': 'No TODO.' }, () => {
 			expect(loadTestFiles()).toEqual([
-				{ path: pathOf('draft'), error: 'Missing test.yaml; run `agent-tests compile draft`' }
+				{ path: pathOf('draft'), error: 'Missing test.yaml; run `agentests compile draft`' }
 			]);
 		});
 	});
@@ -132,7 +132,7 @@ describe('loadDefinitions', () => {
 				`${pathOf('broken')}\n  assert.1.id: Duplicate assertion id\n  assert.0.grep: Invalid regular expression`
 			);
 			expect(message).toContain(
-				`${pathOf('draft')}\n  Missing test.yaml; run \`agent-tests compile draft\``
+				`${pathOf('draft')}\n  Missing test.yaml; run \`agentests compile draft\``
 			);
 			expect(message).not.toContain(pathOf('no-todo'));
 		});

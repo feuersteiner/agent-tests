@@ -10,7 +10,7 @@ import type { InitConfig } from './presets.ts';
 import { message } from '../../helpers/error.ts';
 
 /** The command the pre-commit hook runs; the package is pure Node, so `npx`. */
-const HOOK_COMMAND = 'npx agent-tests run --staged';
+const HOOK_COMMAND = 'npx agentests run --staged';
 
 /** The exit status Git uses for a fatal error, such as running outside a repository. */
 const GIT_FATAL = 128;
@@ -58,7 +58,7 @@ const writeHook = (): string => {
 	if (path === undefined) return 'Not a Git repository; skipped the pre-commit hook.';
 	if (existsSync(path))
 		return readFileSync(path, 'utf8').includes(HOOK_COMMAND)
-			? `${path} already runs agent-tests.`
+			? `${path} already runs agentests.`
 			: `${path} exists; left it alone. Add: ${HOOK_COMMAND}`;
 	mkdirSync(dirname(path), { recursive: true });
 	writeFileSync(path, `#!/bin/sh\n${HOOK_COMMAND}\n`, { flag: 'wx' });

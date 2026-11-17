@@ -19,11 +19,11 @@ export const WRITE_EVALS =
 
 /** Compile prompt. */
 export const toValidate = (id: string): string =>
-	`Run \`npx agent-tests validate ${id}\` until it exits 0.`;
+	`Run \`npx agentests validate ${id}\` until it exits 0.`;
 
 /** Compile prompt. */
 export const toEval = (id: string): string =>
-	`Run \`npx agent-tests eval ${id}\` until every eval matches. On a mismatch, fix \`test.yaml\` or an eval that contradicts the rule, never an expected outcome or the config just to match.`;
+	`Run \`npx agentests eval ${id}\` until every eval matches. On a mismatch, fix \`test.yaml\` or an eval that contradicts the rule, never an expected outcome or the config just to match.`;
 
 /** Compile prompt. */
 export const REPORT = 'Report what you wrote and what `test.yaml` cannot express.';
@@ -38,8 +38,8 @@ export const toReadFolder = (id: string): string =>
 
 /** Rule prompts. */
 export const toWriteTestMd = (id: string): string =>
-	`Write \`${toTestFolder(id)}/TEST.md\` (format below) with one rule. Each other rule is its own Test: run \`npx agent-tests compile\` again afterwards.`;
+	`Write \`${toTestFolder(id)}/TEST.md\` (format below) with one rule. Each other rule is its own Test: run \`npx agentests compile\` again afterwards.`;
 
 /** Rule prompts. */
 export const toCompile = (id: string): string =>
-	`Run \`npx agent-tests compile ${id}\` and follow the prompt it prints. Start your final report with the rule you wrote.`;
+	`Run \`npx agentests compile ${id}\` and follow the prompt it prints. Start your final report with the rule you wrote.`;

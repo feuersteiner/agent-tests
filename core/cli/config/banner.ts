@@ -1,4 +1,4 @@
-/** The agent-tests shield as pixel art: each half-block character is one square pixel. */
+/** The agentests shield as pixel art: each half-block character is one square pixel. */
 export const LOGO = `
    ▄▄▄████▄▄▄
 ████████████████
@@ -43,7 +43,7 @@ const shade = (lines: string[]): string[] => {
 export const banner = (columns = process.stdout.columns || 80): string => {
 	const width = Math.max(1, Math.floor(columns));
 	const shield = shade(LOGO.trimEnd().slice(1).split('\n'));
-	const title = shade(wordmark('AGENT TESTS'));
+	const title = shade(wordmark('AGENTESTS'));
 	let lines: string[];
 
 	if (width >= 16 + 3 + title[0]!.length + 4)
@@ -52,7 +52,7 @@ export const banner = (columns = process.stdout.columns || 80): string => {
 		const words =
 			title[0]!.length <= width
 				? title
-				: [...shade(wordmark('AGENT')), '', ...shade(wordmark('TESTS'))];
+				: [...shade(wordmark('AGEN')), '', ...shade(wordmark('TESTS'))];
 		lines = [...shield, '', ...words].map(
 			(line) =>
 				' '.repeat(Math.max(0, Math.floor((width - line.length) / 2))) + line.slice(0, width)

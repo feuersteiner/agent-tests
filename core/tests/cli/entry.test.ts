@@ -20,13 +20,13 @@ const PROJECT = {
 /** The finding `run` prints for `PROJECT`, proof that it got past building the engines. */
 const FINDING = 'src/a.ts  no-todo/no-todo  Remove the TODO.';
 
-describe('agent-tests entry', () => {
+describe('agentests entry', () => {
 	test('--help exits 0 and lists the six commands', async () => {
 		await inTempDir({}, (dir) => {
 			const result = runCli(['--help'], { cwd: dir });
 			expect(result.exitCode).toBe(0);
 			for (const name of ['init', 'compile', 'list', 'validate', 'eval', 'run'])
-				expect(result.stdout).toContain(`Usage: agent-tests ${name} `);
+				expect(result.stdout).toContain(`Usage: agentests ${name} `);
 		});
 	});
 

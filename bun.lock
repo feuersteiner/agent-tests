@@ -18,10 +18,10 @@
       },
     },
     "core": {
-      "name": "agent-tests",
+      "name": "agentests",
       "version": "0.8.0",
       "bin": {
-        "agent-tests": "./cli/index.ts",
+        "agentests": "./dist/cli/index.js",
       },
       "dependencies": {
         "@ai-sdk/anthropic": "4.0.96",
@@ -127,7 +127,7 @@
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
 
-    "agent-tests": ["agent-tests@workspace:core"],
+    "agentests": ["agentests@workspace:core"],
 
     "ai": ["ai@7.0.162", "", { "dependencies": { "@ai-sdk/gateway": "4.0.135", "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-NPzL6/GmjjPwhzM1kGP9O60TfJ3uXV4Z4A/ztljxcJFAmRAFAjgk5mAHaikk3sE8NQo4NbRCiS+DgHinE2d0sQ=="],
 

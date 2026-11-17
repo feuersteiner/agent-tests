@@ -21,7 +21,7 @@ const MATCHING = {
 	empty: { expect: 'skip' as const, files: { 'README.md': 'TODO\n' } }
 };
 
-describe('agent-tests eval', () => {
+describe('agentests eval', () => {
 	test('exits 0 and ends with the count line when every eval matches', async () => {
 		await inTempDir({ ...configFile(), ...testFolder(validTest(), MATCHING) }, (dir) => {
 			const result = runCli(['eval'], { cwd: dir, env: KEYS });
@@ -100,7 +100,7 @@ describe('agent-tests eval', () => {
 			files: testFolder(validTest(), MATCHING),
 			args: ['eval'],
 			env: KEYS,
-			message: 'Missing agent-tests.config.yaml'
+			message: 'Missing agentests.config.yaml'
 		},
 		{
 			name: 'a missing API key',

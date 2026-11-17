@@ -7,7 +7,7 @@ import { inTempDir } from '../helpers/temp.ts';
 
 /** The invalid line `list` prints for a Test folder that did not load. */
 const invalidLine = (folder: string): string =>
-	`${folder}  invalid; run \`agent-tests validate ${folder}\``;
+	`${folder}  invalid; run \`agentests validate ${folder}\``;
 
 /** Two valid Tests, one Test whose id differs from its folder, and one folder without a test.yaml. */
 const mixed = {

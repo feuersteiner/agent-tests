@@ -35,7 +35,7 @@ export interface AgentTestEvalFile {
 	error?: string;
 }
 
-/** agent-tests.config.yaml; both models are required even for Tests using only regexes. */
+/** agentests.config.yaml; both models are required even for Tests using only regexes. */
 export const AgentTestConfigSchema = z.strictObject({
 	ignore: z.array(TextSchema).default(['**/.git', '**/.agents', '**/node_modules']),
 	...EnginesConfigSchema.shape,

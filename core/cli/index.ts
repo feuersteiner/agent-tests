@@ -13,7 +13,7 @@ import { banner } from './config/banner.ts';
 if (existsSync('.env')) process.loadEnvFile('.env');
 
 await clinguini({
-	name: 'agent-tests',
+	name: 'agentests',
 	description: 'Reusable repository checks for lessons learned during agent sessions.',
 	commands: [initCommand, compileCommand, listCommand, validateCommand, evalCommand, runCommand],
 	utils: {

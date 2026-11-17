@@ -14,7 +14,7 @@ export const validateTest = (value: unknown): AgentTestDefinition => {
 		throw new Error(`version: Required as an integer, e.g. \`version: ${LATEST_VERSION}\``);
 	if (version > LATEST_VERSION)
 		throw new Error(
-			`version: ${version} is newer than this package supports (${LATEST_VERSION}); upgrade agent-tests`
+			`version: ${version} is newer than this package supports (${LATEST_VERSION}); upgrade agentests`
 		);
 	const result = AgentTestSchema.safeParse(value);
 	if (!result.success) throw new Error(describeIssues(result.error.issues).join('\n'));

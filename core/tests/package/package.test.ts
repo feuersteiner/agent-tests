@@ -71,7 +71,7 @@ describe('package.json', () => {
 	});
 
 	test('the built CLI entry starts with the node shebang', () => {
-		const entry = manifest.bin['agent-tests'] ?? '';
+		const entry = manifest.bin['agentests'] ?? '';
 		const firstLine = readFileSync(join(CORE, entry), 'utf8').split('\n')[0];
 		expect(firstLine).toBe('#!/usr/bin/env node');
 	});

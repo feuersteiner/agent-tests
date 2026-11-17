@@ -10,7 +10,7 @@ import { git, inTempRepo } from '../helpers/git.ts';
 import { inTempDir, writeFiles } from '../helpers/temp.ts';
 
 /** The command the written pre-commit hook runs. */
-const HOOK_COMMAND = 'npx agent-tests run --staged';
+const HOOK_COMMAND = 'npx agentests run --staged';
 
 /** The default hook path Git reports, relative to the repository root. */
 const HOOK = '.git/hooks/pre-commit';
@@ -18,7 +18,7 @@ const HOOK = '.git/hooks/pre-commit';
 /** Keeps the child's Git away from the developer's global and system config, such as a global core.hooksPath. */
 const GIT_ENV = { GIT_CONFIG_GLOBAL: devNull, GIT_CONFIG_NOSYSTEM: '1' };
 
-/** Runs `agent-tests init` with `args` in `dir`. */
+/** Runs `agentests init` with `args` in `dir`. */
 const init = (dir: string, args: string[] = [], env: Record<string, string> = {}) =>
 	runCli(['init', ...args], { cwd: dir, env: { ...GIT_ENV, ...env } });
 
@@ -37,12 +37,12 @@ const snapshot = (dir: string): Record<string, string> =>
 			})
 	);
 
-describe('agent-tests init', () => {
+describe('agentests init', () => {
 	test('creates the config, the Tests folder, and an executable pre-commit hook running the staged check', async () => {
 		await inTempRepo({}, (dir) => {
 			const result = init(dir);
 			expect(result.exitCode).toBe(0);
-			expect(existsSync(join(dir, 'agent-tests.config.yaml'))).toBe(true);
+			expect(existsSync(join(dir, 'agentests.config.yaml'))).toBe(true);
 			expect(statSync(join(dir, '.agents/tests')).isDirectory()).toBe(true);
 			expect(isExecutable(join(dir, HOOK))).toBe(true);
 			expect(readFileSync(join(dir, HOOK), 'utf8').split('\n')).toEqual([
@@ -51,7 +51,7 @@ describe('agent-tests init', () => {
 				''
 			]);
 			expect(result.lines).toEqual([
-				'Created agent-tests.config.yaml.',
+				'Created agentests.config.yaml.',
 				'Created .agents/tests/.',
 				`Created ${HOOK}.`,
 				'Set OPENAI_API_KEY in .env or the environment.'
@@ -62,7 +62,7 @@ describe('agent-tests init', () => {
 	test('the written config passes the loader', async () => {
 		await inTempRepo({}, (dir) => {
 			init(dir);
-			const config = parseConfig(readFileSync(join(dir, 'agent-tests.config.yaml'), 'utf8'));
+			const config = parseConfig(readFileSync(join(dir, 'agentests.config.yaml'), 'utf8'));
 			expect(config).toMatchObject({
 				decision: { api: 'openai', apiKeyEnv: 'OPENAI_API_KEY' },
 				reasoning: { api: 'openai', apiKeyEnv: 'OPENAI_API_KEY' },
@@ -83,7 +83,7 @@ describe('agent-tests init', () => {
 			await inTempRepo({}, (dir) => {
 				const result = init(dir, ['--decision', decision, '--reasoning', reasoning]);
 				expect(result.exitCode).toBe(0);
-				const config = parseConfig(readFileSync(join(dir, 'agent-tests.config.yaml'), 'utf8'));
+				const config = parseConfig(readFileSync(join(dir, 'agentests.config.yaml'), 'utf8'));
 				expect(config.decision).toMatchObject({ api: decision, apiKeyEnv: decisionKey });
 				expect(config.reasoning).toMatchObject({ api: reasoning, apiKeyEnv: reasoningKey });
 			});
@@ -99,7 +99,7 @@ describe('agent-tests init', () => {
 			const result = init(dir, args);
 			expect(result.exitCode).toBe(2);
 			expect(result.stderr).toContain(error);
-			expect(existsSync(join(dir, 'agent-tests.config.yaml'))).toBe(false);
+			expect(existsSync(join(dir, 'agentests.config.yaml'))).toBe(false);
 			expect(existsSync(join(dir, '.agents'))).toBe(false);
 			expect(existsSync(join(dir, HOOK))).toBe(false);
 		});
@@ -117,12 +117,12 @@ describe('agent-tests init', () => {
 	});
 
 	test('an existing config is left alone and the template for the chosen providers is printed', async () => {
-		await inTempRepo({ 'agent-tests.config.yaml': 'custom: true\n' }, (dir) => {
+		await inTempRepo({ 'agentests.config.yaml': 'custom: true\n' }, (dir) => {
 			const result = init(dir, ['--decision', 'jev', '--reasoning', 'anthropic']);
 			expect(result.exitCode).toBe(0);
-			expect(readFileSync(join(dir, 'agent-tests.config.yaml'), 'utf8')).toBe('custom: true\n');
+			expect(readFileSync(join(dir, 'agentests.config.yaml'), 'utf8')).toBe('custom: true\n');
 			expect(result.stdout).toContain(
-				'agent-tests.config.yaml exists; left it alone. Add what you need from:\n' +
+				'agentests.config.yaml exists; left it alone. Add what you need from:\n' +
 					toYaml(toConfig('jev', 'anthropic'))
 			);
 		});
@@ -145,7 +145,7 @@ describe('agent-tests init', () => {
 			const result = init(dir);
 			expect(result.exitCode).toBe(0);
 			expect(readFileSync(join(dir, HOOK), 'utf8')).toBe(hook);
-			expect(result.lines).toContain(`${HOOK} already runs agent-tests.`);
+			expect(result.lines).toContain(`${HOOK} already runs agentests.`);
 		});
 	});
 
@@ -165,7 +165,7 @@ describe('agent-tests init', () => {
 		await inTempDir({}, (dir) => {
 			const result = init(dir, [], { GIT_CEILING_DIRECTORIES: dirname(dir) });
 			expect(result.exitCode).toBe(0);
-			expect(existsSync(join(dir, 'agent-tests.config.yaml'))).toBe(true);
+			expect(existsSync(join(dir, 'agentests.config.yaml'))).toBe(true);
 			expect(statSync(join(dir, '.agents/tests')).isDirectory()).toBe(true);
 			expect(existsSync(join(dir, '.git'))).toBe(false);
 			expect(result.lines).toContain('Not a Git repository; skipped the pre-commit hook.');
@@ -187,7 +187,7 @@ describe('agent-tests init', () => {
 	);
 
 	test('the key reminder is printed only when the config was created', async () => {
-		await inTempRepo({ 'agent-tests.config.yaml': 'custom: true\n' }, (dir) => {
+		await inTempRepo({ 'agentests.config.yaml': 'custom: true\n' }, (dir) => {
 			const result = init(dir);
 			expect(result.exitCode).toBe(0);
 			expect(result.stdout).not.toContain('in .env or the environment.');

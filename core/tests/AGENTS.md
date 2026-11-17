@@ -64,7 +64,7 @@ await inTempRepo({ 'a.txt': 'a' }, (dir) => {
 - `validConfig = (overrides?: Partial<AgentTestConfig>): AgentTestConfig`: `.invalid` model URLs, thresholds 0.5, the loader's default `ignore`.
 - `validTest = (overrides?: Partial<AgentTestDefinition>): AgentTestDefinition`: id `no-todo`, select glob `src/**/*.ts`, one assertion `no-todo` with grep `TODO` and error `Remove the TODO.`.
 - `toYaml = (value: unknown): string`.
-- `configFile = (overrides?: Partial<AgentTestConfig>): Record<string, string>`: the file map holding `agent-tests.config.yaml`.
+- `configFile = (overrides?: Partial<AgentTestConfig>): Record<string, string>`: the file map holding `agentests.config.yaml`.
 - `testFolder = (test: AgentTestDefinition, evals?: Record<string, { expect: AgentTestOutcome; files: Record<string, string> }>, rule?: string): Record<string, string>`: the file map of `.agents/tests/<id>/`: `test.yaml`, `TEST.md` when `rule` is given, and each eval's `eval.yaml` and files.
 
 ```ts

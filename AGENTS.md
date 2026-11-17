@@ -2,7 +2,7 @@
 
 ## Layout
 
-- `core/`: the `agent-tests` npm package.
+- `core/`: the `agentests` npm package.
 - `docs/`: documentation plans and use cases.
 - `library/`: placeholder for the planned community library.
 - `.github/workflows/`: npm publishing.

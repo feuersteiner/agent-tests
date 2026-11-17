@@ -46,7 +46,7 @@ const todoLine = (path: string): string => `${path}  no-todo/todo-free  Remove t
 /** The finding line `no-fixme` reports for `path`. */
 const fixmeLine = (path: string): string => `${path}  no-fixme/fixme-free  Remove the FIXME.`;
 
-describe('agent-tests run', () => {
+describe('agentests run', () => {
 	test('exits 0 with no finding line when no source fails', async () => {
 		await inTempRepo({ ...setup, 'src/a.ts': 'export const a = 1;\n' }, (dir) => {
 			const result = runCli(['run'], { cwd: dir, env });
@@ -143,9 +143,7 @@ describe('agent-tests run', () => {
 		await inTempRepo(files, (dir) => {
 			const result = runCli(['run'], { cwd: dir, env });
 			expect(result.exitCode).toBe(2);
-			expect(result.stderr).toBe(
-				'Error: Missing agent-tests.config.yaml; run `agent-tests init`\n'
-			);
+			expect(result.stderr).toBe('Error: Missing agentests.config.yaml; run `agentests init`\n');
 		});
 	});
 

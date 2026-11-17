@@ -52,7 +52,7 @@ export const validTest = (overrides: Partial<AgentTestDefinition> = {}): AgentTe
 /** The value as YAML text. */
 export const toYaml = (value: unknown): string => stringify(value);
 
-/** The file map holding `agent-tests.config.yaml` for `validConfig(overrides)`. */
+/** The file map holding `agentests.config.yaml` for `validConfig(overrides)`. */
 export const configFile = (overrides: Partial<AgentTestConfig> = {}): Record<string, string> => ({
 	[CONFIG_PATH]: toYaml(validConfig(overrides))
 });

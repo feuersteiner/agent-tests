@@ -18,7 +18,7 @@ export const loadTestFiles = (id?: string): AgentTestFile[] => {
 		const path = join(directory, folder, 'test.yaml');
 		try {
 			const test = parseTest(
-				readFile(path, `Missing test.yaml; run \`agent-tests compile ${folder}\``)
+				readFile(path, `Missing test.yaml; run \`agentests compile ${folder}\``)
 			);
 			if (test.id !== folder) return { path, error: `id: Must match the folder name "${folder}"` };
 			return { path, test };

@@ -31,7 +31,7 @@ describe('compile command', () => {
 		await inTempDir(testFolder(validTest(), {}, RULE), (dir) => {
 			const { stdout } = runCli(['compile', 'no-todo'], { cwd: dir });
 			expect(stdout).toContain(RULE);
-			expect(stdout).toContain('# Compile the agent-tests Test `no-todo`');
+			expect(stdout).toContain('# Compile the agentests Test `no-todo`');
 			expect(stdout).toContain('`.agents/tests/no-todo/test.yaml`');
 		});
 	});
@@ -39,8 +39,8 @@ describe('compile command', () => {
 	test('the compile prompt names the validate and eval commands with npx, never bunx or bun run', async () => {
 		await inTempDir(testFolder(validTest(), {}, RULE), (dir) => {
 			const { stdout } = runCli(['compile', 'no-todo'], { cwd: dir });
-			expect(stdout).toContain('`npx agent-tests validate no-todo`');
-			expect(stdout).toContain('`npx agent-tests eval no-todo`');
+			expect(stdout).toContain('`npx agentests validate no-todo`');
+			expect(stdout).toContain('`npx agentests eval no-todo`');
 			expect(stdout).not.toContain('bunx');
 			expect(stdout).not.toContain('bun run');
 		});
@@ -151,29 +151,29 @@ describe('compile prompts', () => {
 
 	test('toCompilePrompt names the id and its validate and eval steps, numbered in order', () => {
 		const prompt = toCompilePrompt('user-text-french', RULE);
-		expect(prompt).toContain('# Compile the agent-tests Test `user-text-french`');
+		expect(prompt).toContain('# Compile the agentests Test `user-text-french`');
 		const steps = toStepLines(prompt);
 		expect(steps.map((line) => line.split('.')[0])).toEqual(['1', '2', '3', '4', '5', '6', '7']);
-		expect(steps[4]).toContain('`npx agent-tests validate user-text-french`');
-		expect(steps[5]).toContain('`npx agent-tests eval user-text-french`');
+		expect(steps[4]).toContain('`npx agentests validate user-text-french`');
+		expect(steps[5]).toContain('`npx agentests eval user-text-french`');
 	});
 
 	test('toRulePrompt names the id, its TEST.md, and the compile command for it', () => {
 		const prompt = toRulePrompt('user-text-french');
-		expect(prompt).toContain('# Write the rule of the agent-tests Test `user-text-french`');
+		expect(prompt).toContain('# Write the rule of the agentests Test `user-text-french`');
 		expect(prompt).toContain('`.agents/tests/user-text-french/TEST.md` is missing or blank');
 		const steps = toStepLines(prompt);
 		expect(steps.map((line) => line.split('.')[0])).toEqual(['1', '2', '3', '4', '5']);
-		expect(steps[4]).toContain('`npx agent-tests compile user-text-french`');
+		expect(steps[4]).toContain('`npx agentests compile user-text-french`');
 	});
 
 	test('NEW_TEST_PROMPT names a new Test with the <id> placeholder', () => {
-		expect(NEW_TEST_PROMPT).toContain('# Write the rule of a new agent-tests Test');
+		expect(NEW_TEST_PROMPT).toContain('# Write the rule of a new agentests Test');
 		const steps = toStepLines(NEW_TEST_PROMPT);
 		expect(steps.map((line) => line.split('.')[0])).toEqual(['1', '2', '3', '4', '5']);
 		expect(steps[2]).toContain('Choose an id, `<id>` below');
 		expect(steps[3]).toContain('`.agents/tests/<id>/TEST.md`');
-		expect(steps[4]).toContain('`npx agent-tests compile <id>`');
+		expect(steps[4]).toContain('`npx agentests compile <id>`');
 	});
 
 	const prompts: [string, string][] = [
@@ -183,7 +183,7 @@ describe('compile prompts', () => {
 	];
 
 	test.each(prompts)('%s says npx, never bunx or bun run', (_, prompt) => {
-		expect(prompt).toContain('npx agent-tests');
+		expect(prompt).toContain('npx agentests');
 		expect(prompt).not.toContain('bunx');
 		expect(prompt).not.toContain('bun run');
 	});

@@ -1,6 +1,6 @@
 import { TESTS_FOLDER, toTestFolder } from '../../config/paths.ts';
 
-const ABOUT = 'agent-tests checks a repository against rules stated in plain language.';
+const ABOUT = 'agentests checks a repository against rules stated in plain language.';
 
 const ROOT = 'Run commands from the repository root.';
 
@@ -17,7 +17,7 @@ export const toSteps = (steps: string[]): string =>
 /** Heading and job: `test.yaml` and evals from the rule. */
 export const toCompileIntro = (id: string): string =>
 	[
-		`# Compile the agent-tests Test \`${id}\``,
+		`# Compile the agentests Test \`${id}\``,
 		'',
 		`${ABOUT} Turn the rule below into \`${toTestFolder(id)}/test.yaml\` and evals that prove it. ${ROOT}`
 	].join('\n');
@@ -25,14 +25,14 @@ export const toCompileIntro = (id: string): string =>
 /** Heading and job: the missing `TEST.md` of a named Test. */
 export const toRuleIntro = (id: string): string =>
 	[
-		`# Write the rule of the agent-tests Test \`${id}\``,
+		`# Write the rule of the agentests Test \`${id}\``,
 		'',
 		`${ABOUT} \`${toTestFolder(id)}/TEST.md\` is missing or blank: write it from the person's request, then compile it. ${ROOT}`
 	].join('\n');
 
 /** Heading and job: name a Test, then write its `TEST.md`. */
 export const NEW_TEST_INTRO = [
-	'# Write the rule of a new agent-tests Test',
+	'# Write the rule of a new agentests Test',
 	'',
 	`${ABOUT} Each Test is a folder in \`${TESTS_FOLDER}/\` whose \`TEST.md\` states one rule. Write a new Test's \`TEST.md\` from the person's request, then compile it. ${ROOT}`
 ].join('\n');
@@ -51,7 +51,7 @@ export const toQuote = (id: string, rule: string): string => {
 
 /** The config and keys the commands need, and who supplies them. */
 export const LIMITS =
-	'Leave `TEST.md` as it is. If the config is missing, ask the person to run `npx agent-tests init`. `eval` needs the API keys the config names, even for a Test using only `glob` and `grep`; ask the person for a missing one.';
+	'Leave `TEST.md` as it is. If the config is missing, ask the person to run `npx agentests init`. `eval` needs the API keys the config names, even for a Test using only `glob` and `grep`; ask the person for a missing one.';
 
 /** Its fields, YAML quoting, the regular expression dialect, and glob wildcards. */
 export const FIELDS = [
