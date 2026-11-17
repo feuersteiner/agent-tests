@@ -1,6 +1,6 @@
 {
 	"name": "agentests",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Linting for intelligence: plain-language rules compiled into engineered checks and proved on your own evals.",
 	"keywords": [
 		"ai-native",
