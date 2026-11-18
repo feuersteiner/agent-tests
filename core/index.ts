@@ -13,8 +13,15 @@ export {
 	parseTest,
 	validateConfig,
 	validateEval,
-	validateTest
+	validateTest,
+	SECURITY_PATH,
+	LOCAL_HOSTS,
+	loadSecurityPolicy,
+	parseSecurityPolicy,
+	validateSecurityPolicy
 } from './src/loader/index.ts';
+export { ProbeOrchestrator, RUN_HEADER, TEST_HEADER } from './src/probe/index.ts';
+export { PROTECTED_DEFENSES, startMockApi } from './src/mock/index.ts';
 export { createEngines } from './src/engines/index.ts';
 export { ScopeOrchestrator } from './src/scope/index.ts';
 export { SelectOrchestrator } from './src/select/index.ts';

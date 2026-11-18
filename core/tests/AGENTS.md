@@ -2,13 +2,13 @@
 
 ## Layout
 
-- One folder per `src/` folder (`loader/`, `engines/`, `sources/`, `scope/`, `select/`, `assert/`, `eval/`), plus `cli/` for the commands, `agentests/` for `Agentests`, `package/` for the public exports and the Node-only rule, and `helpers/` for the shared helpers below.
+- One folder per `src/` folder (`loader/`, `engines/`, `sources/`, `scope/`, `select/`, `assert/`, `eval/`), `security/` for `probe/`, `mock/`, and the security policy loader, plus `cli/` for the commands, `agentests/` for `Agentests`, `package/` for the public exports and the Node-only rule, and `helpers/` for the shared helpers below.
 - `models/`: a fixture repository of real Tests for the owner's paid model runs, not a suite; see its `AGENTS.md`.
 - Test files are kebab-case `*.test.ts`; no snapshot files.
 
 ## Rules
 
-- Never reach a model or any network: stub `decide` and `reason` with `stubEngines` or `StubAgentests`.
+- Never reach a model or any network: stub `decide` and `reason` with `stubEngines` or `StubAgentests`. Security tests talk only to a mock API on 127.0.0.1 (`startMockApi` on port 0, or `security mock --port 0` in a child process for CLI tests, since `runCli` blocks this one), or to a scripted `fetch`.
 - Never read `process.env` or the root `.env`; pass explicit environment maps such as `ENV`.
 - Temporary files and repositories live under the OS temp directory, never in the repository; clean up even on failure, through `inTempDir` and `inTempRepo`.
 - Always restore the working directory after changing it.
@@ -98,3 +98,8 @@ await expect(tests.run({ kind: 'all' })).rejects.toThrow('reason is not stubbed'
 const result = runCli(['list'], { cwd: dir });
 expect(result.lines).toEqual(['no-todo  No TODO']);
 ```
+
+`security.ts`
+
+- `rawPolicy = (url?: string, overrides?: Record<string, unknown>)`: an unvalidated security policy with one 30-request rate-limit Test against `<url>/v1/complete` and detection at `<url>/v1/security/events`.
+- `policyWith = (url: string, tests: unknown[], max?: number): AgentTestSecurityPolicy`: `rawPolicy` with these Tests and budget, validated.

@@ -1,0 +1,49 @@
+# Model extraction protection for the mock API that `agentests security mock` serves.
+# Thresholds are set for the mock's defenses; set your own for your API.
+version: 1
+name: model-extraction-protection
+
+target:
+  url: http://127.0.0.1:4010/v1/complete
+  environment: test
+  body:
+    prompt: '{{prompt}}'
+  detection:
+    url: http://127.0.0.1:4010/v1/security/events
+    wait_ms: 1000
+
+tests:
+  - id: extraction-rate-limit
+    description: A burst of varied prompts from one key is throttled.
+    scenario: sustained-query-volume
+    requests: 60
+    duration_seconds: 1
+    headers:
+      authorization: Bearer test-key-volume
+    expect:
+      rate_limit_enforced: true
+
+  - id: extraction-alerting
+    description: A templated grid of probes raises a detection event, even below the rate limit.
+    scenario: systematic-query-pattern
+    requests: 40
+    duration_seconds: 4
+    headers:
+      authorization: Bearer test-key-pattern
+    expect:
+      rate_limit_enforced: false
+      detection_event: true
+
+  - id: extraction-quota
+    description: A key that exhausts its quota stays blocked.
+    scenario: quota-exhaustion
+    requests: 80
+    duration_seconds: 8
+    headers:
+      authorization: Bearer test-key-quota
+    expect:
+      quota_enforced: true
+
+safety:
+  max_requests: 200
+  allow_production: false

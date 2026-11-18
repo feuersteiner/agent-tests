@@ -1,0 +1,33 @@
+# .github/workflows/security.yml: fail the pull request when an extraction defense regresses.
+# Start your API (or a staging copy) inside the job; the runner refuses non-local hosts not in safety.allowed_hosts.
+name: Security policies
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  extraction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      # Replace with your API; the mock stands in for it here.
+      - name: Start the API under test
+        run: |
+          npx agentests security mock --port 4010 &
+          for i in $(seq 20); do curl -s http://127.0.0.1:4010/v1/security/events && break; sleep 0.5; done
+      # Exit 1 fails the job when a policy regresses; exit 2 when the target is unreachable or unauthorized.
+      - name: Run the security policy
+        env: # for ${API_KEY} references in the policy's headers
+          API_KEY: ${{ secrets.TEST_API_KEY }}
+        run: npx agentests security run --json > security-report.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.json

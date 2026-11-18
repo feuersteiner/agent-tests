@@ -5,6 +5,7 @@ import { SelectConfigSchema, SelectSchema } from '../select/types.ts';
 import { AssertConfigSchema, AssertSchema } from '../assert/types.ts';
 import { OutcomeSchema } from '../eval/types.ts';
 import type { AgentTestEvalDefinition } from '../eval/types.ts';
+import { SafetySchema, SecurityTestSchema, TargetSchema } from '../probe/types.ts';
 
 /** test.yaml at `version: 1`; optional fields have no implicit defaults. */
 export const AgentTestSchema = z.strictObject({
@@ -43,3 +44,13 @@ export const AgentTestConfigSchema = z.strictObject({
 	assert: AssertConfigSchema
 });
 export type AgentTestConfig = z.infer<typeof AgentTestConfigSchema>;
+
+/** agentests.security.yaml at `version: 1`: one target, its security Tests, and the safety limits that bound them. */
+export const AgentTestSecurityPolicySchema = z.strictObject({
+	version: z.literal(1),
+	name: IdSchema,
+	target: TargetSchema,
+	tests: z.array(SecurityTestSchema).min(1),
+	safety: SafetySchema
+});
+export type AgentTestSecurityPolicy = z.infer<typeof AgentTestSecurityPolicySchema>;

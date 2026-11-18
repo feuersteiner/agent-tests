@@ -135,6 +135,22 @@ emails/launch.md  brand-voice/no-guarantees  Describe the typical result, or lin
 Replace the line with `Most teams see results within a month.` and the commit goes through. The
 decision now reaches every commit. `npx agentests run` checks the whole repository.
 
+## Security policies
+
+`agentests security` tests an AI API's defenses against model extraction. A policy
+sends bounded, deterministic attack traffic to a local or explicitly authorized
+endpoint, then checks that the rate limits, quotas, and detection events still fire.
+CI fails when one of them regresses.
+
+```sh
+npx agentests security validate   # check agentests.security.yaml without sending anything
+npx agentests security run        # exit 0 pass, 1 regression, 2 error
+npx agentests security mock       # a local mock AI API; --disable rate-limit to see a FAIL
+```
+
+See [examples/security](examples/security) for the policy format, a demo, and a
+GitHub Actions workflow.
+
 ## Why?
 
 - **Engineered, not vibes.** "Is this on brand?" cannot be grepped and is too broad to ask a model
