@@ -1,0 +1,13 @@
+version: 1
+id: hand-copy-payment-error-says-charged
+title: Payment errors say whether money was taken
+description: A payment error says whether money was taken.
+select:
+  glob: content/errors/**/*.md
+assert:
+  - id: says-charged
+    description: A payment error says whether money was taken.
+    error: Say whether money was taken, or that you do not know yet.
+    decide: The message states explicitly whether the customer was charged, or
+      states explicitly that this is not yet known. Saying only that the payment
+      failed or was declined does not count.

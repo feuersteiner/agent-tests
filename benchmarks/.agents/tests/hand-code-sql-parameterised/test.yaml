@@ -1,0 +1,13 @@
+version: 1
+id: hand-code-sql-parameterised
+title: SQL values are parameters
+description: SQL values are passed as parameters.
+select:
+  glob: src/**/*.ts
+assert:
+  - id: parameterised-sql
+    description: SQL values are passed as parameters.
+    error: Use a placeholder and pass the value as a parameter.
+    decide: No SQL query text is built by inserting a runtime value into it through
+      concatenation or interpolation; every runtime value is passed as a query
+      parameter.

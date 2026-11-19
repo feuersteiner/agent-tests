@@ -1,0 +1,13 @@
+version: 1
+id: hand-config-actions-pinned
+title: GitHub Actions are pinned to a commit
+description: Actions from other repositories are pinned to a full SHA.
+select:
+  glob: .github/workflows/*.yml
+assert:
+  - id: actions-pinned
+    description: Actions from other repositories are pinned to a full SHA.
+    error: Pin the action to a full commit SHA.
+    decide: Every `uses:` entry that references an action or workflow in another
+      repository pins it to a full 40-character commit SHA. Entries that start
+      with `./` are exempt.

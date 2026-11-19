@@ -1,0 +1,12 @@
+version: 1
+id: hand-docs-deprecation-names-replacement
+title: Deprecations name a replacement
+description: A deprecation notice names what to use instead.
+select:
+  glob: docs/**/*.md
+assert:
+  - id: names-replacement
+    description: A deprecation notice names what to use instead.
+    error: Name what to use instead.
+    decide: Every deprecation notice in the document names the specific thing to use
+      instead. A document with no deprecation notice passes.

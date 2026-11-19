@@ -1,0 +1,13 @@
+version: 1
+id: hand-config-docker-pinned-base
+title: Docker base images are pinned
+description: Base images name a version or a digest.
+select:
+  glob: "**/Dockerfile"
+assert:
+  - id: pinned-base-image
+    description: Base images name a version or a digest.
+    error: Name a version tag or a digest.
+    decide: Every `FROM` line that pulls an image from a registry names a version
+      tag other than `latest`, or a digest. `FROM scratch` and a `FROM` that
+      names an earlier build stage are exempt.

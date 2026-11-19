@@ -1,0 +1,14 @@
+version: 1
+id: hand-copy-no-result-promise
+title: No promise of a result
+description: Copy promises no result.
+select:
+  glob: content/**/*.md
+assert:
+  - id: no-result-promise
+    description: Copy promises no result.
+    error: Describe the typical result, or link the terms.
+    decide: The text makes no promise about the results the customer will achieve by
+      using the product. A refund commitment or a service-level commitment is
+      not such a promise, and neither is a report of what other customers
+      achieved.

@@ -1,0 +1,6 @@
+{
+  "notifications.email": "Recevoir un e-mail à chaque déploiement",
+  "notifications.weekend": "Ne pas me déranger le week-end",
+  "notifications.digest": "Un résumé par semaine",
+  "notifications.saved": "Préférences enregistrées"
+}

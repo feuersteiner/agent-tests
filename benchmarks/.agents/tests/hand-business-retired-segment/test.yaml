@@ -1,0 +1,13 @@
+version: 1
+id: hand-business-retired-segment
+title: No spend on the retired education segment
+description: Plans commit nothing to the education segment.
+select:
+  glob: plans/**/*.md
+assert:
+  - id: no-education-spend
+    description: Plans commit nothing to the education segment.
+    error: Remove the education spend, or move it to a current segment.
+    decide: The plan commits no budget, headcount or campaign to the education
+      segment, meaning selling to schools, universities and other education
+      customers, which the company has exited.

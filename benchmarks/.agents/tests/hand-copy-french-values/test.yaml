@@ -1,0 +1,13 @@
+version: 1
+id: hand-copy-french-values
+title: French locale is in French
+description: French locale values are in French.
+select:
+  glob: locales/fr/**/*.json
+assert:
+  - id: french-values
+    description: French locale values are in French.
+    error: Translate the value into French.
+    decide: Every text value in the file is written in French. Product names,
+      placeholders in braces and URLs may stay unchanged, and keys may be in any
+      language.

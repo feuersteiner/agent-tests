@@ -1,0 +1,9 @@
+{
+  "session.welcome": "Bon retour, {name} !",
+  "session.signed_out": "Vous êtes déconnecté.",
+  "session.sign_in": "Se connecter",
+  "session.expired": "Your session has expired. Please sign in again.",
+  "session.remember": "Se souvenir de moi",
+  "session.forgot": "Mot de passe oublié ?",
+  "session.sso": "Continuer avec l'authentification unique"
+}

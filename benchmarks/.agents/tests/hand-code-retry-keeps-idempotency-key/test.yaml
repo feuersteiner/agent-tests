@@ -1,0 +1,12 @@
+version: 1
+id: hand-code-retry-keeps-idempotency-key
+title: Payment retries keep the idempotency key
+description: A retried payment keeps its idempotency key.
+select:
+  glob: src/**/*.ts
+assert:
+  - id: same-idempotency-key
+    description: A retried payment keeps its idempotency key.
+    error: Create the idempotency key once, before the first attempt.
+    decide: Every retry of a payment request sends the same idempotency key as the
+      first attempt.

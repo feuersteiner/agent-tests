@@ -1,0 +1,12 @@
+version: 1
+id: hand-code-errors-hide-internals
+title: Error responses hide internals
+description: Responses carry no stack trace, database error or server path.
+select:
+  glob: src/**/*.ts
+assert:
+  - id: no-internals-in-responses
+    description: Responses carry no stack trace, database error or server path.
+    error: Log the detail on the server and send a generic message.
+    decide: No response sent to the client includes a stack trace, a raw database
+      error message or a server file path.

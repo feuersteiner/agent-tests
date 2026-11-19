@@ -1,0 +1,6 @@
+{
+  "settings.title": "Settings",
+  "settings.save": "Enregistrer les modifications",
+  "settings.delete": "Supprimer le compte",
+  "settings.delete_warning": "Cette action est irréversible."
+}

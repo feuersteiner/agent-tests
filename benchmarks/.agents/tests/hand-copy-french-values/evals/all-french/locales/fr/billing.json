@@ -1,0 +1,7 @@
+{
+  "billing.title": "Facturation",
+  "billing.next_invoice": "Votre prochaine facture sera émise le {date}.",
+  "billing.seats": "{count} sièges utilisés sur {total}",
+  "billing.upgrade": "Passer à Relay Pro",
+  "billing.help": "Une question ? Écrivez-nous sur https://example.com/contact"
+}

@@ -1,0 +1,13 @@
+version: 1
+id: hand-docs-no-private-addresses
+title: No private addresses in public docs
+description: Docs show no private address or internal hostname.
+select:
+  glob: docs/**/*.md
+assert:
+  - id: no-private-addresses
+    description: Docs show no private address or internal hostname.
+    error: Use an address from 192.0.2.0/24 or a name under example.com.
+    decide: The document contains no private IPv4 address, meaning one inside
+      10.0.0.0/8, 172.16.0.0/12 or 192.168.0.0/16, and no hostname that ends in
+      .internal or .corp.

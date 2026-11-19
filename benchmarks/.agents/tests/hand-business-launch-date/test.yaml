@@ -1,0 +1,12 @@
+version: 1
+id: hand-business-launch-date
+title: No promise of Atlas before September 2026
+description: Sales documents promise Atlas no earlier than September 2026.
+select:
+  glob: sales/**/*.md
+assert:
+  - id: launch-date
+    description: Sales documents promise Atlas no earlier than September 2026.
+    error: Give September 2026 as the Atlas date.
+    decide: The document does not say or promise that Atlas will be available before
+      September 2026.

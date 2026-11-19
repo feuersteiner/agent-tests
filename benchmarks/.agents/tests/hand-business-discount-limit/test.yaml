@@ -1,0 +1,12 @@
+version: 1
+id: hand-business-discount-limit
+title: No discount above 20%
+description: No proposal discounts more than 20%.
+select:
+  glob: proposals/**/*.md
+assert:
+  - id: discount-limit
+    description: No proposal discounts more than 20%.
+    error: Bring the discount down to 20% or less, or get finance to sign off.
+    decide: The proposal offers the customer no discount greater than 20% of the
+      list price.

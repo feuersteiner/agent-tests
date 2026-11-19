@@ -1,0 +1,12 @@
+version: 1
+id: hand-docs-changelog-breaking-marked
+title: Breaking changes are marked
+description: Removals and renames are marked BREAKING.
+select:
+  glob: "**/CHANGELOG.md"
+assert:
+  - id: breaking-marked
+    description: Removals and renames are marked BREAKING.
+    error: Mark the entry BREAKING.
+    decide: Every changelog entry that removes or renames a function, option, flag
+      or command that users call is marked with the word BREAKING.

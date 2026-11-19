@@ -1,0 +1,13 @@
+version: 1
+id: hand-docs-destructive-command-warning
+title: Destructive commands carry a warning
+description: Destructive commands are warned about.
+select:
+  glob: docs/**/*.md
+assert:
+  - id: destructive-warning
+    description: Destructive commands are warned about.
+    error: Add a warning that the command cannot be undone.
+    decide: Every command in the document that permanently deletes data is
+      accompanied by a warning that it cannot be undone. A document with no such
+      command passes.

@@ -1,0 +1,11 @@
+version: 1
+id: hand-copy-no-reader-blame
+title: Never blame the reader
+description: Emails never blame the reader.
+select:
+  glob: emails/**/*.md
+assert:
+  - id: no-blame
+    description: Emails never blame the reader.
+    error: Say what happened and what to do next.
+    decide: The text does not tell the reader that the reader made a mistake.

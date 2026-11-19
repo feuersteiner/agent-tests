@@ -1,0 +1,11 @@
+version: 1
+id: hand-code-no-personal-data-in-logs
+title: No personal data in logs
+description: Logs hold no email address, name or card number.
+select:
+  glob: src/**/*.ts
+assert:
+  - id: no-personal-data-in-logs
+    description: Logs hold no email address, name or card number.
+    error: Log the internal id instead.
+    decide: No log statement writes an email address, a person's name or a card number.
