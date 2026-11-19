@@ -16,3 +16,8 @@ core/LICENSE
 
 # Model accuracy fixture samples, with deliberate violations
 core/tests/models/.agents/
+
+# Benchmark samples, with deliberate violations, and generated run folders
+benchmarks/.agents/
+benchmarks/results/
+benchmarks/licences/

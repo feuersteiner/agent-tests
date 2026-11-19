@@ -13,7 +13,7 @@ const sourceFiles = ['**/*.{js,mjs,cjs,ts,mts,cts,svelte}'];
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
-	globalIgnores(['**/build/**', '**/dist/**', 'core/tests/models/.agents/']),
+	globalIgnores(['**/build/**', '**/dist/**', 'core/tests/models/.agents/', 'benchmarks/.agents/']),
 	js.configs.recommended,
 	ts.configs.recommended,
 	svelte.configs.recommended,

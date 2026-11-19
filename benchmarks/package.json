@@ -1,0 +1,23 @@
+{
+	"name": "agentests-benchmarks",
+	"private": true,
+	"type": "module",
+	"license": "MIT",
+	"scripts": {
+		"check": "tsc --noEmit",
+		"test": "bun test ./tests",
+		"dataset": "bun cli/dataset.ts",
+		"bench": "bun --env-file=../.env cli/run.ts",
+		"bench:dry": "bun cli/run.ts --dry-run",
+		"report": "bun cli/report.ts",
+		"import:eslint": "bun cli/import-eslint.ts"
+	},
+	"dependencies": {
+		"yaml": "2.9.1",
+		"zod": "^4.6.7"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"typescript": "^6.0.3"
+	}
+}

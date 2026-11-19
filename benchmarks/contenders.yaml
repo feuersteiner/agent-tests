@@ -1,0 +1,28 @@
+# The decision models the benchmark compares. `price` is per million tokens; leave a value null
+# until you have read it from the provider's price page, and the report leaves cost out.
+threshold: 0.5
+contenders:
+  - id: gpt-6-luna
+    label: OpenAI gpt-6-luna
+    decision:
+      api: openai
+      url: https://api.openai.com/v1
+      model: gpt-6-luna
+      apiKeyEnv: OPENAI_API_KEY
+    price:
+      currency: USD
+      inputPerMillion: null
+      outputPerMillion: null
+      asOf: null
+  - id: jev
+    label: Jev by typesafe.ai
+    decision:
+      api: jev
+      url: https://api.typesafe.ai/v1
+      model: jev-latest
+      apiKeyEnv: TYPESAFE_AI_API_KEY
+    price:
+      currency: USD
+      inputPerMillion: null
+      outputPerMillion: null
+      asOf: null
