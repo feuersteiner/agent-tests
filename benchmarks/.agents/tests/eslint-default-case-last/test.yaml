@@ -1,0 +1,12 @@
+version: 1
+id: eslint-default-case-last
+title: Default clause last
+description: In a switch statement, the default clause comes last.
+select:
+  glob: src/**/*.js
+assert:
+  - id: default-case-last
+    description: In a switch statement, the default clause comes last.
+    error: Move the default clause to the end of the switch statement.
+    decide: In every switch statement that has a default clause, the default clause
+      is the last clause.

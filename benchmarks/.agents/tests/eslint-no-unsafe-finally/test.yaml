@@ -1,0 +1,14 @@
+version: 1
+id: eslint-no-unsafe-finally
+title: No control flow out of finally
+description: A `finally` block never returns, throws, breaks or continues its way out.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-unsafe-finally
+    description: A `finally` block never returns, throws, breaks or continues its way out.
+    error: Move the statement out of the finally block.
+    decide: No `finally` block contains a `return`, `throw`, `break` or `continue`
+      that leaves the `finally` block itself. One inside a function nested in
+      the block does not count, and neither does a `break` or `continue` whose
+      loop, switch or label is itself inside the block.

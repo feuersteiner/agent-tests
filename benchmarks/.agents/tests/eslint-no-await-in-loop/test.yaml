@@ -1,0 +1,19 @@
+version: 1
+id: eslint-no-await-in-loop
+title: No await in a loop
+description: Code does not await on each turn of a loop. Awaiting once in the
+  part of a loop header that runs a single time is fine, and so is the body of a
+  `for await` loop.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-await-in-loop
+    description: Code does not await on each turn of a loop. Awaiting once in the
+      part of a loop header that runs a single time is fine, and so is the body
+      of a `for await` loop.
+    error: Collect the promises and await them together, outside the loop.
+    decide: "No `await` runs on each iteration of a loop: none appears in a loop
+      body, a loop test, or a loop update expression. An `await` does not count
+      when it is inside a function or class nested in the loop, in the part of a
+      loop header that runs only once, or directly in the body of a `for await`
+      loop."

@@ -1,0 +1,16 @@
+version: 1
+id: eslint-no-fallthrough
+title: No silent fallthrough
+description: A `case` that has statements does not fall through to the next
+  clause, unless a comment says `falls through`.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-fallthrough
+    description: A `case` that has statements does not fall through to the next
+      clause, unless a comment says `falls through`.
+    error: End the case with break, or add a falls-through comment.
+    decide: No `case` clause that contains statements lets execution fall through
+      into the next clause, unless a comment that says "falls through" or "fall
+      through" sits directly before that next clause. A `case` with no
+      statements may fall through.

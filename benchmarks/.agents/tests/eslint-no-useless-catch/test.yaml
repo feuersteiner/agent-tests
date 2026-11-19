@@ -1,0 +1,12 @@
+version: 1
+id: eslint-no-useless-catch
+title: No catch that only rethrows
+description: A `catch` clause does more than rethrow the error it caught.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-useless-catch
+    description: A `catch` clause does more than rethrow the error it caught.
+    error: Remove the try and catch, or handle the error.
+    decide: No `catch` clause consists of nothing but a statement that rethrows the
+      very error it caught.

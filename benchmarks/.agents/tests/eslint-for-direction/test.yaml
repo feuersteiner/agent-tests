@@ -1,0 +1,13 @@
+version: 1
+id: eslint-for-direction
+title: For loops count the right way
+description: A `for` loop moves its counter towards its stop condition, not away from it.
+select:
+  glob: src/**/*.js
+assert:
+  - id: for-direction
+    description: A `for` loop moves its counter towards its stop condition, not away
+      from it.
+    error: Reverse the update or the comparison.
+    decide: No `for` loop changes its counter in the direction that moves it away
+      from the bound its `<`, `<=`, `>` or `>=` test compares it with.

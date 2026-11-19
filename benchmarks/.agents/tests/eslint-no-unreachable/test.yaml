@@ -1,0 +1,13 @@
+version: 1
+id: eslint-no-unreachable
+title: No unreachable code
+description: No statement sits where execution can never reach it.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-unreachable
+    description: No statement sits where execution can never reach it.
+    error: Remove the unreachable code.
+    decide: "No statement is unreachable: none follows a `return`, `throw`, `break`
+      or `continue` that always runs before it. Function declarations and `var`
+      declarations without a value do not count."

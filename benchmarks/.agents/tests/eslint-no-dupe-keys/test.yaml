@@ -1,0 +1,14 @@
+version: 1
+id: eslint-no-dupe-keys
+title: No duplicate keys
+description: An object literal never defines the same key twice.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-dupe-keys
+    description: An object literal never defines the same key twice.
+    error: Remove or rename the duplicate key.
+    decide: No object literal defines the same property name twice at the same
+      level, where two keys are the same when they name the same property once
+      converted to a string. Computed keys and keys of nested objects do not
+      count.

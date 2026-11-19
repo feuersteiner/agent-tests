@@ -1,0 +1,14 @@
+version: 1
+id: eslint-getter-return
+title: Getters return a value
+description: A property getter always returns a value.
+select:
+  glob: src/**/*.js
+assert:
+  - id: getter-return
+    description: A property getter always returns a value.
+    error: Return a value from the getter.
+    decide: Every property getter returns a value on every path through it. A getter
+      is a `get` accessor of an object or class, or a `get` function in a
+      property descriptor passed to Object.defineProperty,
+      Object.defineProperties, Reflect.defineProperty or Object.create.

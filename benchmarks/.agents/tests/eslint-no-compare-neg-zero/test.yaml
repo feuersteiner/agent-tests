@@ -1,0 +1,11 @@
+version: 1
+id: eslint-no-compare-neg-zero
+title: No comparison with negative zero
+description: Code never compares a value with `-0`.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-compare-neg-zero
+    description: Code never compares a value with `-0`.
+    error: Use Object.is(x, -0) to test for negative zero.
+    decide: The code never compares a value with negative zero, written `-0`.

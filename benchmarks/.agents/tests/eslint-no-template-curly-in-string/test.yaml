@@ -1,0 +1,15 @@
+version: 1
+id: eslint-no-template-curly-in-string
+title: No template placeholder in a plain string
+description: A `${...}` placeholder only appears in a template literal, never in
+  a quoted string.
+select:
+  glob: src/**/*.js
+assert:
+  - id: no-template-curly-in-string
+    description: A `${...}` placeholder only appears in a template literal, never in
+      a quoted string.
+    error: Use backticks, or remove the placeholder.
+    decide: No string written with single or double quotes contains a `${...}`
+      placeholder; such placeholders appear only inside template literals
+      written with backticks.

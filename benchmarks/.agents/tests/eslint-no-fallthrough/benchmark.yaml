@@ -1,0 +1,6 @@
+tier: linter
+category: code
+source: ESLint rule tests, tests/lib/rules/no-fallthrough.js
+licence: MIT
+url: https://github.com/eslint/eslint/blob/48207902fccd37450823b8fd07736d84449ec8e7/tests/lib/rules/no-fallthrough.js
+commit: 48207902fccd37450823b8fd07736d84449ec8e7
